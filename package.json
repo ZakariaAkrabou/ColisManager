@@ -16,10 +16,16 @@
     "@tauri-apps/plugin-fs": "^2.5.1",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-sql": "^2.4.0",
+    "countries-list": "^3.3.0",
+    "country-list-with-dial-code-and-flag": "^5.1.1",
     "flag-icons": "^7.5.0",
     "lucide-react": "^1.16.0",
     "react": "^19.1.0",
+    "react-country-flag": "^3.1.0",
     "react-dom": "^19.1.0",
+    "react-select": "^5.10.2",
+    "sweetalert2": "^11.26.24",
+    "sweetalert2-react-content": "^5.1.2",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {

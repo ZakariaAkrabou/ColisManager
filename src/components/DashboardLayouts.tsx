@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import Dashboard from '../pages/Dashboard/Dashboard';
+import Location from '../pages/Locations/location';
 
 interface DashboardLayoutProps {
   children?: React.ReactNode;
@@ -51,10 +53,16 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
         <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         <div className="flex-1 p-4 md:p-6 overflow-y-auto">
           {children || (
-            <div className="p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
-              <p className="text-gray-500">This is the placeholder content for the {activeItem} page.</p>
-            </div>
+            activeItem === 'dashboard' ? (
+              <Dashboard />
+            ) : activeItem === 'locations' ? (
+              <Location />
+            ) : (
+              <div className="p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
+                <p className="text-gray-500">This is the placeholder content for the {activeItem} page.</p>
+              </div>
+            )
           )}
         </div>
       </main>
