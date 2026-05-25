@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import ClientsPage from '../pages/Clients/Clients';
+import SettingsPage from '../pages/Settings/Settings';
+import ReportsPage from '../pages/reports/reports';
 import Dashboard from '../pages/Dashboard/Dashboard';
-import Location from '../pages/Locations/location';
 
 interface DashboardLayoutProps {
   children?: React.ReactNode;
@@ -10,7 +12,7 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayouts({ children }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeItem, setActiveItem] = useState('dashboard');
+  const [activeItem, setActiveItem] = useState('clients');
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -51,18 +53,23 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
       />
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+        <div className="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-50/50">
           {children || (
-            activeItem === 'dashboard' ? (
+            activeItem === 'clients' ? (
+              <ClientsPage />
+            ) : activeItem === 'settings' ? (
+              <SettingsPage />
+            )  : activeItem === 'dashboard' ? (
               <Dashboard />
-            ) : activeItem === 'locations' ? (
-              <Location />
+            ) :
+            (activeItem === 'reports' ? (
+              <ReportsPage />
             ) : (
               <div className="p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
                 <p className="text-gray-500">This is the placeholder content for the {activeItem} page.</p>
               </div>
-            )
+            ))
           )}
         </div>
       </main>
