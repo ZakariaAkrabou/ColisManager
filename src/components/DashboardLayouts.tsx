@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import ClientsPage from '../pages/Clients/Clients';
+import SettingsPage from '../pages/Settings/Settings';
+import ReportsPage from '../pages/reports/reports';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import Location from '../pages/Locations/location';
 import Colis from '../pages/Colis/colis';
@@ -12,10 +15,10 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayouts({ children }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeItem, setActiveItem] = useState('dashboard');
+  const [activeItem, setActiveItem] = useState('clients');
   const [isMobile, setIsMobile] = useState(false);
 
-  // Shared state: new colis items added from the add-colis page
+  
   const [pendingColis, setPendingColis] = useState<any | null>(null);
 
   useEffect(() => {
@@ -34,12 +37,12 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Navigation helper exposed to child pages
+ 
   const navigateTo = useCallback((page: string) => {
     setActiveItem(page);
   }, []);
 
-  // Called by AddColisPage when user saves a new colis
+  
   const handleAddColisSave = useCallback((newColis: any) => {
     setPendingColis(newColis);
   }, []);
@@ -47,7 +50,6 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50 text-gray-800 font-sans relative">
       
-      {/* Mobile Overlay */}
       {isMobile && isSidebarOpen && (
         <div 
           className="fixed inset-0 bg-black/40 z-40 transition-opacity"
@@ -66,10 +68,17 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
       />
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+        <div className="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-50/50">
           {children || (
-            activeItem === 'dashboard' ? (
+            activeItem === 'clients' ? (
+              <ClientsPage />
+            ) : activeItem === 'settings' ? (
+              <SettingsPage />
+            )  : activeItem === 'dashboard' ? (
               <Dashboard />
+            ) :
+            (activeItem === 'reports' ? (
+              <ReportsPage />
             ) : activeItem === 'locations' ? (
               <Location />
             ) : activeItem === 'colis' ? (
@@ -88,7 +97,7 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
                 <p className="text-gray-500">This is the placeholder content for the {activeItem} page.</p>
               </div>
-            )
+            ))
           )}
         </div>
       </main>
