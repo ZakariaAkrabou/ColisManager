@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import Location from '../pages/Locations/location';
+import Colis from '../pages/Colis/colis';
+import AddColisPage from './colis/addColis';
 
 interface DashboardLayoutProps {
   children?: React.ReactNode;
@@ -12,6 +14,9 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeItem, setActiveItem] = useState('dashboard');
   const [isMobile, setIsMobile] = useState(false);
+
+  // Shared state: new colis items added from the add-colis page
+  const [pendingColis, setPendingColis] = useState<any | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -29,6 +34,16 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Navigation helper exposed to child pages
+  const navigateTo = useCallback((page: string) => {
+    setActiveItem(page);
+  }, []);
+
+  // Called by AddColisPage when user saves a new colis
+  const handleAddColisSave = useCallback((newColis: any) => {
+    setPendingColis(newColis);
+  }, []);
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50 text-gray-800 font-sans relative">
       
@@ -43,7 +58,7 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
       <Sidebar 
         isOpen={isSidebarOpen} 
         isMobile={isMobile}
-        activeItem={activeItem}
+        activeItem={activeItem === 'add-colis' ? 'colis' : activeItem}
         onItemClick={(item) => {
           setActiveItem(item);
           if (isMobile) setIsSidebarOpen(false);
@@ -57,6 +72,17 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
               <Dashboard />
             ) : activeItem === 'locations' ? (
               <Location />
+            ) : activeItem === 'colis' ? (
+              <Colis
+                onNavigateToAdd={() => navigateTo('add-colis')}
+                pendingColis={pendingColis}
+                onPendingConsumed={() => setPendingColis(null)}
+              />
+            ) : activeItem === 'add-colis' ? (
+              <AddColisPage
+                onBack={() => navigateTo('colis')}
+                onSave={handleAddColisSave}
+              />
             ) : (
               <div className="p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">{activeItem.charAt(0).toUpperCase() + activeItem.slice(1)}</h2>
