@@ -1,19 +1,19 @@
 import { useState, useMemo, useEffect } from 'react';
-import { 
-  Users, 
-  Send, 
-  Download, 
-  Wallet, 
-  Search, 
-  Filter, 
-  Plus, 
-  MoreVertical, 
-  ChevronLeft, 
-  ChevronRight, 
-  X, 
-  Edit3, 
-  Trash2, 
-  Eye, 
+import {
+  Users,
+  Send,
+  Download,
+  Wallet,
+  Search,
+  Filter,
+  Plus,
+  MoreVertical,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Edit3,
+  Trash2,
+  Eye,
   Info,
   CheckCircle2,
   AlertTriangle
@@ -41,12 +41,12 @@ export interface Client {
 function distributeSum(count: number, targetSum: number, minVal: number, maxVal: number): number[] {
   const arr = Array(count).fill(minVal);
   let currentSum = count * minVal;
-  
+
   if (currentSum > targetSum) {
     // If target sum is less than min possible, just return array filled with min
     return arr;
   }
-  
+
   // Distribute the remaining sum randomly
   let attempts = 0;
   while (currentSum < targetSum && attempts < 100000) {
@@ -57,7 +57,7 @@ function distributeSum(count: number, targetSum: number, minVal: number, maxVal:
     }
     attempts++;
   }
-  
+
   return arr;
 }
 
@@ -68,7 +68,7 @@ const FIRST_8_CLIENTS: Client[] = [
     fullName: 'Mara Rontret',
     phone: '+212 6 12 34 56 78',
     pays: 'Maroc',
-    region: 'Casablanca',
+    region: 'Casablanca-Settat',
     ville: 'Casablanca',
     fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
     totalSent: 15,
@@ -80,180 +80,91 @@ const FIRST_8_CLIENTS: Client[] = [
     fullName: 'Youssef Benali',
     phone: '+212 6 23 45 67 89',
     pays: 'Maroc',
-    region: 'Rabat',
+    region: 'Rabat-Salé-Kénitra',
     ville: 'Rabat',
     fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
     totalSent: 10,
     totalReceived: 8,
     totalAmount: 320
-  },  {
-    id: 'CL001',
-    fullName: 'Mara Rontret',
-    phone: '+212 6 12 34 56 78',
-    pays: 'Maroc',
-    region: 'Casablanca',
-    ville: 'Casablanca',
-    fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450
   },
   {
-    id: 'CL002',
-    fullName: 'Youssef Benali',
-    phone: '+212 6 23 45 67 89',
+    id: 'CL003',
+    fullName: 'Fatima Zahra El Amrani',
+    phone: '+212 6 34 56 78 90',
     pays: 'Maroc',
-    region: 'Rabat',
-    ville: 'Rabat',
-    fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320
-  },  {
-    id: 'CL001',
-    fullName: 'Mara Rontret',
-    phone: '+212 6 12 34 56 78',
-    pays: 'Maroc',
-    region: 'Casablanca',
-    ville: 'Casablanca',
-    fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450
+    region: 'Fès-Meknès',
+    ville: 'Fès',
+    fullAddress: 'Quartier Atlas, Rue 12, Fès',
+    totalSent: 18,
+    totalReceived: 14,
+    totalAmount: 520
   },
   {
-    id: 'CL002',
-    fullName: 'Youssef Benali',
-    phone: '+212 6 23 45 67 89',
+    id: 'CL004',
+    fullName: 'Hamza Alaoui',
+    phone: '+212 6 45 67 89 01',
     pays: 'Maroc',
-    region: 'Rabat',
-    ville: 'Rabat',
-    fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320
-  },  {
-    id: 'CL001',
-    fullName: 'Mara Rontret',
-    phone: '+212 6 12 34 56 78',
-    pays: 'Maroc',
-    region: 'Casablanca',
-    ville: 'Casablanca',
-    fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450
+    region: 'Marrakech-Safi',
+    ville: 'Marrakech',
+    fullAddress: 'Avenue Mohammed VI, Marrakech',
+    totalSent: 12,
+    totalReceived: 10,
+    totalAmount: 380
   },
   {
-    id: 'CL002',
-    fullName: 'Youssef Benali',
-    phone: '+212 6 23 45 67 89',
+    id: 'CL005',
+    fullName: 'Salma Idrissi',
+    phone: '+212 6 56 78 90 12',
     pays: 'Maroc',
-    region: 'Rabat',
-    ville: 'Rabat',
-    fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320
-  },  {
-    id: 'CL001',
-    fullName: 'Mara Rontret',
-    phone: '+212 6 12 34 56 78',
-    pays: 'Maroc',
-    region: 'Casablanca',
-    ville: 'Casablanca',
-    fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450
+    region: 'Tanger-Tétouan-Al Hoceïma',
+    ville: 'Tanger',
+    fullAddress: 'Boulevard Pasteur, Tanger',
+    totalSent: 20,
+    totalReceived: 17,
+    totalAmount: 610
   },
   {
-    id: 'CL002',
-    fullName: 'Youssef Benali',
-    phone: '+212 6 23 45 67 89',
+    id: 'CL006',
+    fullName: 'Omar Chraibi',
+    phone: '+212 6 67 89 01 23',
     pays: 'Maroc',
-    region: 'Rabat',
-    ville: 'Rabat',
-    fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320
-  },  {
-    id: 'CL001',
-    fullName: 'Mara Rontret',
-    phone: '+212 6 12 34 56 78',
-    pays: 'Maroc',
-    region: 'Casablanca',
-    ville: 'Casablanca',
-    fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450
+    region: 'Souss-Massa',
+    ville: 'Agadir',
+    fullAddress: 'Hay Salam, Agadir',
+    totalSent: 9,
+    totalReceived: 7,
+    totalAmount: 290
   },
   {
-    id: 'CL002',
-    fullName: 'Youssef Benali',
-    phone: '+212 6 23 45 67 89',
+    id: 'CL007',
+    fullName: 'Nadia Bennis',
+    phone: '+212 6 78 90 12 34',
     pays: 'Maroc',
-    region: 'Rabat',
-    ville: 'Rabat',
-    fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320
-  },  {
-    id: 'CL001',
-    fullName: 'Mara Rontret',
-    phone: '+212 6 12 34 56 78',
-    pays: 'Maroc',
-    region: 'Casablanca',
-    ville: 'Casablanca',
-    fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450
+    region: 'L’Oriental',
+    ville: 'Oujda',
+    fullAddress: 'Rue Al Qods, Oujda',
+    totalSent: 14,
+    totalReceived: 11,
+    totalAmount: 430
   },
   {
-    id: 'CL002',
-    fullName: 'Youssef Benali',
-    phone: '+212 6 23 45 67 89',
+    id: 'CL008',
+    fullName: 'Karim El Fassi',
+    phone: '+212 6 89 01 23 45',
     pays: 'Maroc',
-    region: 'Rabat',
-    ville: 'Rabat',
-    fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320
-  },  {
-    id: 'CL001',
-    fullName: 'Mara Rontret',
-    phone: '+212 6 12 34 56 78',
-    pays: 'Maroc',
-    region: 'Casablanca',
-    ville: 'Casablanca',
-    fullAddress: 'Rue Mohamed V, Résidence Al Amal, Casablanca',
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450
-  },
-  {
-    id: 'CL002',
-    fullName: 'Youssef Benali',
-    phone: '+212 6 23 45 67 89',
-    pays: 'Maroc',
-    region: 'Rabat',
-    ville: 'Rabat',
-    fullAddress: 'Avenue Hassan II, Appt 5, Agdal, Rabat',
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320
-  },
-  
+    region: 'Béni Mellal-Khénifra',
+    ville: 'Béni Mellal',
+    fullAddress: 'Avenue Hassan II, Béni Mellal',
+    totalSent: 16,
+    totalReceived: 13,
+    totalAmount: 470
+  }
+
 ];
 
 const generateMockClients = (): Client[] => {
   const clients = [...FIRST_8_CLIENTS];
-  
+
   const count = 239;
   // We want the total sum of ALL 247 clients to be:
   // - Total Clients: 247
@@ -263,31 +174,35 @@ const generateMockClients = (): Client[] => {
   const sents = distributeSum(count, 1125, 1, 10);
   const receiveds = distributeSum(count, 1000, 1, 8);
   const amountTens = distributeSum(count, 811, 1, 15);
-  
+
   const moroccanNames = [
     { first: 'Youssef', last: 'Benali' },
     { first: 'Fatima', last: 'Zahra' },
-   
+    { first: 'Hamza', last: 'Alaoui' },
+    { first: 'Salma', last: 'Idrissi' },
+    { first: 'Omar', last: 'Chraibi' },
+    { first: 'Nadia', last: 'Bennis' },
+    { first: 'Karim', last: 'El Fassi' }
   ];
-  
+
   const locations = [
-    { pays: 'Maroc', ville: 'Casablanca', region: 'Casablanca', address: 'Boulevard Anfa, Immeuble B, Casablanca' },
-     { pays: 'Maroc', ville: 'Oujda', region: 'L\'Oriental', address: 'Boulevard Mohammed V, Oujda' },
+    { pays: 'Maroc', ville: 'Casablanca', region: 'Casablanca-Settat', address: 'Boulevard Anfa, Immeuble B, Casablanca' },
+    { pays: 'Maroc', ville: 'Oujda', region: 'L\'Oriental', address: 'Boulevard Mohammed V, Oujda' },
     { pays: 'Maroc', ville: 'Kénitra', region: 'Rabat-Salé-Kénitra', address: 'Avenue Mohammed Diouri, Kénitra' }
   ];
 
   for (let i = 0; i < count; i++) {
     const idNum = i + 9;
     const id = `CL${idNum.toString().padStart(3, '0')}`;
-    
+
     // Mix and match first/last names for high variety
     const nameObj = moroccanNames[i % moroccanNames.length];
     const firstName = nameObj.first;
     const lastName = moroccanNames[(i + 7) % moroccanNames.length].last;
     const fullName = `${firstName} ${lastName}`;
-    
+
     const loc = locations[i % locations.length];
-    
+
     // Generate simulated Moroccan or French phone number
     let phone = '';
     if (loc.pays === 'Maroc') {
@@ -297,7 +212,7 @@ const generateMockClients = (): Client[] => {
       const randDigits = Math.floor(10000000 + Math.random() * 90000000);
       phone = `+33 7 ${randDigits.toString().replace(/(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4')}`;
     }
-    
+
     clients.push({
       id,
       fullName,
@@ -311,37 +226,37 @@ const generateMockClients = (): Client[] => {
       totalAmount: amountTens[i] * 10
     });
   }
-  
+
   return clients;
 };
 
 export default function ClientsPage() {
   // Store all clients in state
   const [clients, setClients] = useState<Client[]>(() => generateMockClients());
-  
+
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPays, setFilterPays] = useState('Tous');
   const [filterRegion, setFilterRegion] = useState('Toutes');
   const [filterVille, setFilterVille] = useState('Toutes');
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8); // Default 8 to match the image exactly
-  
+  const [pageSize, setPageSize] = useState(5); // Default 5 to match the image exactly
+
   // Active actions dropdown state
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
-  
+
   // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  
+
   // Currently selected client for editing/viewing
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  
 
-  
+
+
   // Notification banner/toast state
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'danger' } | null>(null);
 
@@ -367,7 +282,7 @@ export default function ClientsPage() {
 
   const uniqueRegions = useMemo(() => {
     // If a country is selected, filter regions for that country only
-    const filtered = filterPays !== 'Tous' 
+    const filtered = filterPays !== 'Tous'
       ? clients.filter(c => c.pays === filterPays)
       : clients;
     return ['Toutes', ...Array.from(new Set(filtered.map(c => c.region)))];
@@ -404,17 +319,17 @@ export default function ClientsPage() {
   // Filter clients list
   const filteredClients = useMemo(() => {
     return clients.filter(client => {
-      const matchesSearch = 
+      const matchesSearch =
         client.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         client.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         client.phone.includes(searchQuery) ||
         client.fullAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
         client.ville.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesPays = filterPays === 'Tous' || client.pays === filterPays;
       const matchesRegion = filterRegion === 'Toutes' || client.region === filterRegion;
       const matchesVille = filterVille === 'Toutes' || client.ville === filterVille;
-      
+
       return matchesSearch && matchesPays && matchesRegion && matchesVille;
     });
   }, [clients, searchQuery, filterPays, filterRegion, filterVille]);
@@ -458,7 +373,7 @@ export default function ClientsPage() {
       return num > max ? num : max;
     }, 0);
     const newId = `CL${(maxIdNum + 1).toString().padStart(3, '0')}`;
-    
+
     const newClient: Client = {
       id: newId,
       ...newClientData
@@ -510,17 +425,17 @@ export default function ClientsPage() {
 
   // Generate pagination number array
   const paginationRange = useMemo(() => {
-    
+
     if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
-    
+
     const startPages = [1];
     const endPages = [totalPages];
-    
+
     const showLeftDots = currentPage > 3;
     const showRightDots = currentPage < totalPages - 2;
-    
+
     if (!showLeftDots && showRightDots) {
       const middlePages = [2, 3, 4];
       return [...startPages, ...middlePages, 'ellipsis', ...endPages];
@@ -535,14 +450,13 @@ export default function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Toast Notification */}
       {toastMessage && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform scale-100 ${
-          toastMessage.type === 'success' 
-            ? 'bg-emerald-600 text-white shadow-emerald-600/20' 
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform scale-100 ${toastMessage.type === 'success'
+            ? 'bg-emerald-600 text-white shadow-emerald-600/20'
             : 'bg-rose-600 text-white shadow-rose-600/20'
-        }`}>
+          }`}>
           {toastMessage.type === 'success' ? (
             <CheckCircle2 className="w-5 h-5 shrink-0" />
           ) : (
@@ -572,7 +486,7 @@ export default function ClientsPage() {
 
       {/* Stats Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        
+
         {/* Card 1: Total Clients */}
         <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-brand-orange shrink-0">
@@ -621,7 +535,7 @@ export default function ClientsPage() {
       {/* Filters Card */}
       <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-          
+
           {/* Search bar */}
           <div className="col-span-1 md:col-span-4 space-y-1.5">
             <span className="text-xs text-gray-400 font-medium block">Recherche</span>
@@ -635,7 +549,7 @@ export default function ClientsPage() {
                 className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl pl-10 pr-4 py-2 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
               />
               {searchQuery && (
-                <button 
+                <button
                   onClick={() => setSearchQuery('')}
                   className="w-5 h-5 text-gray-400 hover:text-gray-600 absolute right-3 top-1/2 -translate-y-1/2 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors cursor-pointer"
                 >
@@ -732,8 +646,8 @@ export default function ClientsPage() {
                 <button onClick={() => setFilterVille('Toutes')} className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"><X className="w-3 h-3" /></button>
               </span>
             )}
-            <button 
-              onClick={handleResetFilters} 
+            <button
+              onClick={handleResetFilters}
               className="text-xs text-slate-400 hover:text-brand-orange underline font-semibold ml-auto cursor-pointer"
             >
               Effacer tout
@@ -751,11 +665,12 @@ export default function ClientsPage() {
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-[100px]">ClientID</th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">FullName</th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Pays / Ville / Région</th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">Pays </th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider max-w-[280px]">FullAddress</th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-[110px]">TotalSent</th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-[130px]">TotalReceived</th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-[140px]">TotalAmount</th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-[140px]">Actions</th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-[60px] text-center"></th>
               </tr>
             </thead>
@@ -773,7 +688,7 @@ export default function ClientsPage() {
                       {client.phone}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      <span className="capitalize">{client.pays}</span> / <span className="capitalize">{client.ville}</span> / <span className="capitalize">{client.region}</span>
+                      <span className="capitalize">{client.pays}</span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-[280px] truncate" title={client.fullAddress}>
                       {client.fullAddress}
@@ -787,59 +702,34 @@ export default function ClientsPage() {
                     <td className="px-6 py-4 text-sm font-bold text-gray-900 whitespace-nowrap">
                       {client.totalAmount.toLocaleString()} MAD
                     </td>
-                    <td className="px-6 py-4 text-sm text-center relative">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation(); // Avoid triggering row clicks if any
-                          setActiveDropdownId(activeDropdownId === client.id ? null : client.id);
-                        }}
-                        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors cursor-pointer"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center ">
 
-                      {/* Dropdown Menu */}
-                      {activeDropdownId === client.id && (
-                        <div 
-                          className="absolute right-6 top-12 z-30 w-44 bg-white border border-gray-100 rounded-xl shadow-xl py-1.5 divide-y divide-gray-50 text-left"
-                          onClick={(e) => e.stopPropagation()} // Stop propagation from closing the dropdown inside
+                        <button
+                          onClick={() => handleOpenDetails(client)}
+                          className="p-2 rounded-lg  text-blue-600 hover:bg-blue-100 transition-colors"
+                          title="Voir Détails"
                         >
-                          <div className="py-1">
-                            <button
-                              onClick={() => {
-                                handleOpenDetails(client);
-                                setActiveDropdownId(null);
-                              }}
-                              className="flex items-center gap-2.5 px-4 py-2 w-full text-xs font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-950 transition-colors cursor-pointer"
-                            >
-                              <Eye className="w-4 h-4 text-gray-400" />
-                              <span>Voir Détails</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                handleOpenEditModal(client);
-                                setActiveDropdownId(null);
-                              }}
-                              className="flex items-center gap-2.5 px-4 py-2 w-full text-xs font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-950 transition-colors cursor-pointer"
-                            >
-                              <Edit3 className="w-4 h-4 text-gray-400" />
-                              <span>Modifier</span>
-                            </button>
-                          </div>
-                          <div className="py-1">
-                            <button
-                              onClick={() => {
-                                handleDeleteClient(client);
-                                setActiveDropdownId(null);
-                              }}
-                              className="flex items-center gap-2.5 px-4 py-2 w-full text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4 text-rose-450" />
-                              <span>Supprimer</span>
-                            </button>
-                          </div>
-                        </div>
-                      )}
+                          <Eye className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenEditModal(client)}
+                          className="p-2 rounded-lg  text-amber-600 hover:bg-amber-100 transition-colors"
+                          title="Modifier"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteClient(client)}
+                          className="p-2 rounded-lg  text-rose-600 hover:bg-rose-100 transition-colors"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -886,11 +776,10 @@ export default function ClientsPage() {
                   <button
                     key={`page-${page}`}
                     onClick={() => setCurrentPage(page as number)}
-                    className={`w-8 h-8 flex items-center justify-center text-sm font-semibold rounded-lg border transition-all cursor-pointer ${
-                      isActive 
-                        ? 'border-brand-orange text-brand-orange bg-orange-50/10' 
+                    className={`w-8 h-8 flex items-center justify-center text-sm font-semibold rounded-lg border transition-all cursor-pointer ${isActive
+                        ? 'border-brand-orange text-brand-orange bg-orange-50/10'
                         : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     {page}
                   </button>
