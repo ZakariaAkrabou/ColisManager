@@ -89,30 +89,30 @@ const ReportsTable: React.FC<Props> = ({ colisList }) => {
                   {colis.total} MAD
                 </td>
 
-                <td className="px-6 py-5">
-                  <div className="flex items-center gap-2">
-                    {/* <button className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 transition">
-                      <Eye
-                        size={18}
-                        className="text-blue-600"
-                      />
-                    </button> */}
+               <td className="px-6 py-5">
+  <div className="flex items-center gap-2">
+    <button className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 transition">
+      <Eye
+        size={18}
+        className="text-blue-600"
+      />
+    </button>
 
-                    <button className="p-2 rounded-lg bg-green-100 hover:bg-green-200 transition">
-                      <Printer
-                        size={18}
-                        className="text-green-600"
-                      />
-                    </button>
+    <button className="p-2 rounded-lg bg-green-100 hover:bg-green-200 transition">
+      <Printer
+        size={18}
+        className="text-green-600"
+      />
+    </button>
 
-                    <button className="p-2 rounded-lg bg-indigo-100 hover:bg-indigo-200 transition">
-                      <FileText
-                        size={18}
-                        className="text-indigo-600"
-                      />
-                    </button>
-                  </div>
-                </td>
+    <button className="p-2 rounded-lg bg-indigo-100 hover:bg-indigo-200 transition">
+      <FileText
+        size={18}
+        className="text-indigo-600"
+      />
+    </button>
+  </div>
+</td>
               </tr>
             ))}
           </tbody>
