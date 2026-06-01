@@ -161,43 +161,7 @@ export default function EditClientModal({ isOpen, client, onClose, onSave }: Edi
           </div>
 
           {/* Stats/Financial fields */}
-          <div className="border-t border-gray-100 pt-4">
-            <span className="text-xs font-bold text-brand-orange uppercase tracking-wider block mb-3">Statistiques</span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Envoyés</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={formSent}
-                  onChange={(e) => setFormSent(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
-                />
-              </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Reçus</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={formReceived}
-                  onChange={(e) => setFormReceived(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Montant Total (MAD)</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={formAmount}
-                  onChange={(e) => setFormAmount(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
-                />
-              </div>
-            </div>
-          </div>
 
           {/* Footer Buttons */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
