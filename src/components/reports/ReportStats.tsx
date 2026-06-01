@@ -1,12 +1,15 @@
-import { Package, Truck, CheckCircle } from 'lucide-react';
+import { Package, Truck, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const ReportStats = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-gray-500 text-sm">Livrés</p>
+            <p className="text-gray-500 text-sm">{t("reports.delivered")}</p>
             <h2 className="text-3xl font-bold mt-1 text-green-600">12</h2>
           </div>
 
@@ -19,7 +22,7 @@ const ReportStats = () => {
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-gray-500 text-sm">En cours</p>
+            <p className="text-gray-500 text-sm">{t("reports.inProgress")}</p>
             <h2 className="text-3xl font-bold mt-1 text-orange-500">5</h2>
           </div>
 
@@ -32,7 +35,7 @@ const ReportStats = () => {
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-gray-500 text-sm">Revenu Total</p>
+            <p className="text-gray-500 text-sm">{t("reports.totalRevenue")}</p>
             <h2 className="text-3xl font-bold mt-1 text-blue-600">
               12,500 MAD
             </h2>

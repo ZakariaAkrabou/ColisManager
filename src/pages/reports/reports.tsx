@@ -1,6 +1,7 @@
-import React from 'react';
-import ReportStats from '../../components/reports/ReportStats';
-import ReportsTable from '../../components/reports/ReportsTable';
+import React from "react";
+import ReportStats from "../../components/reports/ReportStats";
+import ReportsTable from "../../components/reports/ReportsTable";
+import { useTranslation } from "react-i18next";
 
 interface Colis {
   id: string;
@@ -12,37 +13,39 @@ interface Colis {
 }
 
 const Reports: React.FC = () => {
+  const { t } = useTranslation();
+
   const colisList: Colis[] = [
     {
-      id: 'Colis80390001',
-      client: 'Mara Rontret',
+      id: "Colis80390001",
+      client: "Mara Rontret",
       weight: 1.5,
-      type: 'À domicile',
-      status: 'Livré',
+      type: "À domicile",
+      status: "Livré",
       total: 450,
     },
     {
-      id: 'Colis80300622',
-      client: 'Casablanca',
+      id: "Colis80300622",
+      client: "Casablanca",
       weight: 15,
-      type: 'Express',
-      status: 'En cours',
+      type: "Express",
+      status: "En cours",
       total: 620,
     },
     {
-      id: 'Colis80500403',
-      client: 'Rabat',
+      id: "Colis80500403",
+      client: "Rabat",
       weight: 10,
-      type: 'Standard',
-      status: 'Nouveau',
+      type: "Standard",
+      status: "Nouveau",
       total: 300,
     },
     {
-      id: 'Colis0360014',
-      client: 'Rasa Ahbrad',
+      id: "Colis0360014",
+      client: "Rasa Ahbrad",
       weight: 12,
-      type: 'À domicile',
-      status: 'Livré',
+      type: "À domicile",
+      status: "Livré",
       total: 480,
     },
   ];
@@ -53,9 +56,8 @@ const Reports: React.FC = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">
-            Rapport des Colis
+            {t("reports.title")}
           </h1>
-
         </div>
       </div>
 

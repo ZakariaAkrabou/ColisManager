@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import Select from "react-select";
 import { countries } from "countries-list";
 import ReactCountryFlag from "react-country-flag";
+import { useTranslation } from "react-i18next";
 
 const countryOptions = Object.entries(countries).map(([code, country]) => ({
   value: country.name,
@@ -21,6 +22,7 @@ export default function EditLocationModal({
   onClose,
   location,
 }: EditLocationModalProps) {
+  const { t } = useTranslation();
   const [selectedCountry, setSelectedCountry] = useState<{
     value: string;
     label: string;
@@ -57,7 +59,7 @@ export default function EditLocationModal({
       <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800">
-            Modifier la Location
+            {t("locations.editLocation")}
           </h2>
           <button
             onClick={onClose}
@@ -71,13 +73,13 @@ export default function EditLocationModal({
           <form className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">
-                Pays (Country)
+                {t("locations.country")}
               </label>
               <Select
                 options={countryOptions}
                 value={selectedCountry}
                 onChange={(option) => setSelectedCountry(option as any)}
-                placeholder="Sélectionner un pays..."
+                placeholder={t("locations.selectCountry")}
                 isSearchable
                 formatOptionLabel={formatOptionLabel}
                 className="react-select-container cursor-pointer"
@@ -123,24 +125,24 @@ export default function EditLocationModal({
 
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">
-                Région (Region)
+                {t("locations.region")}
               </label>
               <input
                 type="text"
                 defaultValue={location?.region}
-                placeholder="Ex: Casablanca-Settat"
+                placeholder={t("locations.regionPlaceholder")}
                 className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">
-                Ville (City)
+                {t("locations.city")}
               </label>
               <input
                 type="text"
                 defaultValue={location?.city}
-                placeholder="Ex: Casablanca"
+                placeholder={t("locations.cityPlaceholder")}
                 className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
               />
             </div>
@@ -152,10 +154,10 @@ export default function EditLocationModal({
             onClick={onClose}
             className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
           >
-            Annuler
+            {t("common.cancel")}
           </button>
           <button className="px-4 py-2 bg-brand-orange text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors cursor-pointer">
-            Mettre à jour
+            {t("common.update")}
           </button>
         </div>
       </div>
