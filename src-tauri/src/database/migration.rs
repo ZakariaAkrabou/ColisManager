@@ -1,49 +1,31 @@
 use tauri_plugin_sql::{Migration, MigrationKind};
 
-
 pub fn get_migrations() -> Vec<Migration> {
     vec![
         Migration {
             version: 1,
             description: "create_initial_schema",
             sql: r#"
-                -- 1. COUNTRIES TABLE
-                CREATE TABLE IF NOT EXISTS Countries (
-                    CountryID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name TEXT NOT NULL UNIQUE
+                -- 1. LOCATIONS TABLE
+                CREATE TABLE IF NOT EXISTS Locations (
+                    LocationID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Country TEXT NOT NULL,
+                    City TEXT,
+                    Region TEXT NOT NULL,
+                    UNIQUE(Country, City, Region)
                 );
 
-                -- 2. CITIES TABLE
-                CREATE TABLE IF NOT EXISTS Cities (
-                    CityID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CountryID INTEGER,
-                    Name TEXT NOT NULL,
-                    FOREIGN KEY (CountryID) REFERENCES Countries(CountryID) ON DELETE RESTRICT
-                );
-
-                -- 3. REGIONS TABLE
-                CREATE TABLE IF NOT EXISTS Regions (
-                    RegionID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CityID INTEGER NOT NULL,
-                    Name TEXT NOT NULL,
-                    FOREIGN KEY (CityID) REFERENCES Cities(CityID) ON DELETE RESTRICT
-                );
-
-                -- 4. CLIENTS TABLE (Required for Colis Foreign Key mappings)
+                -- 2. CLIENTS TABLE
                 CREATE TABLE IF NOT EXISTS Clients (
                     ClientID INTEGER PRIMARY KEY AUTOINCREMENT,
                     Name TEXT NOT NULL,
                     Phone TEXT NOT NULL,
                     Address TEXT,
-                    CountryID INTEGER,
-                    CityID INTEGER,
-                    RegionID INTEGER,
-                    FOREIGN KEY (CountryID) REFERENCES Countries(CountryID) ON DELETE SET NULL,
-                    FOREIGN KEY (CityID) REFERENCES Cities(CityID) ON DELETE SET NULL,
-                    FOREIGN KEY (RegionID) REFERENCES Regions(RegionID) ON DELETE SET NULL
+                    LocationID INTEGER,
+                    FOREIGN KEY (LocationID) REFERENCES Locations(LocationID) ON DELETE SET NULL
                 );
 
-                -- 5. COLIS TABLE
+                -- 3. COLIS TABLE
                 CREATE TABLE IF NOT EXISTS Colis (
                     ColisID INTEGER PRIMARY KEY AUTOINCREMENT,
                     TrackingNumber TEXT NOT NULL UNIQUE,
@@ -53,9 +35,7 @@ pub fn get_migrations() -> Vec<Migration> {
                     SenderClientID INTEGER,
                     ReceiverName TEXT NOT NULL,
                     ReceiverPhone TEXT NOT NULL,
-                    ReceiverCountryID INTEGER NOT NULL,
-                    ReceiverCityID INTEGER NOT NULL,
-                    ReceiverRegionID INTEGER,
+                    ReceiverLocationID INTEGER NOT NULL,
                     ReceiverFullAddress TEXT NOT NULL,
                     ReceiverClientID INTEGER,
                     Weight REAL NOT NULL,
@@ -72,12 +52,10 @@ pub fn get_migrations() -> Vec<Migration> {
                     DeliveredAt DATETIME,
                     FOREIGN KEY (SenderClientID) REFERENCES Clients(ClientID) ON DELETE SET NULL,
                     FOREIGN KEY (ReceiverClientID) REFERENCES Clients(ClientID) ON DELETE SET NULL,
-                    FOREIGN KEY (ReceiverCountryID) REFERENCES Countries(CountryID) ON DELETE RESTRICT,
-                    FOREIGN KEY (ReceiverCityID) REFERENCES Cities(CityID) ON DELETE RESTRICT,
-                    FOREIGN KEY (ReceiverRegionID) REFERENCES Regions(RegionID) ON DELETE SET NULL
+                    FOREIGN KEY (ReceiverLocationID) REFERENCES Locations(LocationID) ON DELETE RESTRICT
                 );
 
-                -- 6. STATUS HISTORY TABLE
+                -- 4. STATUS HISTORY TABLE
                 CREATE TABLE IF NOT EXISTS StatusHistory (
                     StatusHistoryID INTEGER PRIMARY KEY AUTOINCREMENT,
                     ColisID INTEGER NOT NULL,
@@ -87,14 +65,14 @@ pub fn get_migrations() -> Vec<Migration> {
                     FOREIGN KEY (ColisID) REFERENCES Colis(ColisID) ON DELETE CASCADE
                 );
 
-                -- 7. USER TABLE
+                -- 5. USER TABLE
                 CREATE TABLE IF NOT EXISTS User (
                     UserID INTEGER PRIMARY KEY AUTOINCREMENT,
                     Username TEXT NOT NULL UNIQUE,
                     PasswordHash TEXT NOT NULL
                 );
 
-                -- 8. BACKUPS TABLE
+                -- 6. BACKUPS TABLE
                 CREATE TABLE IF NOT EXISTS Backups (
                     BackupID INTEGER PRIMARY KEY AUTOINCREMENT,
                     BackupPath TEXT NOT NULL,
@@ -107,8 +85,7 @@ pub fn get_migrations() -> Vec<Migration> {
             version: 2,
             description: "seed_static_locations",
             sql: r#"
-                INSERT OR IGNORE INTO Countries (CountryID, Name) VALUES (1, 'Morocco');
-                -- You can cleanly append your 84 pre-loaded Moroccan city inserts here
+                INSERT OR IGNORE INTO Locations (LocationID, Country, City, Region) VALUES (1, 'Morocco', 'Casablanca', 'Casablanca-Settat');
             "#,
             kind: MigrationKind::Up,
         },

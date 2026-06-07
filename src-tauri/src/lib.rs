@@ -1,5 +1,9 @@
 mod database;
+pub mod models;
+pub mod services;
+pub mod commands;
 
+use tauri::Manager;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -9,18 +13,24 @@ fn greet(name: &str) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-       
+        .setup(|app| {
+            let handle = app.handle();
+            tauri::async_runtime::block_on(async move {
+                let state = database::connection::init_db(&handle).await.expect("Failed to initialize database");
+                handle.manage(state);
+            });
+            Ok(())
+        })
         .plugin(tauri_plugin_opener::init())
-        
-     
         .plugin(
             tauri_plugin_sql::Builder::default()
+                .add_migrations("sqlite:colismanager.db", database::migration::get_migrations())
                 .build(),
         )
-        
-       
-        .invoke_handler(tauri::generate_handler![greet])
-        
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            commands::location_commands::create_location
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
