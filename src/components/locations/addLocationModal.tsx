@@ -4,6 +4,8 @@ import Select from "react-select";
 import { countries } from "countries-list";
 import ReactCountryFlag from "react-country-flag";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
+import Swal from "sweetalert2";
 
 const countryOptions = Object.entries(countries).map(([code, country]) => ({
   value: country.name,
@@ -26,6 +28,49 @@ export default function AddLocationModal({
     label: string;
     countryCode: string;
   } | null>(null);
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
+
+  const handleSave = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!selectedCountry || !region.trim()) {
+      Swal.fire({
+        title: t("common.error") || "Erreur",
+        text: "Veuillez remplir les champs obligatoires (Pays et Région).",
+        icon: "error",
+      });
+      return;
+    }
+    
+    try {
+      await invoke("create_location", {
+        payload: {
+          country: selectedCountry.value,
+          region: region.trim(),
+          city: city.trim() || null,
+        }
+      });
+      
+      Swal.fire({
+        title: t("common.success") || "Succès",
+        text: "Location ajoutée avec succès.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      onClose();
+      setSelectedCountry(null);
+      setRegion("");
+      setCity("");
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: t("common.error") || "Erreur",
+        text: String(error),
+        icon: "error",
+      });
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -115,6 +160,8 @@ export default function AddLocationModal({
               </label>
               <input
                 type="text"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
                 placeholder={t("locations.regionPlaceholder")}
                 className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
               />
@@ -126,6 +173,8 @@ export default function AddLocationModal({
               </label>
               <input
                 type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
                 placeholder={t("locations.cityPlaceholder")}
                 className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
               />
@@ -140,7 +189,10 @@ export default function AddLocationModal({
           >
             {t("common.cancel")}
           </button>
-          <button className="px-4 py-2 bg-brand-orange text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors cursor-pointer">
+          <button 
+            onClick={handleSave}
+            className="px-4 py-2 bg-brand-orange text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors cursor-pointer"
+          >
             {t("locations.saveLocation")}
           </button>
         </div>

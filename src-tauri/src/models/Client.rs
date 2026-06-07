@@ -6,9 +6,7 @@ pub struct Client {
     pub id: i64,
     pub full_name: String,
     pub phone_number: String,
-    pub country: String,
-    pub region: String,
-    pub city: String,
+    pub location_id: Option<i64>,
     pub full_address: String,
     pub created_at: String,
 }
@@ -17,8 +15,6 @@ pub struct Client {
 pub struct CreateClientRequest {
     pub full_name: String,
     pub phone_number: String,
-    pub country: String,
-    pub region: String,
-    pub city: String,
+    pub location_id: Option<i64>,
     pub full_address: String,
 }

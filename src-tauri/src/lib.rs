@@ -1,11 +1,10 @@
-//lib.rs
+pub mod commands;
 mod database;
-mod commands;
-mod models;
-mod services;
+pub mod models;
+pub mod services;
 
-use crate::database::connection;
-use crate::database::state::AppState;
+
+use tauri::Manager;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -13,24 +12,39 @@ fn greet(name: &str) -> String {
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub async fn run() {
-    let db = connection::create_pool().await;
-    let app_state = AppState { db };
-
+pub fn run() {
     tauri::Builder::default()
-        .manage(app_state)
+        .setup(|app| {
+            let handle = app.handle();
 
+            tauri::async_runtime::block_on(async move {
+                let state = database::connection::init_db(&handle)
+                    .await
+                    .expect("Failed to initialize database");
+
+                handle.manage(state);
+            });
+
+            Ok(())
+        })
         .plugin(tauri_plugin_opener::init())
-
-        .plugin(tauri_plugin_sql::Builder::default().build())
-
-        .invoke_handler(
-            tauri::generate_handler![
-                greet,
-                commands::client_commands::create_client
-            ]
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations(
+                    "sqlite:colismanager.db",
+                    database::migration::get_migrations(),
+                )
+                .build(),
         )
+        .invoke_handler(tauri::generate_handler![
+            greet,
 
+            commands::location_commands::create_location,
+            // commands::location_commands::update_location,
+            // commands::location_commands::delete_location,
+
+            commands::client_commands::create_client
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

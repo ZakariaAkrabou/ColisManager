@@ -12,19 +12,15 @@ pub async fn create_client(
         INSERT INTO clients (
             full_name,
             phone_number,
-            country,
-            region,
-            city,
+            location_id,
             full_address
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?)
         "#
     )
     .bind(client.full_name)
     .bind(client.phone_number)
-    .bind(client.country)
-    .bind(client.region)
-    .bind(client.city)
+    .bind(client.location_id)
     .bind(client.full_address)
     .execute(pool)
     .await
