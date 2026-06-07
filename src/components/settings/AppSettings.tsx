@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { Save, Check, RefreshCw, Sun, Moon } from 'lucide-react';
+import React, { useState } from "react";
+import { Save, Check, RefreshCw, Sun, Moon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function AppSettings() {
+  const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [settings, setSettings] = useState({
-    language: 'fr',
-    currency: 'MAD',
-    theme: 'light',
-    dateFormat: 'dd/MM/yyyy',
+    language: "fr",
+    currency: "MAD",
+    theme: "light",
+    dateFormat: "dd/MM/yyyy",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,26 +27,37 @@ export default function AppSettings() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl animate-fade-in">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 max-w-2xl animate-fade-in"
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Langue par défaut</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {t("settings.app.defaultLanguage")}
+          </label>
           <select
             value={settings.language}
-            onChange={(e) => setSettings({ ...settings, language: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, language: e.target.value })
+            }
             className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-750 focus:outline-none transition-all cursor-pointer"
           >
-            <option value="fr">Français (French)</option>
-            <option value="ar">العربية (Arabic)</option>
-            <option value="en">English (US)</option>
+            <option value="fr">{t("settings.app.languageFrench")}</option>
+            <option value="ar">{t("settings.app.languageArabic")}</option>
+            <option value="en">{t("settings.app.languageEnglish")}</option>
           </select>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Devise principale</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {t("settings.app.mainCurrency")}
+          </label>
           <select
             value={settings.currency}
-            onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, currency: e.target.value })
+            }
             className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-750 focus:outline-none transition-all cursor-pointer"
           >
             <option value="MAD">MAD (Dirham Marocain)</option>
@@ -54,10 +67,14 @@ export default function AppSettings() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Format des dates</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {t("settings.app.dateFormat")}
+          </label>
           <select
             value={settings.dateFormat}
-            onChange={(e) => setSettings({ ...settings, dateFormat: e.target.value })}
+            onChange={(e) =>
+              setSettings({ ...settings, dateFormat: e.target.value })
+            }
             className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-750 focus:outline-none transition-all cursor-pointer"
           >
             <option value="dd/MM/yyyy">JJ/MM/AAAA (ex: 25/05/2026)</option>
@@ -67,31 +84,33 @@ export default function AppSettings() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Thème Visuel</label>
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {t("settings.app.visualTheme")}
+          </label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => setSettings({ ...settings, theme: 'light' })}
+              onClick={() => setSettings({ ...settings, theme: "light" })}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
-                settings.theme === 'light'
-                  ? 'bg-white border-brand-orange text-brand-orange ring-1 ring-brand-orange'
-                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                settings.theme === "light"
+                  ? "bg-white border-brand-orange text-brand-orange ring-1 ring-brand-orange"
+                  : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
               }`}
             >
               <Sun className="w-4 h-4" />
-              Clair
+              {t("settings.app.light")}
             </button>
             <button
               type="button"
-              onClick={() => setSettings({ ...settings, theme: 'dark' })}
+              onClick={() => setSettings({ ...settings, theme: "dark" })}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
-                settings.theme === 'dark'
-                  ? 'bg-slate-900 border-slate-950 text-white shadow-md'
-                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                settings.theme === "dark"
+                  ? "bg-slate-900 border-slate-950 text-white shadow-md"
+                  : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
               }`}
             >
               <Moon className="w-4 h-4" />
-              Sombre
+              {t("settings.app.dark")}
             </button>
           </div>
         </div>
@@ -101,7 +120,7 @@ export default function AppSettings() {
         {saveSuccess && (
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold animate-fade-in">
             <Check className="w-3.5 h-3.5" />
-            <span>Préférences enregistrées</span>
+            <span>{t("settings.app.preferencesSaved")}</span>
           </div>
         )}
         <button
@@ -114,7 +133,7 @@ export default function AppSettings() {
           ) : (
             <Save className="w-4 h-4" />
           )}
-          <span>Enregistrer les préférences</span>
+          <span>{t("settings.app.savePreferences")}</span>
         </button>
       </div>
     </form>

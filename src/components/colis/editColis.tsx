@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import type { ColisItem } from "../../types/colis";
+import i18n from "../../i18n";
 
 export type EditableColisFields = Pick<
   ColisItem,
@@ -10,7 +11,7 @@ export async function showEditColisModal(
   colis: ColisItem,
 ): Promise<EditableColisFields | null> {
   const result = await Swal.fire({
-    title: "Modifier le Colis",
+    title: i18n.t("colis.editTitle"),
     html: `
 			<div class="text-left font-sans space-y-4 p-2">
 				<p class="text-gray-500 text-sm">Vous modifiez les informations pour le colis <strong class="font-mono">${colis.trackingNo}</strong>.</p>
@@ -41,8 +42,8 @@ export async function showEditColisModal(
 			</div>
 		`,
     showCancelButton: true,
-    confirmButtonText: "Sauvegarder",
-    cancelButtonText: "Annuler",
+    confirmButtonText: i18n.t("common.save"),
+    cancelButtonText: i18n.t("common.cancel"),
     confirmButtonColor: "#E26D28",
     cancelButtonColor: "#6B7280",
     preConfirm: () => {
@@ -59,9 +60,7 @@ export async function showEditColisModal(
         .value as ColisItem["type"];
 
       if (!sender || !receiver || !city) {
-        Swal.showValidationMessage(
-          "Veuillez remplir tous les champs obligatoires",
-        );
+        Swal.showValidationMessage(i18n.t("colis.requiredFields"));
         return false;
       }
 
@@ -75,8 +74,8 @@ export async function showEditColisModal(
   }
 
   await Swal.fire({
-    title: "Mis à jour !",
-    text: "Le colis a été mis à jour avec succès.",
+    title: i18n.t("common.updated"),
+    text: i18n.t("colis.updatedText"),
     icon: "success",
     timer: 1400,
     showConfirmButton: false,

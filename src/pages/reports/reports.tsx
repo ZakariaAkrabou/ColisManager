@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import ReportsTable from '../../components/reports/ReportsTable';
+import React, { useState } from "react";
+import ReportsTable from "../../components/reports/ReportsTable";
+import { useTranslation } from "react-i18next";
 
 interface Colis {
   id: string;
@@ -11,37 +12,39 @@ interface Colis {
 }
 
 const Reports: React.FC = () => {
+  const { t } = useTranslation();
+
   const colisList: Colis[] = [
     {
-      id: 'Colis80390001',
-      client: 'Mara Rontret',
+      id: "Colis80390001",
+      client: "Mara Rontret",
       weight: 1.5,
-      type: 'À domicile',
-      status: 'Livré',
+      type: "À domicile",
+      status: "Livré",
       total: 450,
     },
     {
-      id: 'Colis80300622',
-      client: 'Casablanca',
+      id: "Colis80300622",
+      client: "Casablanca",
       weight: 15,
-      type: 'Express',
-      status: 'En cours',
+      type: "Express",
+      status: "En cours",
       total: 620,
     },
     {
-      id: 'Colis80500403',
-      client: 'Rabat',
+      id: "Colis80500403",
+      client: "Rabat",
       weight: 10,
-      type: 'Standard',
-      status: 'Nouveau',
+      type: "Standard",
+      status: "Nouveau",
       total: 300,
     },
     {
-      id: 'Colis0360014',
-      client: 'Rasa Ahbrad',
+      id: "Colis0360014",
+      client: "Rasa Ahbrad",
       weight: 12,
-      type: 'À domicile',
-      status: 'Livré',
+      type: "À domicile",
+      status: "Livré",
       total: 480,
     },
     {
@@ -186,10 +189,13 @@ const Reports: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Rapport des Colis
-        </h1>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            {t("reports.title")}
+          </h1>
+        </div>
       </div>
 
       <ReportsTable colisList={paginatedColis} />
@@ -204,7 +210,7 @@ const Reports: React.FC = () => {
         <div className="flex gap-2">
           <button
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage(prev => prev - 1)}
+            onClick={() => setCurrentPage((prev: number) => prev - 1)}
             className="px-3 py-2 border rounded-lg disabled:opacity-50"
           >
             Précédent
@@ -226,7 +232,7 @@ const Reports: React.FC = () => {
 
           <button
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(prev => prev + 1)}
+            onClick={() => setCurrentPage((prev: number) => prev + 1)}
             className="px-3 py-2 border rounded-lg disabled:opacity-50"
           >
             Suivant

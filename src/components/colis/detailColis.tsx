@@ -1,9 +1,10 @@
 import Swal from "sweetalert2";
 import type { ColisItem } from "../../types/colis";
+import i18n from "../../i18n";
 
 export async function showDetailColisModal(colis: ColisItem): Promise<void> {
   await Swal.fire({
-    title: "Détails du Colis",
+    title: i18n.t("colis.detailsTitle"),
     html: `
 			<div class="text-left font-sans space-y-4 p-2">
 				<div class="flex items-center gap-3 border-b border-gray-100 pb-3 mb-2">
@@ -64,7 +65,7 @@ export async function showDetailColisModal(colis: ColisItem): Promise<void> {
 			</div>
 		`,
     showCloseButton: true,
-    confirmButtonText: "Fermer",
+    confirmButtonText: i18n.t("common.close"),
     confirmButtonColor: "#2B4C8C",
     customClass: {
       popup: "rounded-xl",
