@@ -4,6 +4,8 @@ import Select from "react-select";
 import { countries } from "countries-list";
 import ReactCountryFlag from "react-country-flag";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
+import Swal from "sweetalert2";
 
 const countryOptions = Object.entries(countries).map(([code, country]) => ({
   value: country.name,
@@ -11,16 +13,25 @@ const countryOptions = Object.entries(countries).map(([code, country]) => ({
   countryCode: code,
 }));
 
+export interface Location {
+  id: number;
+  country: string;
+  city: string | null;
+  region: string;
+}
+
 interface EditLocationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  location?: any; // The location to edit
+  location: Location | null;
+  onSuccess?: () => void;
 }
 
 export default function EditLocationModal({
   isOpen,
   onClose,
   location,
+  onSuccess,
 }: EditLocationModalProps) {
   const { t } = useTranslation();
   const [selectedCountry, setSelectedCountry] = useState<{
@@ -28,20 +39,64 @@ export default function EditLocationModal({
     label: string;
     countryCode: string;
   } | null>(null);
+  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Pre-populate the form when the location prop changes
   useEffect(() => {
     if (location) {
-      // Find the matching country option
-      const option = countryOptions.find((o) => o.value === location.country);
-      if (option) {
-        setSelectedCountry(option);
-      } else {
-        setSelectedCountry(null);
-      }
+      const found = countryOptions.find((o) => o.value === location.country) ?? null;
+      setSelectedCountry(found);
+      setRegion(location.region ?? "");
+      setCity(location.city ?? "");
     }
   }, [location]);
 
-  if (!isOpen) return null;
+  const handleSave = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!selectedCountry || !region.trim()) {
+      Swal.fire({
+        title: t("common.error") || "Erreur",
+        text: "Veuillez remplir les champs obligatoires (Pays et Région).",
+        icon: "error",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await invoke("update_location", {
+        payload: {
+          id: location!.id,
+          country: selectedCountry.value,
+          region: region.trim(),
+          city: city.trim() || null,
+        },
+      });
+
+      Swal.fire({
+        title: t("common.success") || "Succès",
+        text: "Location mise à jour avec succès.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      onSuccess?.();
+      onClose();
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: t("common.error") || "Erreur",
+        text: String(error),
+        icon: "error",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isOpen || !location) return null;
 
   const formatOptionLabel = ({ label, countryCode }: any) => (
     <div className="flex items-center gap-2">
@@ -57,9 +112,10 @@ export default function EditLocationModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+        {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800">
-            {t("locations.editLocation")}
+            {t("locations.editLocation") || "Modifier la Location"}
           </h2>
           <button
             onClick={onClose}
@@ -69,8 +125,10 @@ export default function EditLocationModal({
           </button>
         </div>
 
+        {/* Body */}
         <div className="p-6 overflow-y-auto">
           <form className="flex flex-col gap-5">
+            {/* Country */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">
                 {t("locations.country")}
@@ -82,7 +140,7 @@ export default function EditLocationModal({
                 placeholder={t("locations.selectCountry")}
                 isSearchable
                 formatOptionLabel={formatOptionLabel}
-                className="react-select-container cursor-pointer"
+                className="react-select-container"
                 classNamePrefix="react-select"
                 styles={{
                   control: (base) => ({
@@ -97,22 +155,10 @@ export default function EditLocationModal({
                       borderColor: "#D1D5DB",
                     },
                   }),
-                  valueContainer: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
-                  input: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
-                  placeholder: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
-                  singleValue: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
+                  valueContainer: (base) => ({ ...base, cursor: "pointer" }),
+                  input: (base) => ({ ...base, cursor: "pointer" }),
+                  placeholder: (base) => ({ ...base, cursor: "pointer" }),
+                  singleValue: (base) => ({ ...base, cursor: "pointer" }),
                   option: (base, state) => ({
                     ...base,
                     backgroundColor: state.isFocused ? "#FFF3EB" : "white",
@@ -123,25 +169,29 @@ export default function EditLocationModal({
               />
             </div>
 
+            {/* Region */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">
                 {t("locations.region")}
               </label>
               <input
                 type="text"
-                defaultValue={location?.region}
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
                 placeholder={t("locations.regionPlaceholder")}
                 className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
               />
             </div>
 
+            {/* City */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-gray-700">
                 {t("locations.city")}
               </label>
               <input
                 type="text"
-                defaultValue={location?.city}
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
                 placeholder={t("locations.cityPlaceholder")}
                 className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
               />
@@ -149,15 +199,24 @@ export default function EditLocationModal({
           </form>
         </div>
 
+        {/* Footer */}
         <div className="p-5 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
+            disabled={isLoading}
+            className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer disabled:opacity-50"
           >
             {t("common.cancel")}
           </button>
-          <button className="px-4 py-2 bg-brand-orange text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors cursor-pointer">
-            {t("common.update")}
+          <button
+            onClick={handleSave}
+            disabled={isLoading}
+            className="px-4 py-2 bg-brand-orange text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-2"
+          >
+            {isLoading && (
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            )}
+            {t("locations.saveLocation")}
           </button>
         </div>
       </div>

@@ -29,7 +29,10 @@ pub fn run() {
         )
         .invoke_handler(tauri::generate_handler![
             greet,
-            commands::location_commands::create_location
+            commands::location_commands::get_locations,
+            commands::location_commands::create_location,
+            commands::location_commands::update_location,
+            commands::location_commands::delete_location
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
