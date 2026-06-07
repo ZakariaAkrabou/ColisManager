@@ -12,7 +12,6 @@ pub async fn get_locations(pool: &SqlitePool) -> Result<Vec<LocationRow>, String
     Ok(locations)
 }
 
-
 pub async fn create_location(
     pool: &SqlitePool,
     payload: CreateLocationPayload,
