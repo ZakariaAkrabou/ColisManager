@@ -1,14 +1,37 @@
-import React, { useState, useEffect } from "react";
+﻿// src/components/clients/EditClientModal.tsx
+import React, { useState, useEffect, useMemo } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
 import { Client } from "../../pages/Clients/Clients";
-
+import Swal from "sweetalert2";
 interface EditClientModalProps {
   isOpen: boolean;
   client: Client | null;
   onClose: () => void;
   onSave: (updatedClient: Client) => void;
 }
+
+interface LocationRow {
+  id: number;
+  country: string;
+  region: string;
+  city: string | null;
+}
+
+// Country codes with flags and phone codes
+const COUNTRY_CODES = [
+  { name: "Morocco", code: "MA", flag: "🇲🇦", phoneCode: "+212" },
+  { name: "France", code: "FR", flag: "🇫🇷", phoneCode: "+33" },
+  { name: "Spain", code: "ES", flag: "🇪🇸", phoneCode: "+34" },
+  { name: "Senegal", code: "SN", flag: "🇸🇳", phoneCode: "+221" },
+  { name: "Belgium", code: "BE", flag: "🇧🇪", phoneCode: "+32" },
+  { name: "Germany", code: "DE", flag: "🇩🇪", phoneCode: "+49" },
+  { name: "Italy", code: "IT", flag: "🇮🇹", phoneCode: "+39" },
+  { name: "United Kingdom", code: "GB", flag: "🇬🇧", phoneCode: "+44" },
+  { name: "Canada", code: "CA", flag: "🇨🇦", phoneCode: "+1" },
+  { name: "United States", code: "US", flag: "🇺🇸", phoneCode: "+1" },
+];
 
 export default function EditClientModal({
   isOpen,
@@ -17,64 +40,178 @@ export default function EditClientModal({
   onSave,
 }: EditClientModalProps) {
   const { t } = useTranslation();
+
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
-  const [formPays, setFormPays] = useState("Maroc");
+  const [formCountryCode, setFormCountryCode] = useState("MA");
+  const [formPays, setFormPays] = useState("");
   const [formRegion, setFormRegion] = useState("");
   const [formVille, setFormVille] = useState("");
   const [formAddress, setFormAddress] = useState("");
   const [formSent, setFormSent] = useState(0);
   const [formReceived, setFormReceived] = useState(0);
   const [formAmount, setFormAmount] = useState(0);
+  const [locations, setLocations] = useState<LocationRow[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const selectedCountry = useMemo(() => {
+    return (
+      COUNTRY_CODES.find((c) => c.code === formCountryCode) ||
+      COUNTRY_CODES[0]
+    );
+  }, [formCountryCode]);
+
+  const countries = useMemo(() => {
+    return Array.from(new Set(locations.map((loc) => loc.country)));
+  }, [locations]);
+
+  const regions = useMemo(() => {
+    const filtered = locations.filter((loc) => loc.country === formPays);
+    return Array.from(new Set(filtered.map((loc) => loc.region)));
+  }, [locations, formPays]);
+
+  const cities = useMemo(() => {
+    const filtered = locations.filter(
+      (loc) => loc.country === formPays && loc.region === formRegion
+    );
+    return Array.from(new Set(filtered.map((loc) => loc.city || ""))).filter(
+      Boolean
+    );
+  }, [locations, formPays, formRegion]);
+
+  const handleCountryChange = (country: string) => {
+    setFormPays(country);
+    const filteredRegions = locations.filter((loc) => loc.country === country);
+    const uniqueRegs = Array.from(new Set(filteredRegions.map((loc) => loc.region)));
+    if (uniqueRegs.length > 0) {
+      const nextReg = uniqueRegs[0];
+      setFormRegion(nextReg);
+      const filteredCities = filteredRegions.filter((loc) => loc.region === nextReg);
+      const uniqueCits = Array.from(new Set(filteredCities.map((loc) => loc.city || ""))).filter(Boolean);
+      setFormVille(uniqueCits.length > 0 ? uniqueCits[0] : "");
+    } else {
+      setFormRegion("");
+      setFormVille("");
+    }
+  };
+
+  const handleRegionChange = (region: string) => {
+    setFormRegion(region);
+    const filteredCities = locations.filter(
+      (loc) => loc.country === formPays && loc.region === region
+    );
+    const uniqueCits = Array.from(new Set(filteredCities.map((loc) => loc.city || ""))).filter(Boolean);
+    setFormVille(uniqueCits.length > 0 ? uniqueCits[0] : "");
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      invoke<LocationRow[]>("get_locations")
+        .then((res) => setLocations(res))
+        .catch((err) => console.error("Failed to load locations:", err));
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (client) {
-      setFormName(client.fullName);
-      setFormPhone(client.phone);
-      setFormPays(client.pays);
+      setFormName(client.full_name);
+      // Extract phone number without country code
+      const phoneStr = client.phone_number || "";
+      let extractedPhone = phoneStr;
+      let extractedCountryCode = "MA";
+
+      // Try to find matching country code from phone
+      for (const country of COUNTRY_CODES) {
+        if (phoneStr.startsWith(country.phoneCode)) {
+          extractedPhone = phoneStr.slice(country.phoneCode.length);
+          extractedCountryCode = country.code;
+          break;
+        }
+      }
+
+      setFormPhone(extractedPhone);
+      setFormCountryCode(extractedCountryCode);
+      setFormPays(client.country);
       setFormRegion(client.region);
-      setFormVille(client.ville);
-      setFormAddress(client.fullAddress);
-      setFormSent(client.totalSent);
-      setFormReceived(client.totalReceived);
-      setFormAmount(client.totalAmount);
+      setFormVille(client.city);
+      setFormAddress(client.full_address);
+      setFormSent(client.totalSent ?? 0);
+      setFormReceived(client.totalReceived ?? 0);
+      setFormAmount(client.totalAmount ?? 0);
+      setSubmitError(null);
     }
   }, [client]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!client) return;
     if (!formName.trim() || !formPhone.trim() || !formAddress.trim()) {
       return;
     }
 
-    onSave({
-      ...client,
-      fullName: formName.trim(),
-      phone: formPhone.trim(),
-      pays: formPays,
-      region: formRegion.trim() || formVille.trim(),
-      ville: formVille.trim(),
-      fullAddress: formAddress.trim(),
-      totalSent: Number(formSent) || 0,
-      totalReceived: Number(formReceived) || 0,
-      totalAmount: Number(formAmount) || 0,
-    });
+    const selectedLocation = locations.find(
+      (loc) =>
+        loc.country === formPays &&
+        loc.region === formRegion &&
+        (loc.city === formVille || (!loc.city && !formVille))
+    );
+    const locationId = selectedLocation ? selectedLocation.id : null;
+
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      await invoke("update_client", {
+        payload: {
+          id: client.id,
+          full_name: formName.trim(),
+          phone_number: `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
+          location_id: locationId,
+          full_address: formAddress.trim(),
+        },
+      });
+      Swal.fire({
+        title: t("common.success") || "Succès",
+        text: "Client mis à jour avec succès.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      onSave({
+        ...client,
+        full_name: formName.trim(),
+        phone_number: `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
+        country: formPays,
+        region: formRegion.trim() || formVille.trim(),
+        city: formVille.trim(),
+        full_address: formAddress.trim(),
+        totalSent: Number(formSent) || 0,
+        totalReceived: Number(formReceived) || 0,
+        totalAmount: Number(formAmount) || 0,
+      });
+
+    } catch (error) {
+      console.error("Update client error:", error);
+      setSubmitError(
+        typeof error === "string"
+          ? error
+          : "Failed to update client. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen || !client) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       ></div>
-
-      {/* Modal Container */}
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-150 w-full max-w-2xl overflow-hidden relative z-10 transform transition-all duration-300 scale-100 flex flex-col max-h-[90vh]">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4.5 border-b border-gray-100">
           <div>
             <h3 className="text-lg font-bold text-gray-900">
@@ -92,12 +229,7 @@ export default function EditClientModal({
           </button>
         </div>
 
-        {/* Form Content */}
-        <form
-          onSubmit={handleSubmit}
-          className="flex-1 overflow-y-auto p-6 space-y-4"
-        >
-          {/* Profile fields */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -111,22 +243,53 @@ export default function EditClientModal({
                 className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
               />
             </div>
-
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {t("clients.modal.phone")} *
               </label>
-              <input
-                type="text"
-                required
-                value={formPhone}
-                onChange={(e) => setFormPhone(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
-              />
+              <div className="flex items-center bg-gray-50/50 border border-gray-200 focus-within:border-brand-orange focus-within:ring-1 focus-within:ring-brand-orange rounded-xl overflow-hidden relative">
+
+                {/* Hidden select for country code - overlays the flag area */}
+                <select
+                  value={formCountryCode}
+                  onChange={(e) => {
+                    setFormCountryCode(e.target.value);
+                    setFormPhone("");
+                  }}
+                  className="absolute left-0 top-0 w-20 h-full opacity-0 cursor-pointer z-10"
+                >
+                  {COUNTRY_CODES.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.flag} {country.name} {country.phoneCode}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Country flag + code display */}
+                <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-100 border-r border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors">
+                  <span className="text-lg">{selectedCountry.flag}</span>
+                  <span className="text-xs font-semibold text-gray-600">
+                    {selectedCountry.phoneCode}
+                  </span>
+                </div>
+
+                {/* Phone input */}
+                <input
+                  type="tel"
+                  required
+                  inputMode="numeric"
+                  placeholder="612345678"
+                  value={formPhone}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setFormPhone(value);
+                  }}
+                  className="flex-1 bg-transparent px-3.5 py-2.5 text-sm text-gray-700 focus:outline-none placeholder:text-gray-400"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Geographic fields */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -134,44 +297,62 @@ export default function EditClientModal({
               </label>
               <select
                 value={formPays}
-                onChange={(e) => setFormPays(e.target.value)}
+                onChange={(e) => handleCountryChange(e.target.value)}
                 className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
               >
-                <option value="Maroc">Maroc</option>
-                <option value="France">France</option>
-                <option value="Espagne">Espagne</option>
-                <option value="Sénégal">Sénégal</option>
+                {countries.length === 0 ? (
+                  <option value="">{t("common.loading") || "Loading..."}</option>
+                ) : (
+                  countries.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
-
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {t("clients.modal.region")} *
               </label>
-              <input
-                type="text"
-                required
+              <select
                 value={formRegion}
-                onChange={(e) => setFormRegion(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
-              />
+                onChange={(e) => handleRegionChange(e.target.value)}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+              >
+                {regions.length === 0 ? (
+                  <option value="">—</option>
+                ) : (
+                  regions.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))
+                )}
+              </select>
             </div>
-
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {t("clients.modal.city")} *
               </label>
-              <input
-                type="text"
-                required
+              <select
                 value={formVille}
                 onChange={(e) => setFormVille(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
-              />
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+              >
+                {cities.length === 0 ? (
+                  <option value="">—</option>
+                ) : (
+                  cities.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))
+                )}
+              </select>
             </div>
           </div>
 
-          {/* Address */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
               {t("clients.modal.fullAddress")} *
@@ -185,9 +366,48 @@ export default function EditClientModal({
             />
           </div>
 
-          {/* Stats/Financial fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.totalSent")}
+              </label>
+              <input
+                type="number"
+                value={formSent}
+                onChange={(e) => setFormSent(Number(e.target.value))}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.totalReceived")}
+              </label>
+              <input
+                type="number"
+                value={formReceived}
+                onChange={(e) => setFormReceived(Number(e.target.value))}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.totalAmount")}
+              </label>
+              <input
+                type="number"
+                value={formAmount}
+                onChange={(e) => setFormAmount(Number(e.target.value))}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700"
+              />
+            </div>
+          </div>
 
-          {/* Footer Buttons */}
+          {submitError && (
+            <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+              <strong>Error:</strong> {submitError}
+            </div>
+          )}
+
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
             <button
               type="button"
@@ -198,9 +418,10 @@ export default function EditClientModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-semibold bg-brand-orange hover:bg-brand-orange/90 text-white rounded-xl shadow-md shadow-brand-orange/10 transition-colors cursor-pointer"
+              disabled={isSubmitting}
+              className="px-5 py-2 text-sm font-semibold bg-brand-orange hover:bg-brand-orange/90 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl shadow-md shadow-brand-orange/10 transition-colors cursor-pointer"
             >
-              {t("common.save")}
+              {isSubmitting ? t("common.saving") || "Saving..." : t("common.save")}
             </button>
           </div>
         </form>
