@@ -1,5 +1,5 @@
 // src/components/clients/AddClientModal.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Client } from "../../pages/Clients/Clients";
@@ -11,6 +11,13 @@ interface AddClientModalProps {
   onAdd: (client: Omit<Client, "id">) => void;
 }
 
+interface LocationRow {
+  id: number;
+  country: string;
+  region: string;
+  city: string | null;
+}
+
 export default function AddClientModal({
   isOpen,
   onClose,
@@ -19,57 +26,145 @@ export default function AddClientModal({
   const { t } = useTranslation();
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
-  const [formPays, setFormPays] = useState("Maroc");
-  const [formRegion, setFormRegion] = useState("Casablanca");
-  const [formVille, setFormVille] = useState("Casablanca");
+  const [formPays, setFormPays] = useState("");
+  const [formRegion, setFormRegion] = useState("");
+  const [formVille, setFormVille] = useState("");
   const [formAddress, setFormAddress] = useState("");
-  const [formSent, setFormSent] = useState(0);
-  const [formReceived, setFormReceived] = useState(0);
-  const [formAmount, setFormAmount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const [locations, setLocations] = useState<LocationRow[]>([]);
 
-  if (!formName.trim() || !formPhone.trim() || !formAddress.trim()) {
-    return;
-  }
+  useEffect(() => {
+    if (isOpen) {
+      invoke<LocationRow[]>("get_locations")
+        .then((res) => {
+          setLocations(res);
+          if (res.length > 0) {
+            // Find Morocco or the first location to set as default
+            const marocLoc = res.find(loc => loc.country.toLowerCase() === "morocco" || loc.country.toLowerCase() === "maroc") || res[0];
+            setFormPays(marocLoc.country);
+            setFormRegion(marocLoc.region);
+            setFormVille(marocLoc.city || "");
+          }
+        })
+        .catch((err) => console.error("Failed to load locations:", err));
+    }
+  }, [isOpen]);
 
-  try {
-    const result = await invoke("create_client", {
-      payload: {
-        full_name: formName.trim(),
-        phone_number: formPhone.trim(),
-        country: formPays,
-        region: formRegion,
-        city: formVille,
-        full_address: formAddress.trim(),
-      },
-    });
+  // Unique countries
+  const countries = useMemo(() => {
+    return Array.from(new Set(locations.map((loc) => loc.country)));
+  }, [locations]);
 
-    console.log("Rust response:", result);
+  // Unique regions based on current country
+  const regions = useMemo(() => {
+    const filtered = locations.filter((loc) => loc.country === formPays);
+    return Array.from(new Set(filtered.map((loc) => loc.region)));
+  }, [locations, formPays]);
 
-    onAdd({
-      fullName: formName.trim(),
-      phone: formPhone.trim(),
-      pays: formPays,
-      region: formRegion.trim() || formVille.trim(),
-      ville: formVille.trim(),
-      fullAddress: formAddress.trim(),
-      totalSent: 0,
-      totalReceived: 0,
-      totalAmount: 0,
-    });
+  // Unique cities based on current country & region
+  const cities = useMemo(() => {
+    const filtered = locations.filter(
+      (loc) => loc.country === formPays && loc.region === formRegion
+    );
+    return Array.from(
+      new Set(filtered.map((loc) => loc.city || ""))
+    ).filter(Boolean);
+  }, [locations, formPays, formRegion]);
 
-    setFormName("");
-    setFormPhone("");
-    setFormPays("Maroc");
-    setFormRegion("Casablanca");
-    setFormVille("Casablanca");
-    setFormAddress("");
-  } catch (error) {
-    console.error("Create client error:", error);
-  }
-};
+  const handleCountryChange = (country: string) => {
+    setFormPays(country);
+    const filteredRegions = locations.filter((loc) => loc.country === country);
+    const uniqueRegs = Array.from(new Set(filteredRegions.map((loc) => loc.region)));
+    if (uniqueRegs.length > 0) {
+      const nextReg = uniqueRegs[0];
+      setFormRegion(nextReg);
+      const filteredCities = filteredRegions.filter((loc) => loc.region === nextReg);
+      const uniqueCits = Array.from(new Set(filteredCities.map((loc) => loc.city || ""))).filter(Boolean);
+      setFormVille(uniqueCits.length > 0 ? uniqueCits[0] : "");
+    } else {
+      setFormRegion("");
+      setFormVille("");
+    }
+  };
+
+  const handleRegionChange = (region: string) => {
+    setFormRegion(region);
+    const filteredCities = locations.filter(
+      (loc) => loc.country === formPays && loc.region === region
+    );
+    const uniqueCits = Array.from(new Set(filteredCities.map((loc) => loc.city || ""))).filter(Boolean);
+    setFormVille(uniqueCits.length > 0 ? uniqueCits[0] : "");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitError(null);
+
+    if (!formName.trim() || !formPhone.trim() || !formAddress.trim()) {
+      return;
+    }
+
+    // Find the corresponding LocationID
+    const selectedLocation = locations.find(
+      (loc) =>
+        loc.country === formPays &&
+        loc.region === formRegion &&
+        (loc.city === formVille || (!loc.city && !formVille))
+    );
+    const locationId = selectedLocation ? selectedLocation.id : null;
+
+    setIsSubmitting(true);
+    try {
+      const result = await invoke("create_client", {
+        payload: {
+          full_name: formName.trim(),
+          phone_number: formPhone.trim(),
+          location_id: locationId,
+          full_address: formAddress.trim(),
+        },
+      });
+
+      console.log("Rust response:", result);
+
+      // Notify parent (shows toast + closes modal via setIsAddModalOpen(false))
+      onAdd({
+        fullName: formName.trim(),
+        phone: formPhone.trim(),
+        pays: formPays,
+        region: formRegion.trim() || formVille.trim(),
+        ville: formVille.trim(),
+        fullAddress: formAddress.trim(),
+        totalSent: 0,
+        totalReceived: 0,
+        totalAmount: 0,
+      });
+
+      // Reset form
+      setFormName("");
+      setFormPhone("");
+      if (locations.length > 0) {
+        const marocLoc = locations.find(loc => loc.country.toLowerCase() === "morocco" || loc.country.toLowerCase() === "maroc") || locations[0];
+        setFormPays(marocLoc.country);
+        setFormRegion(marocLoc.region);
+        setFormVille(marocLoc.city || "");
+      } else {
+        setFormPays("");
+        setFormRegion("");
+        setFormVille("");
+      }
+      setFormAddress("");
+
+      // Close the modal explicitly
+      onClose();
+    } catch (error) {
+      console.error("Create client error:", error);
+      setSubmitError(typeof error === "string" ? error : "Failed to save client. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -145,13 +240,18 @@ export default function AddClientModal({
               </label>
               <select
                 value={formPays}
-                onChange={(e) => setFormPays(e.target.value)}
+                onChange={(e) => handleCountryChange(e.target.value)}
                 className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
               >
-                <option value="Maroc">Maroc</option>
-                <option value="France">France</option>
-                <option value="Espagne">Espagne</option>
-                <option value="Sénégal">Sénégal</option>
+                {countries.length === 0 ? (
+                  <option value="">{t("common.loading") || "Loading..."}</option>
+                ) : (
+                  countries.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 
@@ -159,28 +259,42 @@ export default function AddClientModal({
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {t("clients.modal.region")} *
               </label>
-              <input
-                type="text"
-                required
-                placeholder={t("clients.modal.cityExample")}
+              <select
                 value={formRegion}
-                onChange={(e) => setFormRegion(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
-              />
+                onChange={(e) => handleRegionChange(e.target.value)}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+              >
+                {regions.length === 0 ? (
+                  <option value="">—</option>
+                ) : (
+                  regions.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))
+                )}
+              </select>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {t("clients.modal.city")} *
               </label>
-              <input
-                type="text"
-                required
-                placeholder={t("clients.modal.cityExample")}
+              <select
                 value={formVille}
                 onChange={(e) => setFormVille(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
-              />
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+              >
+                {cities.length === 0 ? (
+                  <option value="">—</option>
+                ) : (
+                  cities.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))
+                )}
+              </select>
             </div>
           </div>
 
@@ -199,7 +313,12 @@ export default function AddClientModal({
             />
           </div>
 
-          {/* Stats/Financial fields */}
+          {/* Error message */}
+          {submitError && (
+            <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+              <strong>Error:</strong> {submitError}
+            </div>
+          )}
 
           {/* Footer Buttons */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
@@ -212,9 +331,10 @@ export default function AddClientModal({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-sm font-semibold bg-brand-orange hover:bg-brand-orange/90 text-white rounded-xl shadow-md shadow-brand-orange/10 transition-colors cursor-pointer"
+              disabled={isSubmitting}
+              className="px-5 py-2 text-sm font-semibold bg-brand-orange hover:bg-brand-orange/90 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl shadow-md shadow-brand-orange/10 transition-colors cursor-pointer"
             >
-              {t("common.save")}
+              {isSubmitting ? t("common.saving") || "Saving..." : t("common.save")}
             </button>
           </div>
         </form>

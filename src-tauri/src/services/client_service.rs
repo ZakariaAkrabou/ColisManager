@@ -9,11 +9,11 @@ pub async fn create_client(
 
     sqlx::query(
         r#"
-        INSERT INTO clients (
-            full_name,
-            phone_number,
-            location_id,
-            full_address
+        INSERT INTO Clients (
+            Name,
+            Phone,
+            LocationID,
+            Address
         )
         VALUES (?, ?, ?, ?)
         "#

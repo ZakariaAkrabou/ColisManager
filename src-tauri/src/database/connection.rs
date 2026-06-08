@@ -26,20 +26,20 @@ pub async fn init_db(app_handle: &AppHandle) -> Result<AppState, String> {
         .await
         .map_err(|e| e.to_string())?;
         
-    // Enable WAL mode
+   
     sqlx::query("PRAGMA journal_mode = WAL;")
         .execute(&pool)
         .await
         .map_err(|e| e.to_string())?;
 
-    // Run schema using Executor trait to run multiple statements
+  
     use sqlx::Executor;
     let schema = include_str!("../../migrations/0001_schema.sql");
     pool.execute(schema)
         .await
         .map_err(|e| e.to_string())?;
 
-    // Run seed data
+ 
     pool.execute("INSERT OR IGNORE INTO Locations (LocationID, Country, City, Region) VALUES (1, 'Morocco', 'Casablanca', 'Casablanca-Settat');")
         .await
         .map_err(|e| e.to_string())?;

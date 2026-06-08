@@ -1,6 +1,6 @@
 //commands/client_commands.rs
 
-use crate::database::state::AppState;
+use crate::database::connection::AppState;
 use crate::models::client::CreateClientRequest;
 use crate::services::client_service;
 use tauri::State;
