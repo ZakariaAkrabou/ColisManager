@@ -16,17 +16,20 @@ export default function ClientDetailsModal({
   const { t } = useTranslation();
   if (!isOpen || !client) return null;
 
+  const initials = client.full_name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/45 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       ></div>
 
-      {/* Modal Container */}
       <div className="bg-white rounded-2xl shadow-2xl border border-gray-150 w-full max-w-lg overflow-hidden relative z-10 transform transition-all duration-300 scale-100 flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4.5 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
             <span className="bg-orange-50 text-brand-orange text-xs font-bold px-2.5 py-1 rounded-lg font-mono">
@@ -44,29 +47,22 @@ export default function ClientDetailsModal({
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Client Profile Summary */}
           <div className="flex items-center gap-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
             <div className="w-12 h-12 rounded-xl bg-orange-100/60 text-brand-orange flex items-center justify-center font-bold text-lg">
-              {client.fullName
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()}
+              {initials}
             </div>
             <div>
               <h4 className="text-base font-bold text-gray-950">
-                {client.fullName}
+                {client.full_name}
               </h4>
               <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1 font-mono">
                 <Phone className="w-3.5 h-3.5" />
-                <span>{client.phone}</span>
+                <span>{client.phone_number}</span>
               </div>
             </div>
           </div>
 
-          {/* Geographic details */}
           <div className="space-y-3.5">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
               {t("clients.modal.addressAndLocation")}
@@ -80,7 +76,7 @@ export default function ClientDetailsModal({
                     {t("clients.modal.country")}
                   </p>
                   <p className="text-sm font-semibold text-gray-800 mt-0.5">
-                    {client.pays}
+                    {client.country}
                   </p>
                 </div>
               </div>
@@ -92,7 +88,7 @@ export default function ClientDetailsModal({
                     {t("clients.modal.cityRegion")}
                   </p>
                   <p className="text-sm font-semibold text-gray-800 mt-0.5">
-                    {client.ville} / {client.region}
+                    {client.city} / {client.region}
                   </p>
                 </div>
               </div>
@@ -105,13 +101,12 @@ export default function ClientDetailsModal({
                   {t("clients.modal.fullAddress")}
                 </p>
                 <p className="text-xs font-semibold text-gray-700 mt-0.5 leading-relaxed">
-                  {client.fullAddress}
+                  {client.full_address}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Statistics */}
           <div className="border-t border-gray-100 pt-5">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3.5">
               {t("clients.modal.activityStats")}
@@ -123,7 +118,7 @@ export default function ClientDetailsModal({
                   {t("clients.totalSent")}
                 </p>
                 <p className="text-xl font-extrabold text-blue-600 mt-1">
-                  {client.totalSent}
+                  {client.totalSent ?? 0}
                 </p>
               </div>
 
@@ -132,7 +127,7 @@ export default function ClientDetailsModal({
                   {t("clients.totalReceived")}
                 </p>
                 <p className="text-xl font-extrabold text-brand-orange mt-1">
-                  {client.totalReceived}
+                  {client.totalReceived ?? 0}
                 </p>
               </div>
 
@@ -141,13 +136,12 @@ export default function ClientDetailsModal({
                   {t("clients.totalAmount")}
                 </p>
                 <p className="text-base font-extrabold text-slate-800 mt-1.5 whitespace-nowrap">
-                  {client.totalAmount} MAD
+                  {(client.totalAmount ?? 0).toLocaleString()} MAD
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Footer */}
           <div className="pt-4 border-t border-gray-100 flex justify-end">
             <button
               onClick={onClose}

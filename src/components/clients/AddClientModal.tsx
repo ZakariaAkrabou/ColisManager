@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Client } from "../../pages/Clients/Clients";
 import { invoke } from "@tauri-apps/api/core";
+import Swal from "sweetalert2";
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -18,6 +19,20 @@ interface LocationRow {
   city: string | null;
 }
 
+// Country codes with flags and phone codes
+const COUNTRY_CODES = [
+  { name: "Morocco", code: "MA", flag: "🇲🇦", phoneCode: "+212" },
+  { name: "France", code: "FR", flag: "🇫🇷", phoneCode: "+33" },
+  { name: "Spain", code: "ES", flag: "🇪🇸", phoneCode: "+34" },
+  { name: "Senegal", code: "SN", flag: "🇸🇳", phoneCode: "+221" },
+  { name: "Belgium", code: "BE", flag: "🇧🇪", phoneCode: "+32" },
+  { name: "Germany", code: "DE", flag: "🇩🇪", phoneCode: "+49" },
+  { name: "Italy", code: "IT", flag: "🇮🇹", phoneCode: "+39" },
+  { name: "United Kingdom", code: "GB", flag: "🇬🇧", phoneCode: "+44" },
+  { name: "Canada", code: "CA", flag: "🇨🇦", phoneCode: "+1" },
+  { name: "United States", code: "US", flag: "🇺🇸", phoneCode: "+1" },
+];
+
 export default function AddClientModal({
   isOpen,
   onClose,
@@ -26,6 +41,7 @@ export default function AddClientModal({
   const { t } = useTranslation();
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
+  const [formCountryCode, setFormCountryCode] = useState("MA");
   const [formPays, setFormPays] = useState("");
   const [formRegion, setFormRegion] = useState("");
   const [formVille, setFormVille] = useState("");
@@ -37,12 +53,17 @@ export default function AddClientModal({
 
   useEffect(() => {
     if (isOpen) {
+      // Set default country based on Morocco
+      setFormCountryCode("MA");
       invoke<LocationRow[]>("get_locations")
         .then((res) => {
           setLocations(res);
           if (res.length > 0) {
-            // Find Morocco or the first location to set as default
-            const marocLoc = res.find(loc => loc.country.toLowerCase() === "morocco" || loc.country.toLowerCase() === "maroc") || res[0];
+            const marocLoc = res.find(
+              (loc) =>
+                loc.country.toLowerCase() === "morocco" ||
+                loc.country.toLowerCase() === "maroc"
+            ) || res[0];
             setFormPays(marocLoc.country);
             setFormRegion(marocLoc.region);
             setFormVille(marocLoc.city || "");
@@ -52,18 +73,15 @@ export default function AddClientModal({
     }
   }, [isOpen]);
 
-  // Unique countries
   const countries = useMemo(() => {
     return Array.from(new Set(locations.map((loc) => loc.country)));
   }, [locations]);
 
-  // Unique regions based on current country
   const regions = useMemo(() => {
     const filtered = locations.filter((loc) => loc.country === formPays);
     return Array.from(new Set(filtered.map((loc) => loc.region)));
   }, [locations, formPays]);
 
-  // Unique cities based on current country & region
   const cities = useMemo(() => {
     const filtered = locations.filter(
       (loc) => loc.country === formPays && loc.region === formRegion
@@ -72,6 +90,13 @@ export default function AddClientModal({
       new Set(filtered.map((loc) => loc.city || ""))
     ).filter(Boolean);
   }, [locations, formPays, formRegion]);
+
+  const selectedCountry = useMemo(() => {
+    return (
+      COUNTRY_CODES.find((c) => c.code === formCountryCode) ||
+      COUNTRY_CODES[0]
+    );
+  }, [formCountryCode]);
 
   const handleCountryChange = (country: string) => {
     setFormPays(country);
@@ -106,7 +131,6 @@ export default function AddClientModal({
       return;
     }
 
-    // Find the corresponding LocationID
     const selectedLocation = locations.find(
       (loc) =>
         loc.country === formPays &&
@@ -128,24 +152,35 @@ export default function AddClientModal({
 
       console.log("Rust response:", result);
 
-      // Notify parent (shows toast + closes modal via setIsAddModalOpen(false))
       onAdd({
-        fullName: formName.trim(),
-        phone: formPhone.trim(),
-        pays: formPays,
+        full_name: formName.trim(),
+        phone_number: `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
+        country: formPays,
         region: formRegion.trim() || formVille.trim(),
-        ville: formVille.trim(),
-        fullAddress: formAddress.trim(),
+        city: formVille.trim(),
+        full_address: formAddress.trim(),
         totalSent: 0,
         totalReceived: 0,
         totalAmount: 0,
       });
 
-      // Reset form
+      Swal.fire({
+        title: t("common.success") || "Succès",
+        text: t("clients.clientAddedSuccess") || "Client ajouté avec succès.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
       setFormName("");
       setFormPhone("");
+      setFormCountryCode("MA");
       if (locations.length > 0) {
-        const marocLoc = locations.find(loc => loc.country.toLowerCase() === "morocco" || loc.country.toLowerCase() === "maroc") || locations[0];
+        const marocLoc = locations.find(
+          (loc) =>
+            loc.country.toLowerCase() === "morocco" ||
+            loc.country.toLowerCase() === "maroc"
+        ) || locations[0];
         setFormPays(marocLoc.country);
         setFormRegion(marocLoc.region);
         setFormVille(marocLoc.city || "");
@@ -156,11 +191,14 @@ export default function AddClientModal({
       }
       setFormAddress("");
 
-      // Close the modal explicitly
       onClose();
     } catch (error) {
       console.error("Create client error:", error);
-      setSubmitError(typeof error === "string" ? error : "Failed to save client. Please try again.");
+      setSubmitError(
+        typeof error === "string"
+          ? error
+          : "Failed to save client. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -221,14 +259,47 @@ export default function AddClientModal({
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {t("clients.modal.phone")} *
               </label>
-              <input
-                type="text"
-                required
-                placeholder={t("clients.modal.phoneExample")}
-                value={formPhone}
-                onChange={(e) => setFormPhone(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
-              />
+
+              <div className="flex items-center bg-gray-50/50 border border-gray-200 focus-within:border-brand-orange focus-within:ring-1 focus-within:ring-brand-orange rounded-xl overflow-hidden relative">
+
+                {/* Hidden select for country code - overlays the flag area */}
+                <select
+                  value={formCountryCode}
+                  onChange={(e) => {
+                    setFormCountryCode(e.target.value);
+                    setFormPhone("");
+                  }}
+                  className="absolute left-0 top-0 w-20 h-full opacity-0 cursor-pointer z-10"
+                >
+                  {COUNTRY_CODES.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.flag} {country.name} {country.phoneCode}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Country flag + code display */}
+                <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-100 border-r border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors">
+                  <span className="text-lg">{selectedCountry.flag}</span>
+                  <span className="text-xs font-semibold text-gray-600">
+                    {selectedCountry.phoneCode}
+                  </span>
+                </div>
+
+                {/* Phone input */}
+                <input
+                  type="tel"
+                  required
+                  inputMode="numeric"
+                  placeholder="612345678"
+                  value={formPhone}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setFormPhone(value);
+                  }}
+                  className="flex-1 bg-transparent px-3.5 py-2.5 text-sm text-gray-700 focus:outline-none placeholder:text-gray-400"
+                />
+              </div>
             </div>
           </div>
 

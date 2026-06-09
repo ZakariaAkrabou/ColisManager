@@ -1,5 +1,4 @@
-//src/pages/Clients/Clients.tsx
-import { useState, useMemo, useEffect } from "react";
+﻿import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Users,
@@ -22,225 +21,20 @@ import {
 import AddClientModal from "../../components/clients/AddClientModal";
 import EditClientModal from "../../components/clients/EditClientModal";
 import ClientDetailsModal from "../../components/clients/ClientDetailsModal";
-
+import { invoke } from "@tauri-apps/api/core";
+import Swal from "sweetalert2";
 export interface Client {
-  id: string;
-  fullName: string;
-  phone: string;
-  pays: string;
+  id: number;
+  full_name: string;
+  phone_number: string;
+  country: string;
   region: string;
-  ville: string;
-  fullAddress: string;
+  city: string;
+  full_address: string;
   totalSent: number;
   totalReceived: number;
   totalAmount: number;
 }
-
-function distributeSum(
-  count: number,
-  targetSum: number,
-  minVal: number,
-  maxVal: number,
-): number[] {
-  const arr = Array(count).fill(minVal);
-  let currentSum = count * minVal;
-
-  if (currentSum > targetSum) {
-    return arr;
-  }
-
-  let attempts = 0;
-  while (currentSum < targetSum && attempts < 100000) {
-    const idx = Math.floor(Math.random() * count);
-    if (arr[idx] < maxVal) {
-      arr[idx]++;
-      currentSum++;
-    }
-    attempts++;
-  }
-
-  return arr;
-}
-
-const FIRST_8_CLIENTS: Client[] = [
-  {
-    id: "CL001",
-    fullName: "Mara Rontret",
-    phone: "+212 6 12 34 56 78",
-    pays: "Maroc",
-    region: "Casablanca-Settat",
-    ville: "Casablanca",
-    fullAddress: "Rue Mohamed V, Résidence Al Amal, Casablanca",
-    totalSent: 15,
-    totalReceived: 12,
-    totalAmount: 450,
-  },
-  {
-    id: "CL002",
-    fullName: "Youssef Benali",
-    phone: "+212 6 23 45 67 89",
-    pays: "Maroc",
-    region: "Rabat-Salé-Kénitra",
-    ville: "Rabat",
-    fullAddress: "Avenue Hassan II, Appt 5, Agdal, Rabat",
-    totalSent: 10,
-    totalReceived: 8,
-    totalAmount: 320,
-  },
-  {
-    id: "CL003",
-    fullName: "Fatima Zahra El Amrani",
-    phone: "+212 6 34 56 78 90",
-    pays: "Maroc",
-    region: "Fès-Meknès",
-    ville: "Fès",
-    fullAddress: "Quartier Atlas, Rue 12, Fès",
-    totalSent: 18,
-    totalReceived: 14,
-    totalAmount: 520,
-  },
-  {
-    id: "CL004",
-    fullName: "Hamza Alaoui",
-    phone: "+212 6 45 67 89 01",
-    pays: "Maroc",
-    region: "Marrakech-Safi",
-    ville: "Marrakech",
-    fullAddress: "Avenue Mohammed VI, Marrakech",
-    totalSent: 12,
-    totalReceived: 10,
-    totalAmount: 380,
-  },
-  {
-    id: "CL005",
-    fullName: "Salma Idrissi",
-    phone: "+212 6 56 78 90 12",
-    pays: "Maroc",
-    region: "Tanger-Tétouan-Al Hoceïma",
-    ville: "Tanger",
-    fullAddress: "Boulevard Pasteur, Tanger",
-    totalSent: 20,
-    totalReceived: 17,
-    totalAmount: 610,
-  },
-  {
-    id: "CL006",
-    fullName: "Omar Chraibi",
-    phone: "+212 6 67 89 01 23",
-    pays: "Maroc",
-    region: "Souss-Massa",
-    ville: "Agadir",
-    fullAddress: "Hay Salam, Agadir",
-    totalSent: 9,
-    totalReceived: 7,
-    totalAmount: 290,
-  },
-  {
-    id: "CL007",
-    fullName: "Nadia Bennis",
-    phone: "+212 6 78 90 12 34",
-    pays: "Maroc",
-    region: "L’Oriental",
-    ville: "Oujda",
-    fullAddress: "Rue Al Qods, Oujda",
-    totalSent: 14,
-    totalReceived: 11,
-    totalAmount: 430,
-  },
-  {
-    id: "CL008",
-    fullName: "Karim El Fassi",
-    phone: "+212 6 89 01 23 45",
-    pays: "Maroc",
-    region: "Béni Mellal-Khénifra",
-    ville: "Béni Mellal",
-    fullAddress: "Avenue Hassan II, Béni Mellal",
-    totalSent: 16,
-    totalReceived: 13,
-    totalAmount: 470,
-  },
-];
-
-const generateMockClients = (): Client[] => {
-  const clients = [...FIRST_8_CLIENTS];
-
-  const count = 239;
-  // We want the total sum of ALL 247 clients to be:
-  // - Total Clients: 247
-  // - Total Sent: 1,245 (8 clients sum to 120, so 1125 remaining)
-  // - Total Received: 1,102 (8 clients sum to 102, so 1000 remaining)
-  // - Total Amount: 12,450 (8 clients sum to 4340, so 8110 remaining, which is 811 tens)
-  const sents = distributeSum(count, 1125, 1, 10);
-  const receiveds = distributeSum(count, 1000, 1, 8);
-  const amountTens = distributeSum(count, 811, 1, 15);
-
-  const moroccanNames = [
-    { first: "Youssef", last: "Benali" },
-    { first: "Fatima", last: "Zahra" },
-    { first: "Hamza", last: "Alaoui" },
-    { first: "Salma", last: "Idrissi" },
-    { first: "Omar", last: "Chraibi" },
-    { first: "Nadia", last: "Bennis" },
-    { first: "Karim", last: "El Fassi" },
-  ];
-
-  const locations = [
-    {
-      pays: "Maroc",
-      ville: "Casablanca",
-      region: "Casablanca-Settat",
-      address: "Boulevard Anfa, Immeuble B, Casablanca",
-    },
-    {
-      pays: "Maroc",
-      ville: "Oujda",
-      region: "L'Oriental",
-      address: "Boulevard Mohammed V, Oujda",
-    },
-    {
-      pays: "Maroc",
-      ville: "Kénitra",
-      region: "Rabat-Salé-Kénitra",
-      address: "Avenue Mohammed Diouri, Kénitra",
-    },
-  ];
-
-  for (let i = 0; i < count; i++) {
-    const idNum = i + 9;
-    const id = `CL${idNum.toString().padStart(3, "0")}`;
-
-    const nameObj = moroccanNames[i % moroccanNames.length];
-    const firstName = nameObj.first;
-    const lastName = moroccanNames[(i + 7) % moroccanNames.length].last;
-    const fullName = `${firstName} ${lastName}`;
-
-    const loc = locations[i % locations.length];
-
-    let phone = "";
-    if (loc.pays === "Maroc") {
-      const randDigits = Math.floor(10000000 + Math.random() * 90000000);
-      phone = `+212 6 ${randDigits.toString().replace(/(\d{2})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4")}`;
-    } else {
-      const randDigits = Math.floor(10000000 + Math.random() * 90000000);
-      phone = `+33 7 ${randDigits.toString().replace(/(\d{2})(\d{2})(\d{2})(\d{2})/, "$1 $2 $3 $4")}`;
-    }
-
-    clients.push({
-      id,
-      fullName,
-      phone,
-      pays: loc.pays,
-      region: loc.region,
-      ville: loc.ville,
-      fullAddress: loc.address,
-      totalSent: sents[i],
-      totalReceived: receiveds[i],
-      totalAmount: amountTens[i] * 10,
-    });
-  }
-
-  return clients;
-};
 
 export default function ClientsPage() {
   const { t } = useTranslation();
@@ -251,7 +45,7 @@ export default function ClientsPage() {
     return value;
   };
 
-  const [clients, setClients] = useState<Client[]>(() => generateMockClients());
+  const [clients, setClients] = useState<Client[]>([]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filterPays, setFilterPays] = useState("Tous");
@@ -267,39 +61,56 @@ export default function ClientsPage() {
 
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
-  const [toastMessage, setToastMessage] = useState<{
-    text: string;
-    type: "success" | "danger";
-  } | null>(null);
+  
+
+  const loadClients = async () => {
+    try {
+      const data = await invoke<Client[]>("get_clients");
+      setClients(
+        data.map((client) => ({
+          id: client.id,
+          full_name: client.full_name,
+          phone_number: client.phone_number,
+          country: client.country ?? "",
+          region: client.region ?? "",
+          city: client.city ?? "",
+          full_address: client.full_address ?? "",
+          totalSent: client.totalSent ?? 0,
+          totalReceived: client.totalReceived ?? 0,
+          totalAmount: client.totalAmount ?? 0,
+        }))
+      );
+    } catch (error) {
+      console.error("Failed to load clients:", error);
+    }
+  };
 
   useEffect(() => {
-    if (toastMessage) {
-      const timer = setTimeout(() => setToastMessage(null), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [toastMessage]);
+    loadClients();
+  }, []);
 
+ 
   const uniquePays = useMemo(() => {
-    return ["Tous", ...Array.from(new Set(clients.map((c) => c.pays)))];
+    return ["Tous", ...Array.from(new Set(clients.map((c) => c.country || "")))];
   }, [clients]);
 
   const uniqueRegions = useMemo(() => {
     const filtered =
       filterPays !== "Tous"
-        ? clients.filter((c) => c.pays === filterPays)
+        ? clients.filter((c) => c.country === filterPays)
         : clients;
-    return ["Toutes", ...Array.from(new Set(filtered.map((c) => c.region)))];
+    return ["Toutes", ...Array.from(new Set(filtered.map((c) => c.region || "")))];
   }, [clients, filterPays]);
 
   const uniqueVilles = useMemo(() => {
     let filtered = clients;
     if (filterPays !== "Tous") {
-      filtered = filtered.filter((c) => c.pays === filterPays);
+      filtered = filtered.filter((c) => c.country === filterPays);
     }
     if (filterRegion !== "Toutes") {
       filtered = filtered.filter((c) => c.region === filterRegion);
     }
-    return ["Toutes", ...Array.from(new Set(filtered.map((c) => c.ville)))];
+    return ["Toutes", ...Array.from(new Set(filtered.map((c) => c.city || "")))];
   }, [clients, filterPays, filterRegion]);
 
   useEffect(() => {
@@ -319,18 +130,20 @@ export default function ClientsPage() {
 
   const filteredClients = useMemo(() => {
     return clients.filter((client) => {
-      const matchesSearch =
-        client.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.phone.includes(searchQuery) ||
-        client.fullAddress.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.ville.toLowerCase().includes(searchQuery.toLowerCase());
+      const search = searchQuery.toLowerCase();
 
-      const matchesPays = filterPays === "Tous" || client.pays === filterPays;
+      const matchesSearch =
+        client.full_name.toLowerCase().includes(search) ||
+        String(client.id).includes(search) ||
+        client.phone_number.toLowerCase().includes(search) ||
+        client.full_address.toLowerCase().includes(search) ||
+        client.city.toLowerCase().includes(search);
+
+      const matchesPays = filterPays === "Tous" || client.country === filterPays;
       const matchesRegion =
         filterRegion === "Toutes" || client.region === filterRegion;
       const matchesVille =
-        filterVille === "Toutes" || client.ville === filterVille;
+        filterVille === "Toutes" || client.city === filterVille;
 
       return matchesSearch && matchesPays && matchesRegion && matchesVille;
     });
@@ -352,9 +165,9 @@ export default function ClientsPage() {
   const stats = useMemo(() => {
     return {
       totalClients: clients.length,
-      totalSent: clients.reduce((acc, c) => acc + c.totalSent, 0),
-      totalReceived: clients.reduce((acc, c) => acc + c.totalReceived, 0),
-      totalAmount: clients.reduce((acc, c) => acc + c.totalAmount, 0),
+      totalSent: clients.reduce((acc, c) => acc + (c.totalSent ?? 0), 0),
+      totalReceived: clients.reduce((acc, c) => acc + (c.totalReceived ?? 0), 0),
+      totalAmount: clients.reduce((acc, c) => acc + (c.totalAmount ?? 0), 0),
     };
   }, [clients]);
 
@@ -363,26 +176,29 @@ export default function ClientsPage() {
   };
 
   const handleAddClientSubmit = (newClientData: Omit<Client, "id">) => {
-    const maxIdNum = clients.reduce((max, client) => {
-      const num = parseInt(client.id.replace("CL", ""));
-      return num > max ? num : max;
-    }, 0);
-    const newId = `CL${(maxIdNum + 1).toString().padStart(3, "0")}`;
+    const newId = Date.now();
 
     const newClient: Client = {
       id: newId,
       ...newClientData,
+      totalSent: newClientData.totalSent ?? 0,
+      totalReceived: newClientData.totalReceived ?? 0,
+      totalAmount: newClientData.totalAmount ?? 0,
     };
 
     setClients([newClient, ...clients]);
     setIsAddModalOpen(false);
-    setToastMessage({
+    Swal.fire({
+      icon: "success",
+      title: t("common.success"),
       text: t("clients.clientAdded", {
-        name: newClientData.fullName,
+        name: newClientData.full_name,
         id: newId,
       }),
-      type: "success",
+      timer: 2000,
+      showConfirmButton: false,
     });
+    
   };
 
   const handleOpenEditModal = (client: Client) => {
@@ -391,31 +207,63 @@ export default function ClientsPage() {
   };
 
   const handleEditClientSubmit = (updatedClient: Client) => {
-    const updatedClients = clients.map((c) =>
-      c.id === updatedClient.id ? updatedClient : c,
+    setClients((prev) =>
+      prev.map((c) => (c.id === updatedClient.id ? updatedClient : c))
     );
-    setClients(updatedClients);
     setIsEditModalOpen(false);
     setSelectedClient(null);
-    setToastMessage({
-      text: t("clients.clientUpdated", { name: updatedClient.fullName }),
-      type: "success",
+    Swal.fire({
+      icon: "success",
+      title: t("common.success"),
+      text: t("clients.clientUpdated", { name: updatedClient.full_name }),
+      timer: 2000,
+      showConfirmButton: false,
     });
   };
 
-  const handleDeleteClient = (client: Client) => {
-    if (
-      window.confirm(
-        t("clients.deleteConfirm", { name: client.fullName, id: client.id }),
-      )
-    ) {
-      setClients(clients.filter((c) => c.id !== client.id));
-      setToastMessage({
-        text: t("clients.clientDeleted", { name: client.fullName }),
-        type: "success",
-      });
-    }
-  };
+  const handleDeleteClient = async (client: Client) => {
+  const result = await Swal.fire({
+    title: t("common.areYouSure") || "Are you sure?",
+    text: t("clients.deleteConfirm", {
+      name: client.full_name,
+      id: client.id,
+    }),
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#ea580c",
+    cancelButtonColor: "#6b7280",
+    confirmButtonText: t("common.delete") || "Delete",
+    cancelButtonText: t("common.cancel") || "Cancel",
+    reverseButtons: true,
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await invoke("delete_client", { id: client.id });
+
+    setClients((prev) => prev.filter((c) => c.id !== client.id));
+
+    Swal.fire({
+      icon: "success",
+      title: t("common.success"),
+      text: t("clients.clientDeleted", {
+        name: client.full_name,
+      }),
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    console.error("Failed to delete client:", error);
+
+    Swal.fire({
+      icon: "error",
+      title: t("common.error"),
+      text: t("clients.clientDeleteFailed"),
+      confirmButtonColor: "#ea580c",
+    });
+  }
+};
 
   const handleOpenDetails = (client: Client) => {
     setSelectedClient(client);
@@ -428,7 +276,6 @@ export default function ClientsPage() {
     setFilterRegion("Toutes");
     setFilterVille("Toutes");
     setCurrentPage(1);
-    setToastMessage({ text: t("clients.filtersReset"), type: "success" });
   };
 
   const paginationRange = useMemo(() => {
@@ -450,40 +297,13 @@ export default function ClientsPage() {
       return [...startPages, "ellipsis", ...middlePages, ...endPages];
     } else {
       const middlePages = [currentPage - 1, currentPage, currentPage + 1];
-      return [
-        ...startPages,
-        "ellipsis",
-        ...middlePages,
-        "ellipsis",
-        ...endPages,
-      ];
+      return [...startPages, "ellipsis", ...middlePages, "ellipsis", ...endPages];
     }
   }, [totalPages, currentPage]);
 
   return (
     <div className="space-y-6">
-      {toastMessage && (
-        <div
-          className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform scale-100 ${
-            toastMessage.type === "success"
-              ? "bg-emerald-600 text-white shadow-emerald-600/20"
-              : "bg-rose-600 text-white shadow-rose-600/20"
-          }`}
-        >
-          {toastMessage.type === "success" ? (
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-          ) : (
-            <AlertTriangle className="w-5 h-5 shrink-0" />
-          )}
-          <span className="text-sm font-medium">{toastMessage.text}</span>
-          <button
-            onClick={() => setToastMessage(null)}
-            className="hover:bg-white/20 p-1 rounded-lg transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+    
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -669,62 +489,62 @@ export default function ClientsPage() {
           filterPays !== "Tous" ||
           filterRegion !== "Toutes" ||
           filterVille !== "Toutes") && (
-          <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-2 items-center">
-            <span className="text-xs text-gray-400 font-medium">
-              {t("clients.activeFilters")}
-            </span>
-            {searchQuery && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
-                {t("clients.search")}: "{searchQuery}"
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
-                >
-                  <X className="w-3 h-3" />
-                </button>
+            <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-2 items-center">
+              <span className="text-xs text-gray-400 font-medium">
+                {t("clients.activeFilters")}
               </span>
-            )}
-            {filterPays !== "Tous" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
-                {t("clients.country")}: {filterPays}
-                <button
-                  onClick={() => setFilterPays("Tous")}
-                  className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-            {filterRegion !== "Toutes" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
-                {t("clients.region")}: {filterRegion}
-                <button
-                  onClick={() => setFilterRegion("Toutes")}
-                  className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-            {filterVille !== "Toutes" && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
-                {t("clients.city")}: {filterVille}
-                <button
-                  onClick={() => setFilterVille("Toutes")}
-                  className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            )}
-            <button
-              onClick={handleResetFilters}
-              className="text-xs text-slate-400 hover:text-brand-orange underline font-semibold ml-auto cursor-pointer"
-            >
-              {t("clients.clearAll")}
-            </button>
-          </div>
-        )}
+              {searchQuery && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
+                  {t("clients.search")} : "{searchQuery}"
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filterPays !== "Tous" && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
+                  {t("clients.country")} : {filterPays}
+                  <button
+                    onClick={() => setFilterPays("Tous")}
+                    className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filterRegion !== "Toutes" && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
+                  {t("clients.region")} : {filterRegion}
+                  <button
+                    onClick={() => setFilterRegion("Toutes")}
+                    className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filterVille !== "Toutes" && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
+                  {t("clients.city")} : {filterVille}
+                  <button
+                    onClick={() => setFilterVille("Toutes")}
+                    className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              <button
+                onClick={handleResetFilters}
+                className="text-xs text-slate-400 hover:text-brand-orange underline font-semibold ml-auto cursor-pointer"
+              >
+                {t("clients.clearAll")}
+              </button>
+            </div>
+          )}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -740,6 +560,9 @@ export default function ClientsPage() {
                 </th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   {t("clients.country")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.city")}
                 </th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider max-w-70">
                   {t("clients.fullAddress")}
@@ -766,28 +589,36 @@ export default function ClientsPage() {
                     className="hover:bg-gray-50/70 transition-colors group"
                   >
                     <td className="px-6 py-4 text-sm font-semibold text-slate-800">
-                      {client.fullName}
+                      {client.full_name}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 font-mono whitespace-nowrap">
-                      {client.phone}
+                    <td className=" text-sm text-green-700  rounded font-mono whitespace-nowrap">
+                      {client.phone_number}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      <span className="capitalize">{client.pays}</span>
+                      <span className="capitalize">{client.country}</span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 capitalize">
+                      {client.city}
                     </td>
                     <td
                       className="px-6 py-4 text-sm text-gray-500 max-w-70 truncate"
-                      title={client.fullAddress}
+                      title={client.full_address}
                     >
-                      {client.fullAddress}
+                      {client.full_address}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                      {client.totalSent}
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700 whitespace-nowrap">
+                      {client.totalSent.toLocaleString()}
+                      <span className="px-1 text-xs font-medium text-gray-400">kg</span>
+
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">
-                      {client.totalReceived}
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700 whitespace-nowrap">
+                      {client.totalReceived.toLocaleString()}
+                      <span className="px-1 text-xs font-medium text-gray-400">kg</span>
+
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-900 whitespace-nowrap">
-                      {client.totalAmount.toLocaleString()} MAD
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700 whitespace-nowrap">
+                      {client.totalAmount.toLocaleString()}{" "}
+                      <span className="text-xs font-medium text-gray-400">DH</span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center ">
@@ -871,11 +702,10 @@ export default function ClientsPage() {
                   <button
                     key={`page-${page}`}
                     onClick={() => setCurrentPage(page as number)}
-                    className={`w-8 h-8 flex items-center justify-center text-sm font-semibold rounded-lg border transition-all cursor-pointer ${
-                      isActive
-                        ? "border-brand-orange text-brand-orange bg-orange-50/10"
-                        : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                    }`}
+                    className={`w-8 h-8 flex items-center justify-center text-sm font-semibold rounded-lg border transition-all cursor-pointer ${isActive
+                      ? "border-brand-orange text-brand-orange bg-orange-50/10"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      }`}
                   >
                     {page}
                   </button>
@@ -904,15 +734,9 @@ export default function ClientsPage() {
               >
                 <option value={5}>{t("clients.perPage", { count: 5 })}</option>
                 <option value={8}>{t("clients.perPage", { count: 8 })}</option>
-                <option value={10}>
-                  {t("clients.perPage", { count: 10 })}
-                </option>
-                <option value={20}>
-                  {t("clients.perPage", { count: 20 })}
-                </option>
-                <option value={50}>
-                  {t("clients.perPage", { count: 50 })}
-                </option>
+                <option value={10}>{t("clients.perPage", { count: 10 })}</option>
+                <option value={20}>{t("clients.perPage", { count: 20 })}</option>
+                <option value={50}>{t("clients.perPage", { count: 50 })}</option>
               </select>
             </div>
           </div>
