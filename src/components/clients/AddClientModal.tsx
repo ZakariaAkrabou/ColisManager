@@ -1,6 +1,14 @@
-// src/components/clients/AddClientModal.tsx
 import React, { useState, useEffect, useMemo } from "react";
-import { X } from "lucide-react";
+import {
+  Building2,
+  Globe2,
+  MapPin,
+  Phone,
+  User,
+  UsersRound,
+  X,
+} from "lucide-react";
+import PhoneInput from "react-phone-input-2";
 import { useTranslation } from "react-i18next";
 import { Client } from "../../pages/Clients/Clients";
 import { invoke } from "@tauri-apps/api/core";
@@ -9,7 +17,7 @@ import Swal from "sweetalert2";
 interface AddClientModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (client: Omit<Client, "id">) => void;
+  onAdd: (client: Client) => void;
 }
 
 interface LocationRow {
@@ -19,19 +27,27 @@ interface LocationRow {
   city: string | null;
 }
 
-// Country codes with flags and phone codes
 const COUNTRY_CODES = [
-  { name: "Morocco", code: "MA", flag: "🇲🇦", phoneCode: "+212" },
-  { name: "France", code: "FR", flag: "🇫🇷", phoneCode: "+33" },
-  { name: "Spain", code: "ES", flag: "🇪🇸", phoneCode: "+34" },
-  { name: "Senegal", code: "SN", flag: "🇸🇳", phoneCode: "+221" },
-  { name: "Belgium", code: "BE", flag: "🇧🇪", phoneCode: "+32" },
-  { name: "Germany", code: "DE", flag: "🇩🇪", phoneCode: "+49" },
-  { name: "Italy", code: "IT", flag: "🇮🇹", phoneCode: "+39" },
-  { name: "United Kingdom", code: "GB", flag: "🇬🇧", phoneCode: "+44" },
-  { name: "Canada", code: "CA", flag: "🇨🇦", phoneCode: "+1" },
-  { name: "United States", code: "US", flag: "🇺🇸", phoneCode: "+1" },
+  { name: "Morocco", code: "MA", phoneCode: "+212" },
+  { name: "France", code: "FR", phoneCode: "+33" },
+  { name: "Spain", code: "ES", phoneCode: "+34" },
+  { name: "Senegal", code: "SN", phoneCode: "+221" },
+  { name: "Belgium", code: "BE", phoneCode: "+32" },
+  { name: "Germany", code: "DE", phoneCode: "+49" },
+  { name: "Italy", code: "IT", phoneCode: "+39" },
+  { name: "United Kingdom", code: "GB", phoneCode: "+44" },
+  { name: "Canada", code: "CA", phoneCode: "+1" },
+  { name: "United States", code: "US", phoneCode: "+1" },
 ];
+
+const fieldWrapClass = "space-y-1.5";
+const labelClass =
+  "text-xs font-bold text-gray-500 uppercase tracking-wider";
+const controlClass =
+  "h-11 w-full rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 text-sm text-gray-800 outline-none transition-all placeholder:text-gray-400 hover:bg-white focus:border-brand-orange focus:bg-white focus:ring-2 focus:ring-brand-orange/15";
+const selectClass = `${controlClass} cursor-pointer appearance-none pr-9`;
+const iconClass = "pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400";
+const iconControlClass = `${controlClass} pl-10`;
 
 export default function AddClientModal({
   isOpen,
@@ -41,6 +57,9 @@ export default function AddClientModal({
   const { t } = useTranslation();
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
+  const [formClientType, setFormClientType] = useState<
+    "expediteur" | "destinataire"
+  >("destinataire");
   const [formCountryCode, setFormCountryCode] = useState("MA");
   const [formPays, setFormPays] = useState("");
   const [formRegion, setFormRegion] = useState("");
@@ -48,22 +67,22 @@ export default function AddClientModal({
   const [formAddress, setFormAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
   const [locations, setLocations] = useState<LocationRow[]>([]);
 
   useEffect(() => {
     if (isOpen) {
-      // Set default country based on Morocco
       setFormCountryCode("MA");
+      setSubmitError(null);
       invoke<LocationRow[]>("get_locations")
         .then((res) => {
           setLocations(res);
           if (res.length > 0) {
-            const marocLoc = res.find(
-              (loc) =>
-                loc.country.toLowerCase() === "morocco" ||
-                loc.country.toLowerCase() === "maroc"
-            ) || res[0];
+            const marocLoc =
+              res.find(
+                (loc) =>
+                  loc.country.toLowerCase() === "morocco" ||
+                  loc.country.toLowerCase() === "maroc",
+              ) || res[0];
             setFormPays(marocLoc.country);
             setFormRegion(marocLoc.region);
             setFormVille(marocLoc.city || "");
@@ -84,16 +103,16 @@ export default function AddClientModal({
 
   const cities = useMemo(() => {
     const filtered = locations.filter(
-      (loc) => loc.country === formPays && loc.region === formRegion
+      (loc) => loc.country === formPays && loc.region === formRegion,
     );
-    return Array.from(
-      new Set(filtered.map((loc) => loc.city || ""))
-    ).filter(Boolean);
+    return Array.from(new Set(filtered.map((loc) => loc.city || ""))).filter(
+      Boolean,
+    );
   }, [locations, formPays, formRegion]);
 
   const selectedCountry = useMemo(() => {
     return (
-      COUNTRY_CODES.find((c) => c.code === formCountryCode) ||
+      COUNTRY_CODES.find((country) => country.code === formCountryCode) ||
       COUNTRY_CODES[0]
     );
   }, [formCountryCode]);
@@ -101,12 +120,19 @@ export default function AddClientModal({
   const handleCountryChange = (country: string) => {
     setFormPays(country);
     const filteredRegions = locations.filter((loc) => loc.country === country);
-    const uniqueRegs = Array.from(new Set(filteredRegions.map((loc) => loc.region)));
+    const uniqueRegs = Array.from(
+      new Set(filteredRegions.map((loc) => loc.region)),
+    );
+
     if (uniqueRegs.length > 0) {
       const nextReg = uniqueRegs[0];
       setFormRegion(nextReg);
-      const filteredCities = filteredRegions.filter((loc) => loc.region === nextReg);
-      const uniqueCits = Array.from(new Set(filteredCities.map((loc) => loc.city || ""))).filter(Boolean);
+      const filteredCities = filteredRegions.filter(
+        (loc) => loc.region === nextReg,
+      );
+      const uniqueCits = Array.from(
+        new Set(filteredCities.map((loc) => loc.city || "")),
+      ).filter(Boolean);
       setFormVille(uniqueCits.length > 0 ? uniqueCits[0] : "");
     } else {
       setFormRegion("");
@@ -117,10 +143,36 @@ export default function AddClientModal({
   const handleRegionChange = (region: string) => {
     setFormRegion(region);
     const filteredCities = locations.filter(
-      (loc) => loc.country === formPays && loc.region === region
+      (loc) => loc.country === formPays && loc.region === region,
     );
-    const uniqueCits = Array.from(new Set(filteredCities.map((loc) => loc.city || ""))).filter(Boolean);
+    const uniqueCits = Array.from(
+      new Set(filteredCities.map((loc) => loc.city || "")),
+    ).filter(Boolean);
     setFormVille(uniqueCits.length > 0 ? uniqueCits[0] : "");
+  };
+
+  const resetForm = () => {
+    setFormName("");
+    setFormPhone("");
+    setFormClientType("destinataire");
+    setFormCountryCode("MA");
+    setFormAddress("");
+
+    if (locations.length > 0) {
+      const marocLoc =
+        locations.find(
+          (loc) =>
+            loc.country.toLowerCase() === "morocco" ||
+            loc.country.toLowerCase() === "maroc",
+        ) || locations[0];
+      setFormPays(marocLoc.country);
+      setFormRegion(marocLoc.region);
+      setFormVille(marocLoc.city || "");
+    } else {
+      setFormPays("");
+      setFormRegion("");
+      setFormVille("");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -131,33 +183,52 @@ export default function AddClientModal({
       return;
     }
 
-    const selectedLocation = locations.find(
-      (loc) =>
-        loc.country === formPays &&
-        loc.region === formRegion &&
-        (loc.city === formVille || (!loc.city && !formVille))
-    );
+    if (
+      formClientType === "destinataire" &&
+      (!formPays || !formRegion || !formVille)
+    ) {
+      setSubmitError(
+        t("clients.modal.destinationFieldsRequired") ||
+          "Please fill all destination fields.",
+      );
+      return;
+    }
+
+    const selectedLocation =
+      formClientType === "destinataire"
+        ? locations.find(
+            (loc) =>
+              loc.country === formPays &&
+              loc.region === formRegion &&
+              (loc.city === formVille || (!loc.city && !formVille)),
+          )
+        : null;
     const locationId = selectedLocation ? selectedLocation.id : null;
 
     setIsSubmitting(true);
     try {
-      const result = await invoke("create_client", {
+      const phoneNumber = formPhone.startsWith("+") ? formPhone.trim() : `${selectedCountry.phoneCode}${formPhone.trim().replace(/^\+/, "")}`;
+      const insertedId = await invoke<number>("create_client", {
         payload: {
+          client_type: formClientType,
           full_name: formName.trim(),
-          phone_number: formPhone.trim(),
+          phone_number: phoneNumber,
           location_id: locationId,
           full_address: formAddress.trim(),
         },
       });
 
-      console.log("Rust response:", result);
-
       onAdd({
+        id: insertedId,
+        client_type: formClientType,
         full_name: formName.trim(),
-        phone_number: `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
-        country: formPays,
-        region: formRegion.trim() || formVille.trim(),
-        city: formVille.trim(),
+        phone_number: phoneNumber,
+        country: formClientType === "destinataire" ? formPays : "",
+        region:
+          formClientType === "destinataire"
+            ? formRegion.trim() || formVille.trim()
+            : "",
+        city: formClientType === "destinataire" ? formVille.trim() : "",
         full_address: formAddress.trim(),
         totalSent: 0,
         totalReceived: 0,
@@ -165,39 +236,21 @@ export default function AddClientModal({
       });
 
       Swal.fire({
-        title: t("common.success") || "Succès",
-        text: t("clients.clientAddedSuccess") || "Client ajouté avec succès.",
+        title: t("common.success") || "Succes",
+        text: t("clients.clientAddedSuccess") || "Client ajoute avec succes.",
         icon: "success",
         timer: 1500,
         showConfirmButton: false,
       });
 
-      setFormName("");
-      setFormPhone("");
-      setFormCountryCode("MA");
-      if (locations.length > 0) {
-        const marocLoc = locations.find(
-          (loc) =>
-            loc.country.toLowerCase() === "morocco" ||
-            loc.country.toLowerCase() === "maroc"
-        ) || locations[0];
-        setFormPays(marocLoc.country);
-        setFormRegion(marocLoc.region);
-        setFormVille(marocLoc.city || "");
-      } else {
-        setFormPays("");
-        setFormRegion("");
-        setFormVille("");
-      }
-      setFormAddress("");
-
+      resetForm();
       onClose();
     } catch (error) {
       console.error("Create client error:", error);
       setSubmitError(
         typeof error === "string"
           ? error
-          : "Failed to save client. Please try again."
+          : "Failed to save client. Please try again.",
       );
     } finally {
       setIsSubmitting(false);
@@ -208,204 +261,242 @@ export default function AddClientModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+      <button
+        type="button"
+        aria-label={t("common.close") || "Close"}
+        className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
         onClick={onClose}
-      ></div>
+      />
 
-      {/* Modal Container */}
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-150 w-full max-w-2xl overflow-hidden relative z-10 transform transition-all duration-300 scale-100 flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4.5 border-b border-gray-100">
+      <div className="relative z-10 flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/60 px-6 py-4">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="text-lg font-bold text-gray-950">
               {t("clients.modal.addTitle")}
             </h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="mt-0.5 text-xs font-medium text-gray-400">
               {t("clients.modal.addSubtitle")}
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 transition-colors hover:bg-white hover:text-gray-700"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Form Content */}
         <form
           onSubmit={handleSubmit}
-          className="flex-1 overflow-y-auto p-6 space-y-4"
+          className="flex-1 space-y-4 overflow-y-auto p-5"
         >
-          {/* Profile fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.fullName")} *
-              </label>
+          <section className="space-y-3.5">
+            <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 text-brand-orange">
+                <User className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-bold text-gray-800">
+                {t("clients.modal.clientType")}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className={`${fieldWrapClass} md:col-span-2`}>
+                <label className={labelClass}>
+                  {t("clients.modal.fullName")} *
+                </label>
+                <div className="relative">
+                  <User className={iconClass} />
+                  <input
+                    type="text"
+                    required
+                    placeholder={t("clients.modal.fullNameExample")}
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className={iconControlClass}
+                  />
+                </div>
+              </div>
+
+              <div className={fieldWrapClass}>
+                <label className={labelClass}>
+                  {t("clients.modal.clientType")} *
+                </label>
+                <div className="relative">
+                      <UsersRound className={iconClass} />
+                      <select
+                        value={formClientType}
+                        onChange={(e) =>
+                          setFormClientType(
+                            e.target.value as "expediteur" | "destinataire",
+                          )
+                        }
+                        className={`${iconControlClass} appearance-none pr-10 cursor-pointer`}
+                      >
+                        <option value="destinataire">
+                          {t("clients.modal.destinataire")}
+                        </option>
+                        <option value="expediteur">
+                          {t("clients.modal.expediteur")}
+                        </option>
+                      </select>
+                      <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                        <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                </div>
+              </div>
+
+              <div className={`${fieldWrapClass} md:col-span-3`}>
+                <label className={labelClass}>{t("clients.modal.phone")} *</label>
+                <div className="relative">
+                  <Phone className="absolute left-3.5 top-[12px] h-4 w-4 text-gray-400" />
+                  <PhoneInput
+                    country={formCountryCode.toLowerCase()}
+                    value={formPhone}
+                    onChange={(value: string, data: any) => {
+                      // value may come without +, normalize to include + when sending
+                      setFormPhone(value ? (value.startsWith("+") ? value : `+${value}`) : "");
+                      if (data?.countryCode) setFormCountryCode(data.countryCode.toUpperCase());
+                    }}
+                    inputClass="h-11 min-w-0 bg-transparent pl-10 pr-3.5 text-sm text-gray-800 outline-none placeholder:text-gray-400"
+                    buttonClass="h-11 border-r border-gray-200 bg-white/75"
+                    containerClass="w-full"
+                    dropdownClass="rounded-xl"
+                    enableSearch
+                    preferredCountries={["ma", "fr"]}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {formClientType === "destinataire" ? (
+            <section className="space-y-3.5">
+              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                  <MapPin className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-bold text-gray-800">
+                  {t("clients.modal.addressAndLocation")}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className={fieldWrapClass}>
+                  <label className={labelClass}>
+                    {t("clients.modal.country")} *
+                  </label>
+                  <div className="relative">
+                    <Globe2 className={iconClass} />
+                    <select
+                      value={formPays}
+                      onChange={(e) => handleCountryChange(e.target.value)}
+                      className={`${selectClass} pl-10`}
+                    >
+                      {countries.length === 0 ? (
+                        <option value="">
+                          {t("common.loading") || "Loading..."}
+                        </option>
+                      ) : (
+                        countries.map((country) => (
+                          <option key={country} value={country}>
+                            {country}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div className={fieldWrapClass}>
+                  <label className={labelClass}>
+                    {t("clients.modal.region")} *
+                  </label>
+                  <div className="relative">
+                    <Building2 className={iconClass} />
+                    <select
+                      value={formRegion}
+                      onChange={(e) => handleRegionChange(e.target.value)}
+                      className={`${selectClass} pl-10`}
+                    >
+                      {regions.length === 0 ? (
+                        <option value="">-</option>
+                      ) : (
+                        regions.map((region) => (
+                          <option key={region} value={region}>
+                            {region}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div className={fieldWrapClass}>
+                  <label className={labelClass}>{t("clients.modal.city")} *</label>
+                  <div className="relative">
+                    <MapPin className={iconClass} />
+                    <select
+                      value={formVille}
+                      onChange={(e) => setFormVille(e.target.value)}
+                      className={`${selectClass} pl-10`}
+                    >
+                      {cities.length === 0 ? (
+                        <option value="">-</option>
+                      ) : (
+                        cities.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </section>
+          ) : null}
+
+          <div className={fieldWrapClass}>
+            <label className={labelClass}>
+              {t("clients.modal.fullAddress")} *
+            </label>
+            <div className="relative">
+              <MapPin className={iconClass} />
               <input
                 type="text"
                 required
-                placeholder={t("clients.modal.fullNameExample")}
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
+                placeholder={t("clients.modal.addressExample")}
+                value={formAddress}
+                onChange={(e) => setFormAddress(e.target.value)}
+                className={iconControlClass}
               />
             </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.phone")} *
-              </label>
-
-              <div className="flex items-center bg-gray-50/50 border border-gray-200 focus-within:border-brand-orange focus-within:ring-1 focus-within:ring-brand-orange rounded-xl overflow-hidden relative">
-
-                {/* Hidden select for country code - overlays the flag area */}
-                <select
-                  value={formCountryCode}
-                  onChange={(e) => {
-                    setFormCountryCode(e.target.value);
-                    setFormPhone("");
-                  }}
-                  className="absolute left-0 top-0 w-20 h-full opacity-0 cursor-pointer z-10"
-                >
-                  {COUNTRY_CODES.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.flag} {country.name} {country.phoneCode}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Country flag + code display */}
-                <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-100 border-r border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors">
-                  <span className="text-lg">{selectedCountry.flag}</span>
-                  <span className="text-xs font-semibold text-gray-600">
-                    {selectedCountry.phoneCode}
-                  </span>
-                </div>
-
-                {/* Phone input */}
-                <input
-                  type="tel"
-                  required
-                  inputMode="numeric"
-                  placeholder="612345678"
-                  value={formPhone}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    setFormPhone(value);
-                  }}
-                  className="flex-1 bg-transparent px-3.5 py-2.5 text-sm text-gray-700 focus:outline-none placeholder:text-gray-400"
-                />
-              </div>
-            </div>
           </div>
 
-          {/* Geographic fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.country")} *
-              </label>
-              <select
-                value={formPays}
-                onChange={(e) => handleCountryChange(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-              >
-                {countries.length === 0 ? (
-                  <option value="">{t("common.loading") || "Loading..."}</option>
-                ) : (
-                  countries.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.region")} *
-              </label>
-              <select
-                value={formRegion}
-                onChange={(e) => handleRegionChange(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-              >
-                {regions.length === 0 ? (
-                  <option value="">—</option>
-                ) : (
-                  regions.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.city")} *
-              </label>
-              <select
-                value={formVille}
-                onChange={(e) => setFormVille(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-              >
-                {cities.length === 0 ? (
-                  <option value="">—</option>
-                ) : (
-                  cities.map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              {t("clients.modal.fullAddress")} *
-            </label>
-            <textarea
-              required
-              rows={2}
-              placeholder={t("clients.modal.addressExample")}
-              value={formAddress}
-              onChange={(e) => setFormAddress(e.target.value)}
-              className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700 resize-none"
-            />
-          </div>
-
-          {/* Error message */}
           {submitError && (
-            <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
-              <strong>Error:</strong> {submitError}
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+              {submitError}
             </div>
           )}
 
-          {/* Footer Buttons */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+          <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-semibold border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl text-gray-600 transition-colors cursor-pointer"
+              className="h-10 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50"
             >
               {t("common.cancel")}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 text-sm font-semibold bg-brand-orange hover:bg-brand-orange/90 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl shadow-md shadow-brand-orange/10 transition-colors cursor-pointer"
+              className="h-10 rounded-xl bg-brand-orange px-5 text-sm font-semibold text-white shadow-md shadow-brand-orange/10 transition-colors hover:bg-brand-orange/90 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? t("common.saving") || "Saving..." : t("common.save")}
+              {isSubmitting
+                ? t("common.saving") || "Saving..."
+                : t("common.save")}
             </button>
           </div>
         </form>

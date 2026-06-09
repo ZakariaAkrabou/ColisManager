@@ -44,6 +44,9 @@ pub fn run() {
             commands::location_commands::delete_location,          
 
             commands::client_commands::create_client,
+            commands::client_commands::get_clients,
+            commands::client_commands::update_client,
+            commands::client_commands::delete_client,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

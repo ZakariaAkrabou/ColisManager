@@ -21,6 +21,7 @@ export default function ClientDetailsModal({
     .map((n) => n[0])
     .join("")
     .toUpperCase();
+  const isDestinataire = client.client_type === "destinataire";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -56,9 +57,15 @@ export default function ClientDetailsModal({
               <h4 className="text-base font-bold text-gray-950">
                 {client.full_name}
               </h4>
-              <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1 font-mono">
-                <Phone className="w-3.5 h-3.5" />
-                <span>{client.phone_number}</span>
+              <div className="flex flex-col gap-1 mt-1 text-xs text-gray-500 font-mono">
+                <div className="flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>{client.phone_number}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-semibold text-gray-600">{t("clients.type")}:</span>
+                  <span className="capitalize">{t(`clients.${client.client_type}`)}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -68,31 +75,33 @@ export default function ClientDetailsModal({
               {t("clients.modal.addressAndLocation")}
             </span>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-start gap-2">
-                <Globe className="w-4.5 h-4.5 text-gray-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-                    {t("clients.modal.country")}
-                  </p>
-                  <p className="text-sm font-semibold text-gray-800 mt-0.5">
-                    {client.country}
-                  </p>
+            {isDestinataire ? (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-start gap-2">
+                  <Globe className="w-4.5 h-4.5 text-gray-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                      {t("clients.modal.country")}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-800 mt-0.5">
+                      {client.country}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-start gap-2">
-                <Building className="w-4.5 h-4.5 text-gray-400 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-                    {t("clients.modal.cityRegion")}
-                  </p>
-                  <p className="text-sm font-semibold text-gray-800 mt-0.5">
-                    {client.city} / {client.region}
-                  </p>
+                <div className="flex items-start gap-2">
+                  <Building className="w-4.5 h-4.5 text-gray-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+                      {t("clients.modal.cityRegion")}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-800 mt-0.5">
+                      {client.city} / {client.region}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : null}
 
             <div className="flex items-start gap-2 border-t border-gray-50 pt-3">
               <MapPin className="w-4.5 h-4.5 text-gray-400 shrink-0 mt-0.5" />

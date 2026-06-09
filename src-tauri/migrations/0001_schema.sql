@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS Clients (
     ClientID INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
     Phone TEXT NOT NULL,
+    ClientType TEXT NOT NULL DEFAULT 'destinataire',
     Address TEXT,
     LocationID INTEGER,
     FOREIGN KEY (LocationID) REFERENCES Locations(LocationID) ON DELETE SET NULL

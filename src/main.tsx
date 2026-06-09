@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "flag-icons/css/flag-icons.min.css";
+import "react-phone-input-2/lib/style.css";
 import "./index.css";
 import "./i18n";
 import App from "./App";

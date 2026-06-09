@@ -39,7 +39,17 @@ pub async fn init_db(app_handle: &AppHandle) -> Result<AppState, String> {
         .await
         .map_err(|e| e.to_string())?;
 
- 
+    let client_type_exists: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM pragma_table_info('Clients') WHERE name='ClientType';")
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if client_type_exists == 0 {
+        pool.execute("ALTER TABLE Clients ADD COLUMN ClientType TEXT NOT NULL DEFAULT 'destinataire';")
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+
     pool.execute("INSERT OR IGNORE INTO Locations (LocationID, Country, City, Region) VALUES (1, 'Morocco', 'Casablanca', 'Casablanca-Settat');")
         .await
         .map_err(|e| e.to_string())?;

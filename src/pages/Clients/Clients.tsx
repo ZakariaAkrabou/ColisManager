@@ -15,8 +15,6 @@ import {
   Trash2,
   Eye,
   Info,
-  CheckCircle2,
-  AlertTriangle,
 } from "lucide-react";
 import AddClientModal from "../../components/clients/AddClientModal";
 import EditClientModal from "../../components/clients/EditClientModal";
@@ -25,6 +23,7 @@ import { invoke } from "@tauri-apps/api/core";
 import Swal from "sweetalert2";
 export interface Client {
   id: number;
+  client_type: "expediteur" | "destinataire";
   full_name: string;
   phone_number: string;
   country: string;
@@ -51,6 +50,7 @@ export default function ClientsPage() {
   const [filterPays, setFilterPays] = useState("Tous");
   const [filterRegion, setFilterRegion] = useState("Toutes");
   const [filterVille, setFilterVille] = useState("Toutes");
+  const [filterClientType, setFilterClientType] = useState<"Tous" | "expediteur" | "destinataire">("Tous");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -69,6 +69,7 @@ export default function ClientsPage() {
       setClients(
         data.map((client) => ({
           id: client.id,
+          client_type: client.client_type ?? "destinataire",
           full_name: client.full_name,
           phone_number: client.phone_number,
           country: client.country ?? "",
@@ -144,8 +145,10 @@ export default function ClientsPage() {
         filterRegion === "Toutes" || client.region === filterRegion;
       const matchesVille =
         filterVille === "Toutes" || client.city === filterVille;
+      const matchesType =
+        filterClientType === "Tous" || client.client_type === filterClientType;
 
-      return matchesSearch && matchesPays && matchesRegion && matchesVille;
+      return matchesSearch && matchesPays && matchesRegion && matchesVille && matchesType;
     });
   }, [clients, searchQuery, filterPays, filterRegion, filterVille]);
 
@@ -175,30 +178,9 @@ export default function ClientsPage() {
     setIsAddModalOpen(true);
   };
 
-  const handleAddClientSubmit = (newClientData: Omit<Client, "id">) => {
-    const newId = Date.now();
-
-    const newClient: Client = {
-      id: newId,
-      ...newClientData,
-      totalSent: newClientData.totalSent ?? 0,
-      totalReceived: newClientData.totalReceived ?? 0,
-      totalAmount: newClientData.totalAmount ?? 0,
-    };
-
+  const handleAddClientSubmit = (newClient: Client) => {
     setClients([newClient, ...clients]);
     setIsAddModalOpen(false);
-    Swal.fire({
-      icon: "success",
-      title: t("common.success"),
-      text: t("clients.clientAdded", {
-        name: newClientData.full_name,
-        id: newId,
-      }),
-      timer: 2000,
-      showConfirmButton: false,
-    });
-    
   };
 
   const handleOpenEditModal = (client: Client) => {
@@ -275,6 +257,7 @@ export default function ClientsPage() {
     setFilterPays("Tous");
     setFilterRegion("Toutes");
     setFilterVille("Toutes");
+    setFilterClientType("Tous");
     setCurrentPage(1);
   };
 
@@ -468,6 +451,25 @@ export default function ClientsPage() {
             </select>
           </div>
 
+          <div className="col-span-1 sm:col-span-3 md:col-span-2 space-y-1.5">
+            <label
+              htmlFor="filterClientType"
+              className="text-xs text-gray-400 font-medium block"
+            >
+              {t("clients.clientType")}
+            </label>
+            <select
+              id="filterClientType"
+              value={filterClientType}
+              onChange={(e) => setFilterClientType(e.target.value as "Tous" | "expediteur" | "destinataire")}
+              className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2 text-gray-700 focus:outline-none transition-all cursor-pointer"
+            >
+              <option value="Tous">{t("common.all")}</option>
+              <option value="expediteur">{t("clients.expediteur")}</option>
+              <option value="destinataire">{t("clients.destinataire")}</option>
+            </select>
+          </div>
+
           <div className="col-span-1 sm:col-span-3 md:col-span-2">
             <button
               onClick={handleResetFilters}
@@ -475,7 +477,8 @@ export default function ClientsPage() {
                 searchQuery === "" &&
                 filterPays === "Tous" &&
                 filterRegion === "Toutes" &&
-                filterVille === "Toutes"
+                filterVille === "Toutes" &&
+                filterClientType === "Tous"
               }
               className="w-full inline-flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 text-gray-600 disabled:text-gray-350 disabled:bg-gray-50/30 disabled:border-gray-100 font-medium text-sm px-4 py-2 rounded-xl transition-all cursor-pointer"
             >
@@ -537,6 +540,17 @@ export default function ClientsPage() {
                   </button>
                 </span>
               )}
+              {filterClientType !== "Tous" && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
+                  {t("clients.clientType")} : {t(`clients.${filterClientType}`)}
+                  <button
+                    onClick={() => setFilterClientType("Tous")}
+                    className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
               <button
                 onClick={handleResetFilters}
                 className="text-xs text-slate-400 hover:text-brand-orange underline font-semibold ml-auto cursor-pointer"
@@ -554,6 +568,9 @@ export default function ClientsPage() {
               <tr className="bg-gray-50/75 border-b border-gray-100">
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   {t("clients.fullName")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.type")}
                 </th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   {t("clients.phone")}
@@ -590,6 +607,9 @@ export default function ClientsPage() {
                   >
                     <td className="px-6 py-4 text-sm font-semibold text-slate-800">
                       {client.full_name}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 capitalize">
+                      {t(`clients.${client.client_type}`)}
                     </td>
                     <td className=" text-sm text-green-700  rounded font-mono whitespace-nowrap">
                       {client.phone_number}
@@ -652,7 +672,7 @@ export default function ClientsPage() {
               ) : (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={10}
                     className="px-6 py-12 text-center text-gray-400 text-sm"
                   >
                     <Info className="w-8 h-8 text-gray-300 mx-auto mb-2" />
