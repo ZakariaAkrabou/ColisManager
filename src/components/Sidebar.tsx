@@ -26,7 +26,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`bg-white border-gray-200 flex flex-col transition-all duration-300 ease-in-out shrink-0 h-full ${
+      className={`bg-white dark:bg-slate-950 dark:border-slate-800 border-gray-200 flex flex-col transition-all duration-300 ease-in-out shrink-0 h-full ${
         isMobile
           ? "fixed inset-y-0 left-0 z-50 shadow-2xl"
           : "relative border-r"
@@ -38,7 +38,7 @@ export default function Sidebar({
       }}
     >
       <div
-        className="h-15 flex items-center px-5 text-xl font-bold text-brand-blue border-b border-gray-200 shrink-0"
+        className="h-15 flex items-center px-5 text-xl font-bold text-brand-blue dark:text-slate-100 border-b border-gray-200 dark:border-slate-800 shrink-0"
         style={{ opacity: isOpen ? 1 : 0, transition: "opacity 0.2s" }}
       >
         <span className="flex items-center gap-2 whitespace-nowrap">
@@ -61,8 +61,8 @@ export default function Sidebar({
               key={item.id}
               className={`flex items-center px-5 py-3 mx-3 my-1 rounded-lg text-left w-[calc(100%-24px)] transition-all duration-200 font-medium cursor-pointer ${
                 isActive
-                  ? "bg-[#FDF1EA] text-brand-orange"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-brand-blue"
+                  ? "bg-[#FDF1EA] text-brand-orange dark:bg-slate-800 dark:text-brand-orange"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-brand-blue dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               }`}
               onClick={() => onItemClick?.(item.id)}
             >
@@ -73,7 +73,7 @@ export default function Sidebar({
         })}
       </div>
       <div
-        className="p-5 border-t border-gray-200 shrink-0"
+        className="p-5 border-t border-gray-200 dark:border-slate-800 shrink-0"
         style={{
           opacity: isOpen ? 1 : 0,
           transition: "opacity 0.2s",
@@ -83,8 +83,8 @@ export default function Sidebar({
         <button
           className={`flex items-center px-5 py-3 mx-0 rounded-lg text-left w-full transition-all duration-200 font-medium cursor-pointer ${
             activeItem === "settings"
-              ? "bg-[#FDF1EA] text-brand-orange"
-              : "text-gray-500 hover:bg-gray-100 hover:text-brand-blue"
+              ? "bg-[#FDF1EA] text-brand-orange dark:bg-slate-800 dark:text-brand-orange"
+              : "text-gray-500 hover:bg-gray-100 hover:text-brand-blue dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           }`}
           onClick={() => onItemClick?.("settings")}
         >

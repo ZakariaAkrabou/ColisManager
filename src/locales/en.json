@@ -131,6 +131,8 @@
     }
   },
   "locations": {
+    "title": "Locations",
+    "subtitle": "Manage and browse your geographical location list.",
     "totalLocations": "Total Locations",
     "managementTitle": "Location Management",
     "search": "Search",

@@ -131,6 +131,8 @@
     }
   },
   "locations": {
+    "title": "المواقع",
+    "subtitle": "إدارة واستعراض قائمة المواقع الجغرافية.",
     "totalLocations": "إجمالي المواقع",
     "managementTitle": "إدارة المواقع",
     "search": "بحث",

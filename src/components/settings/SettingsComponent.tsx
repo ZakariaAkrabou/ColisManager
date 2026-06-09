@@ -24,11 +24,11 @@ export default function SettingsComponent() {
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col md:flex-row min-h-137.5 animate-fade-in">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col md:flex-row min-h-137.5 animate-fade-in dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100">
      
-      <div className="w-full md:w-64 border-r border-gray-100 bg-gray-50/50 p-4 shrink-0">
+      <div className="w-full md:w-64 border-r border-gray-100 bg-gray-50/50 p-4 shrink-0 dark:border-slate-800 dark:bg-slate-900">
         <div className="px-3 py-2 mb-4">
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block dark:text-slate-400">
             {t("settings.menu")}
           </span>
         </div>
@@ -42,8 +42,8 @@ export default function SettingsComponent() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all cursor-pointer ${
                   isActive
-                    ? "bg-[#FDF1EA] text-brand-orange shadow-sm"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    ? "bg-[#FDF1EA] text-brand-orange shadow-sm dark:bg-slate-800 dark:text-brand-orange"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 }`}
               >
                 <Icon
@@ -59,14 +59,14 @@ export default function SettingsComponent() {
       {/* Content Form Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900 font-sans">
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-slate-800">
+          <h2 className="text-lg font-bold text-gray-900 font-sans dark:text-white">
             {t(
               tabs.find((tab) => tab.id === activeTab)?.labelKey ??
                 "settings.tabs.profile",
             )}
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 mt-0.5 dark:text-slate-400">
             {t("settings.configureHint")}
           </p>
         </div>

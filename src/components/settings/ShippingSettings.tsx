@@ -27,20 +27,20 @@ export default function ShippingSettings() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 max-w-2xl animate-fade-in"
+      className="space-y-6 max-w-2xl animate-fade-in dark:text-slate-100"
     >
-      <div className="bg-gray-55/30 rounded-xl p-4 border border-gray-100 mb-2">
-        <h3 className="text-sm font-semibold text-gray-800 mb-1">
+      <div className="bg-gray-55/30 rounded-xl p-4 border border-gray-100 mb-2 dark:bg-slate-900 dark:border-slate-800">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-slate-100 mb-1">
           {t("settings.shipping.configTitle")}
         </h3>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-slate-400">
           {t("settings.shipping.configDescription")}
         </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block dark:text-slate-300">
             {t("settings.shipping.agencyDelivery")} (MAD)
           </label>
           <input
@@ -54,16 +54,16 @@ export default function ShippingSettings() {
                 agencyDeliveryFee: Number(e.target.value),
               })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-medium"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-medium dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder="Ex: 20"
           />
-          <span className="text-[11px] text-gray-400 block mt-0.5">
+          <span className="text-[11px] text-gray-400 block mt-0.5 dark:text-slate-400">
             {t("settings.shipping.agencyHint")}
           </span>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">
+          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block dark:text-slate-300">
             {t("settings.shipping.homeDelivery")} (MAD)
           </label>
           <input
@@ -77,18 +77,18 @@ export default function ShippingSettings() {
                 homeDeliveryFee: Number(e.target.value),
               })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-medium"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-medium dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder="Ex: 30"
           />
-          <span className="text-[11px] text-gray-400 block mt-0.5">
+          <span className="text-[11px] text-gray-400 block mt-0.5 dark:text-slate-400">
             {t("settings.shipping.homeHint")}
           </span>
         </div>
       </div>
 
-      <div className="border-t border-gray-100 pt-5 flex items-center justify-end gap-3">
+      <div className="border-t border-gray-100 dark:border-slate-700 pt-5 flex items-center justify-end gap-3">
         {saveSuccess && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold animate-fade-in">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold animate-fade-in dark:bg-emerald-950 dark:text-emerald-100">
             <Check className="w-3.5 h-3.5" />
             <span>{t("settings.shipping.updated")}</span>
           </div>

@@ -31,17 +31,17 @@ export default function ProfileSettings() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 max-w-2xl animate-fade-in"
+      className="space-y-6 max-w-2xl animate-fade-in dark:text-slate-100"
     >
-      <div className="flex items-center gap-4 p-4 rounded-xl bg-orange-50/50 border border-orange-100/50">
-        <div className="w-16 h-16 rounded-xl bg-orange-100 flex items-center justify-center text-brand-orange font-bold text-xl uppercase shrink-0 shadow-inner">
+      <div className="flex items-center gap-4 p-4 rounded-xl bg-orange-50/50 border border-orange-100/50 dark:bg-slate-900 dark:border-slate-800">
+        <div className="w-16 h-16 rounded-xl bg-orange-100 flex items-center justify-center text-brand-orange font-bold text-xl uppercase shrink-0 shadow-inner dark:bg-orange-200">
           {settings.companyName.substring(0, 2)}
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-gray-805">
+          <h3 className="text-sm font-semibold text-gray-805 dark:text-slate-100">
             {t("settings.profile.logoTitle")}
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 mt-0.5 dark:text-slate-400">
             {t("settings.profile.logoHint")}
           </p>
           <button
@@ -55,7 +55,7 @@ export default function ProfileSettings() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
             {t("settings.profile.companyName")}
           </label>
           <input
@@ -65,13 +65,13 @@ export default function ProfileSettings() {
             onChange={(e) =>
               setSettings({ ...settings, companyName: e.target.value })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder={t("settings.profile.companyNamePlaceholder")}
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
             {t("settings.profile.ownerName")}
           </label>
           <input
@@ -81,13 +81,13 @@ export default function ProfileSettings() {
             onChange={(e) =>
               setSettings({ ...settings, ownerName: e.target.value })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder={t("settings.profile.fullNamePlaceholder")}
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
             {t("settings.profile.email")}
           </label>
           <input
@@ -97,13 +97,13 @@ export default function ProfileSettings() {
             onChange={(e) =>
               setSettings({ ...settings, email: e.target.value })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder={t("settings.profile.emailPlaceholder")}
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
             {t("settings.profile.phone")}
           </label>
           <input
@@ -113,13 +113,13 @@ export default function ProfileSettings() {
             onChange={(e) =>
               setSettings({ ...settings, phone: e.target.value })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-mono"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-mono dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder="+212 6 XX XX XX XX"
           />
         </div>
 
         <div className="space-y-1.5 sm:col-span-2">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
             {t("settings.profile.address")}
           </label>
           <input
@@ -129,13 +129,13 @@ export default function ProfileSettings() {
             onChange={(e) =>
               setSettings({ ...settings, address: e.target.value })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder={t("settings.profile.addressPlaceholder")}
           />
         </div>
 
         <div className="space-y-1.5 sm:col-span-2">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
             {t("settings.profile.website")}
           </label>
           <input
@@ -144,15 +144,15 @@ export default function ProfileSettings() {
             onChange={(e) =>
               setSettings({ ...settings, website: e.target.value })
             }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-mono"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all font-mono dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
             placeholder="https://..."
           />
         </div>
       </div>
 
-      <div className="border-t border-gray-100 pt-5 flex items-center justify-end gap-3">
+      <div className="border-t border-gray-100 dark:border-slate-700 pt-5 flex items-center justify-end gap-3">
         {saveSuccess && (
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold animate-fade-in">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold animate-fade-in dark:bg-emerald-950 dark:text-emerald-100">
             <Check className="w-3.5 h-3.5" />
             <span>{t("settings.profile.updated")}</span>
           </div>

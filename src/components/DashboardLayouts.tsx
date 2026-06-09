@@ -47,7 +47,7 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
   }, []);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-gray-50 text-gray-800 font-sans relative">
+    <div className="flex h-screen w-screen overflow-hidden bg-gray-50 text-gray-800 font-sans relative dark:bg-slate-950 dark:text-slate-100">
       {isMobile && isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 transition-opacity"
@@ -66,7 +66,7 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
       />
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <Header onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <div className="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-50/50">
+        <div className="flex-1 p-4 md:p-6 overflow-y-auto bg-gray-50/50 dark:bg-slate-950/80">
           {children ||
             (activeItem === "clients" ? (
               <ClientsPage />
@@ -90,14 +90,14 @@ export default function DashboardLayouts({ children }: DashboardLayoutProps) {
                 onSave={handleAddColisSave}
               />
             ) : (
-              <div className="p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <div className="p-4 md:p-6 bg-white rounded-xl shadow-sm border border-gray-100 dark:bg-slate-900 dark:border-slate-800">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2 dark:text-slate-100">
                   {t("layout.placeholderTitle", {
                     name:
                       activeItem.charAt(0).toUpperCase() + activeItem.slice(1),
                   })}
                 </h2>
-                <p className="text-gray-500">
+                <p className="text-gray-500 dark:text-slate-400">
                   {t("layout.placeholderText", { name: activeItem })}
                 </p>
               </div>

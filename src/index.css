@@ -1,5 +1,19 @@
+
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-blue: #2B4C8C;
+  --color-brand-orange: #E26D28;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  @apply bg-gray-50 text-gray-800;
+}
 @theme {
   --color-brand-blue: #2B4C8C;
   --color-brand-orange: #E26D28;

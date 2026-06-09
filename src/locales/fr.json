@@ -131,6 +131,7 @@
     }
   },
   "locations": {
+    "title": "Locations",
     "totalLocations": "Total Locations",
     "managementTitle": "Gestion des Locations",
     "search": "Rechercher",
