@@ -1,5 +1,3 @@
-//commands/client_commands.rs
-
 use crate::database::connection::AppState;
 use crate::models::client::{Client, CreateClientRequest, UpdateClientRequest};
 use crate::services::client_service;
