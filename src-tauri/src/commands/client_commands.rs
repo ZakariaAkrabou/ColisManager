@@ -2,47 +2,44 @@
 
 use tauri::{command, State};
 use crate::database::connection::AppState;
-use crate::models::client::{Client,ClientView, CreateClientRequest, UpdateClientRequest};
+use crate::models::client::{Client, CreateClientRequest, UpdateClientRequest};
 use crate::services::client_service;
 
 #[command]
 pub async fn create_client(
     payload: CreateClientRequest,
-    state: State<'_, AppState>,
-) -> Result<String, String> {
-    log::info!("New client: {}", payload.full_name);
-    client_service::create_client(&state.db, payload)
-        .await
-        .map(|_| "Client created".to_string())
+) -> Result<i64, String> {
+    log::info!("New client: {:?}", payload.full_name);
+    println!("Name: {}", payload.full_name);
+    println!("Phone: {}", payload.phone_number);
+    log::info!("Phone: {}", payload.phone_number);
+
+    client_service::create_client(&state.db, payload).await
 }
 
-#[command]
+#[tauri::command]
 pub async fn get_clients(
     state: State<'_, AppState>,
-) -> Result<Vec<ClientView>, String> {
-    client_service::get_all_clients(&state.db).await
+) -> Result<Vec<Client>, String> {
+    client_service::get_clients(&state.db).await
 }
 
-#[command]
-pub async fn get_client(
-    id: i64,
-    state: State<'_, AppState>,
-) -> Result<Client, String> {
-    client_service::get_client(&state.db, id).await
-}
-
-#[command]
+#[tauri::command]
 pub async fn update_client(
-    payload: UpdateClientRequest,
     state: State<'_, AppState>,
-) -> Result<(), String> {
-    client_service::update_client(&state.db, payload).await
+    payload: UpdateClientRequest,
+) -> Result<String, String> {
+    client_service::update_client(&state.db, payload)
+        .await
+        .map(|_| "Client updated".to_string())
 }
 
-#[command]
+#[tauri::command]
 pub async fn delete_client(
-    id: i64,
     state: State<'_, AppState>,
-) -> Result<(), String> {
-    client_service::delete_client(&state.db, id).await
+    id: i64,
+) -> Result<String, String> {
+    client_service::delete_client(&state.db, id)
+        .await
+        .map(|_| "Client deleted".to_string())
 }

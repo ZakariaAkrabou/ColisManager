@@ -45,7 +45,6 @@ pub fn run() {
 
             commands::client_commands::create_client,
             commands::client_commands::get_clients,
-            commands::client_commands::get_client,
             commands::client_commands::update_client,
             commands::client_commands::delete_client,
         ])

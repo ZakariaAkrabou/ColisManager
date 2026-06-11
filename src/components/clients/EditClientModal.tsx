@@ -1,6 +1,7 @@
 ﻿// src/components/clients/EditClientModal.tsx
 import React, { useState, useEffect, useMemo } from "react";
-import { X } from "lucide-react";
+import { X,Phone } from "lucide-react";
+import PhoneInput from "react-phone-input-2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { Client } from "../../pages/Clients/Clients";
@@ -43,6 +44,7 @@ export default function EditClientModal({
 
   const [formName, setFormName] = useState("");
   const [formPhone, setFormPhone] = useState("");
+  const [formClientType, setFormClientType] = useState<"expediteur" | "destinataire">("destinataire");
   const [formCountryCode, setFormCountryCode] = useState("MA");
   const [formPays, setFormPays] = useState("");
   const [formRegion, setFormRegion] = useState("");
@@ -116,22 +118,20 @@ export default function EditClientModal({
   useEffect(() => {
     if (client) {
       setFormName(client.full_name);
-      // Extract phone number without country code
+      // Use full phone number if available (server stores with +country)
       const phoneStr = client.phone_number || "";
-      let extractedPhone = phoneStr;
-      let extractedCountryCode = "MA";
+      setFormPhone(phoneStr.startsWith("+") ? phoneStr : phoneStr ? `+${phoneStr}` : "");
 
-      // Try to find matching country code from phone
+      // Try to detect country code from stored phone
+      let extractedCountryCode = "MA";
       for (const country of COUNTRY_CODES) {
-        if (phoneStr.startsWith(country.phoneCode)) {
-          extractedPhone = phoneStr.slice(country.phoneCode.length);
+        if (phoneStr.startsWith(country.phoneCode) || phoneStr.startsWith(`+${country.phoneCode.replace("+", "")}`)) {
           extractedCountryCode = country.code;
           break;
         }
       }
-
-      setFormPhone(extractedPhone);
       setFormCountryCode(extractedCountryCode);
+      setFormClientType(client.client_type || "destinataire");
       setFormPays(client.country);
       setFormRegion(client.region);
       setFormVille(client.city);
@@ -150,12 +150,20 @@ export default function EditClientModal({
       return;
     }
 
-    const selectedLocation = locations.find(
-      (loc) =>
-        loc.country === formPays &&
-        loc.region === formRegion &&
-        (loc.city === formVille || (!loc.city && !formVille))
-    );
+    if (formClientType === "destinataire" && (!formPays || !formRegion || !formVille)) {
+      setSubmitError(t("clients.modal.destinationFieldsRequired") || "Please fill all destination fields.");
+      return;
+    }
+
+    const selectedLocation =
+      formClientType === "destinataire"
+        ? locations.find(
+            (loc) =>
+              loc.country === formPays &&
+              loc.region === formRegion &&
+              (loc.city === formVille || (!loc.city && !formVille)),
+          )
+        : null;
     const locationId = selectedLocation ? selectedLocation.id : null;
 
     setSubmitError(null);
@@ -164,8 +172,9 @@ export default function EditClientModal({
       await invoke("update_client", {
         payload: {
           id: client.id,
+          client_type: formClientType,
           full_name: formName.trim(),
-          phone_number: `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
+          phone_number: formPhone.startsWith("+") ? formPhone : `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
           location_id: locationId,
           full_address: formAddress.trim(),
         },
@@ -180,11 +189,15 @@ export default function EditClientModal({
 
       onSave({
         ...client,
+        client_type: formClientType,
         full_name: formName.trim(),
-        phone_number: `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
-        country: formPays,
-        region: formRegion.trim() || formVille.trim(),
-        city: formVille.trim(),
+        phone_number: formPhone.startsWith("+") ? formPhone : `${COUNTRY_CODES.find((c) => c.code === formCountryCode)?.phoneCode || "+212"}${formPhone}`,
+        country: formClientType === "destinataire" ? formPays : "",
+        region:
+          formClientType === "destinataire"
+            ? formRegion.trim() || formVille.trim()
+            : "",
+        city: formClientType === "destinataire" ? formVille.trim() : "",
         full_address: formAddress.trim(),
         totalSent: Number(formSent) || 0,
         totalReceived: Number(formReceived) || 0,
@@ -237,6 +250,192 @@ return (
       <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.modal.fullName")} *
+              </label>
+              <input
+                type="text"
+                required
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.modal.phone")} *
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3.5 top-[12px] h-4 w-4 text-gray-400" />
+                <PhoneInput
+                  country={formCountryCode.toLowerCase()}
+                  value={formPhone}
+                  onChange={(value: string, data: any) => {
+                    setFormPhone(value ? (value.startsWith("+") ? value : `+${value}`) : "");
+                    if (data?.countryCode) setFormCountryCode(data.countryCode.toUpperCase());
+                  }}
+                  inputClass="flex-1 h-11 min-w-0 bg-transparent pl-10 pr-3.5 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                  buttonClass="h-11 border-r border-gray-200 bg-white/75"
+                  containerClass="w-full"
+                  dropdownClass="rounded-xl"
+                  enableSearch
+                  preferredCountries={["ma", "fr"]}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5 relative">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.modal.clientType")} *
+              </label>
+              <select
+                value={formClientType}
+                onChange={(e) => setFormClientType(e.target.value as "expediteur" | "destinataire")}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 pr-10 text-gray-700 focus:outline-none transition-all cursor-pointer appearance-none"
+              >
+                <option value="destinataire">{t("clients.modal.destinataire")}</option>
+                <option value="expediteur">{t("clients.modal.expediteur")}</option>
+              </select>
+              <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+
+          {formClientType === "destinataire" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.modal.country")} *
+                </label>
+                <select
+                  value={formPays}
+                  onChange={(e) => handleCountryChange(e.target.value)}
+                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+                >
+                  {countries.length === 0 ? (
+                    <option value="">{t("common.loading") || "Loading..."}</option>
+                  ) : (
+                    countries.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.modal.region")} *
+                </label>
+                <select
+                  value={formRegion}
+                  onChange={(e) => handleRegionChange(e.target.value)}
+                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+                >
+                  {regions.length === 0 ? (
+                    <option value="">—</option>
+                  ) : (
+                    regions.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.modal.city")} *
+                </label>
+                <select
+                  value={formVille}
+                  onChange={(e) => setFormVille(e.target.value)}
+                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+                >
+                  {cities.length === 0 ? (
+                    <option value="">—</option>
+                  ) : (
+                    cities.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            </div>
+          ) : null}
+
+          {false ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.modal.country")} *
+              </label>
+              <select
+                value={formPays}
+                onChange={(e) => handleCountryChange(e.target.value)}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+              >
+                {countries.length === 0 ? (
+                  <option value="">{t("common.loading") || "Loading..."}</option>
+                ) : (
+                  countries.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.modal.region")} *
+              </label>
+              <select
+                value={formRegion}
+                onChange={(e) => handleRegionChange(e.target.value)}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+              >
+                {regions.length === 0 ? (
+                  <option value="">—</option>
+                ) : (
+                  regions.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {t("clients.modal.city")} *
+              </label>
+              <select
+                value={formVille}
+                onChange={(e) => setFormVille(e.target.value)}
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
+              >
+                {cities.length === 0 ? (
+                  <option value="">—</option>
+                ) : (
+                  cities.map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+          </div>
+          ) : null}
 
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">

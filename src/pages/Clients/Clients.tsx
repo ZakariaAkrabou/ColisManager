@@ -24,6 +24,7 @@ import ClientDetailsModal from "../../components/clients/ClientDetailsModal";
 import { invoke } from "@tauri-apps/api/core";
 import Swal from "sweetalert2";
 export interface Client {
+  client_type: string;
   id: number;
   full_name: string;
   phone_number: string;
@@ -302,15 +303,15 @@ export default function ClientsPage() {
   }, [totalPages, currentPage]);
 
   return (
-    <div className="space-y-6 dark:text-slate-100">
+    <div className="space-y-6">
     
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
             {t("clients.title")}
           </h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t("clients.subtitle")}</p>
+          <p className="text-sm text-gray-500 mt-1">{t("clients.subtitle")}</p>
         </div>
         <button
           onClick={handleOpenAddModal}
@@ -322,82 +323,82 @@ export default function ClientsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 dark:bg-slate-950 dark:border-slate-800">
-          <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-brand-orange shrink-0 dark:bg-orange-500/10">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-brand-orange shrink-0">
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
               {t("clients.totalClients")}
             </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+            <p className="text-2xl font-bold text-gray-900 mt-0.5">
               {stats.totalClients.toLocaleString()}
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 dark:bg-slate-950 dark:border-slate-800">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 dark:bg-slate-800">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
             <Send className="w-5.5 h-5.5 -rotate-12 translate-y-0.5 -translate-x-0.5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
               {t("clients.totalSent")}
             </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+            <p className="text-2xl font-bold text-gray-900 mt-0.5">
               {stats.totalSent.toLocaleString()}
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 dark:bg-slate-950 dark:border-slate-800">
-          <div className="w-12 h-12 rounded-xl bg-[#FDF1EA] flex items-center justify-center text-brand-orange shrink-0 dark:bg-slate-800">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[#FDF1EA] flex items-center justify-center text-brand-orange shrink-0">
             <Download className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
               {t("clients.totalReceived")}
             </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+            <p className="text-2xl font-bold text-gray-900 mt-0.5">
               {stats.totalReceived.toLocaleString()}
             </p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4 dark:bg-slate-950 dark:border-slate-800">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700 shrink-0 dark:bg-slate-800">
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700 shrink-0">
             <Wallet className="w-5.5 h-5.5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-gray-400 dark:text-slate-400 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
               {t("clients.totalAmount")}
             </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-0.5">
+            <p className="text-2xl font-bold text-gray-900 mt-0.5">
               {stats.totalAmount.toLocaleString()} MAD
             </p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm dark:bg-slate-950 dark:border-slate-800">
+      <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <div className="col-span-1 md:col-span-4 space-y-1.5">
-            <span className="text-xs text-gray-400 dark:text-slate-400 font-medium block">
+            <span className="text-xs text-gray-400 font-medium block">
               {t("clients.search")}
             </span>
             <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 dark:text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder={t("clients.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-50/50 dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl pl-10 pr-4 py-2 focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500 text-gray-700 dark:text-slate-100"
+                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl pl-10 pr-4 py-2 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="w-5 h-5 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-slate-200 absolute right-3 top-1/2 -translate-y-1/2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-5 h-5 text-gray-400 hover:text-gray-600 absolute right-3 top-1/2 -translate-y-1/2 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -408,7 +409,7 @@ export default function ClientsPage() {
           <div className="col-span-1 sm:col-span-3 md:col-span-2 space-y-1.5">
             <label
               htmlFor="filterPays"
-              className="text-xs text-gray-400 dark:text-slate-400 font-medium block"
+              className="text-xs text-gray-400 font-medium block"
             >
               {t("clients.country")}
             </label>
@@ -416,7 +417,7 @@ export default function ClientsPage() {
               id="filterPays"
               value={filterPays}
               onChange={(e) => setFilterPays(e.target.value)}
-              className="w-full bg-gray-50/50 dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2 text-gray-700 dark:text-slate-100 focus:outline-none transition-all cursor-pointer"
+              className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2 text-gray-700 focus:outline-none transition-all cursor-pointer"
             >
               {uniquePays.map((p) => (
                 <option key={p} value={p}>
@@ -429,7 +430,7 @@ export default function ClientsPage() {
           <div className="col-span-1 sm:col-span-3 md:col-span-2 space-y-1.5">
             <label
               htmlFor="filterRegion"
-              className="text-xs text-gray-400 dark:text-slate-400 font-medium block"
+              className="text-xs text-gray-400 font-medium block"
             >
               {t("clients.region")}
             </label>
@@ -437,7 +438,7 @@ export default function ClientsPage() {
               id="filterRegion"
               value={filterRegion}
               onChange={(e) => setFilterRegion(e.target.value)}
-              className="w-full bg-gray-50/50 dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2 text-gray-700 dark:text-slate-100 focus:outline-none transition-all cursor-pointer"
+              className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2 text-gray-700 focus:outline-none transition-all cursor-pointer"
             >
               {uniqueRegions.map((r) => (
                 <option key={r} value={r}>
@@ -450,7 +451,7 @@ export default function ClientsPage() {
           <div className="col-span-1 sm:col-span-3 md:col-span-2 space-y-1.5">
             <label
               htmlFor="filterVille"
-              className="text-xs text-gray-400 dark:text-slate-400 font-medium block"
+              className="text-xs text-gray-400 font-medium block"
             >
               {t("clients.city")}
             </label>
@@ -458,7 +459,7 @@ export default function ClientsPage() {
               id="filterVille"
               value={filterVille}
               onChange={(e) => setFilterVille(e.target.value)}
-              className="w-full bg-gray-50/50 dark:bg-slate-800 dark:border-slate-700 hover:bg-gray-50 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2 text-gray-700 dark:text-slate-100 focus:outline-none transition-all cursor-pointer"
+              className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2 text-gray-700 focus:outline-none transition-all cursor-pointer"
             >
               {uniqueVilles.map((v) => (
                 <option key={v} value={v}>
@@ -477,7 +478,7 @@ export default function ClientsPage() {
                 filterRegion === "Toutes" &&
                 filterVille === "Toutes"
               }
-              className="w-full inline-flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 bg-white dark:bg-slate-900 dark:border-slate-700 dark:hover:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-200 disabled:text-gray-350 disabled:bg-gray-50/30 dark:disabled:bg-slate-900 disabled:border-gray-100 dark:disabled:border-slate-800 font-medium text-sm px-4 py-2 rounded-xl transition-all cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 text-gray-600 disabled:text-gray-350 disabled:bg-gray-50/30 disabled:border-gray-100 font-medium text-sm px-4 py-2 rounded-xl transition-all cursor-pointer"
             >
               <Filter className="w-4 h-4" />
               <span>{t("common.filters")}</span>
@@ -527,11 +528,11 @@ export default function ClientsPage() {
                 </span>
               )}
               {filterVille !== "Toutes" && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold dark:bg-slate-800 dark:text-brand-orange">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
                   {t("clients.city")} : {filterVille}
                   <button
                     onClick={() => setFilterVille("Toutes")}
-                    className="hover:bg-orange-100 dark:hover:bg-slate-700 p-0.5 rounded-md cursor-pointer"
+                    className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -539,7 +540,7 @@ export default function ClientsPage() {
               )}
               <button
                 onClick={handleResetFilters}
-                className="text-xs text-slate-400 dark:text-slate-400 hover:text-brand-orange underline font-semibold ml-auto cursor-pointer"
+                className="text-xs text-slate-400 hover:text-brand-orange underline font-semibold ml-auto cursor-pointer"
               >
                 {t("clients.clearAll")}
               </button>
@@ -547,140 +548,126 @@ export default function ClientsPage() {
           )}
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden dark:bg-slate-950 dark:border-slate-800">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-       <table className="w-full text-left border-collapse min-w-250">
-  <thead>
-    <tr className="bg-gray-50/75 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-        {t("clients.fullName")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-        {t("clients.phone")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-        {t("clients.country")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-        {t("clients.city")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider max-w-70">
-        {t("clients.fullAddress")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider w-27.5">
-        {t("clients.totalSent")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider w-32.5">
-        {t("clients.totalReceived")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider w-35">
-        {t("clients.totalAmount")}
-      </th>
-      <th className="px-6 py-4.5 text-xs font-bold text-gray-500 dark:text-gray-300 uppercase tracking-wider w-35">
-        {t("common.actions")}
-      </th>
-    </tr>
-  </thead>
+          <table className="w-full text-left border-collapse min-w-250">
+            <thead>
+              <tr className="bg-gray-50/75 border-b border-gray-100">
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.fullName")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.phone")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.country")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  {t("clients.city")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider max-w-70">
+                  {t("clients.fullAddress")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-27.5">
+                  {t("clients.totalSent")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-32.5">
+                  {t("clients.totalReceived")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-35">
+                  {t("clients.totalAmount")}
+                </th>
+                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider w-35">
+                  {t("common.actions")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {paginatedClients.length > 0 ? (
+                paginatedClients.map((client) => (
+                  <tr
+                    key={client.id}
+                    className="hover:bg-gray-50/70 transition-colors group"
+                  >
+                    <td className="px-6 py-4 text-sm font-semibold text-slate-800">
+                      {client.full_name}
+                    </td>
+                    <td className=" text-sm text-green-700  rounded font-mono whitespace-nowrap">
+                      {client.phone_number}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      <span className="capitalize">{client.country}</span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 capitalize">
+                      {client.city}
+                    </td>
+                    <td
+                      className="px-6 py-4 text-sm text-gray-500 max-w-70 truncate"
+                      title={client.full_address}
+                    >
+                      {client.full_address}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700 whitespace-nowrap">
+                      {client.totalSent.toLocaleString()}
+                      <span className="px-1 text-xs font-medium text-gray-400">kg</span>
 
-  <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-950">
-    {paginatedClients.length > 0 ? (
-      paginatedClients.map((client) => (
-        <tr
-          key={client.id}
-          className="hover:bg-gray-50/70 dark:hover:bg-gray-900 transition-colors group"
-        >
-          <td className="px-6 py-4 text-sm font-semibold text-slate-800 dark:text-gray-100">
-            {client.full_name}
-          </td>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700 whitespace-nowrap">
+                      {client.totalReceived.toLocaleString()}
+                      <span className="px-1 text-xs font-medium text-gray-400">kg</span>
 
-          <td className="px-6 py-4 text-sm text-green-700 dark:text-green-400 rounded font-mono whitespace-nowrap">
-            {client.phone_number}
-          </td>
+                    </td>
+                    <td className="px-6 py-4 text-sm font-bold text-gray-700 whitespace-nowrap">
+                      {client.totalAmount.toLocaleString()}{" "}
+                      <span className="text-xs font-medium text-gray-400">DH</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center ">
+                        <button
+                          onClick={() => handleOpenDetails(client)}
+                          className="p-2 rounded-lg  text-blue-600 hover:bg-blue-100 transition-colors cursor-pointer"
+                          title={t("clients.viewDetails")}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
 
-          <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-            <span className="capitalize">{client.country}</span>
-          </td>
+                        <button
+                          onClick={() => handleOpenEditModal(client)}
+                          className="p-2 rounded-lg  text-amber-600 hover:bg-amber-100 transition-colors cursor-pointer"
+                          title={t("common.edit")}
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
 
-          <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 capitalize">
-            {client.city}
-          </td>
-
-          <td
-            className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-70 truncate"
-            title={client.full_address}
-          >
-            {client.full_address}
-          </td>
-
-          <td className="px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-200 whitespace-nowrap">
-            {client.totalSent.toLocaleString()}
-            <span className="px-1 text-xs font-medium text-gray-400 dark:text-gray-500">
-              kg
-            </span>
-          </td>
-
-          <td className="px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-200 whitespace-nowrap">
-            {client.totalReceived.toLocaleString()}
-            <span className="px-1 text-xs font-medium text-gray-400 dark:text-gray-500">
-              kg
-            </span>
-          </td>
-
-          <td className="px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-200 whitespace-nowrap">
-            {client.totalAmount.toLocaleString()}{" "}
-            <span className="text-xs font-medium text-gray-400 dark:text-gray-500">
-              DH
-            </span>
-          </td>
-
-          <td className="px-6 py-4">
-            <div className="flex items-center justify-center">
-              <button
-                onClick={() => handleOpenDetails(client)}
-                className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer"
-                title={t("clients.viewDetails")}
-              >
-                <Eye className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => handleOpenEditModal(client)}
-                className="p-2 rounded-lg text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors cursor-pointer"
-                title={t("common.edit")}
-              >
-                <Edit3 className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => handleDeleteClient(client)}
-                className="p-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-colors cursor-pointer"
-                title={t("common.delete")}
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </td>
-        </tr>
-      ))
-    ) : (
-      <tr>
-        <td
-          colSpan={8}
-          className="px-6 py-12 text-center text-gray-400 dark:text-gray-500 text-sm"
-        >
-          <Info className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-          {t("clients.noClientFound")}
-        </td>
-      </tr>
-    )}
-  </tbody>
-</table>
-      
+                        <button
+                          onClick={() => handleDeleteClient(client)}
+                          className="p-2 rounded-lg  text-rose-600 hover:bg-rose-100 transition-colors cursor-pointer"
+                          title={t("common.delete")}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={8}
+                    className="px-6 py-12 text-center text-gray-400 text-sm"
+                  >
+                    <Info className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                    {t("clients.noClientFound")}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
         {filteredClients.length > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4.5 bg-white border-t border-gray-100 dark:bg-slate-950 dark:border-slate-800">
-            <div className="text-xs text-gray-500 dark:text-slate-400 font-medium order-2 sm:order-1">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4.5 bg-white border-t border-gray-100">
+            <div className="text-xs text-gray-500 font-medium order-2 sm:order-1">
               {t("clients.showingRange", {
                 from: Math.min(
                   filteredClients.length,
@@ -695,7 +682,7 @@ export default function ClientsPage() {
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="w-8 h-8 flex items-center justify-center border border-gray-200 dark:border-slate-700 rounded-lg text-gray-500 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -705,7 +692,7 @@ export default function ClientsPage() {
                   return (
                     <span
                       key={`ellipsis-${index}`}
-                      className="w-8 h-8 flex items-center justify-center text-gray-400 dark:text-slate-500 text-xs select-none"
+                      className="w-8 h-8 flex items-center justify-center text-gray-400 text-xs select-none"
                     >
                       ...
                     </span>
@@ -717,8 +704,8 @@ export default function ClientsPage() {
                     key={`page-${page}`}
                     onClick={() => setCurrentPage(page as number)}
                     className={`w-8 h-8 flex items-center justify-center text-sm font-semibold rounded-lg border transition-all cursor-pointer ${isActive
-                      ? "border-brand-orange text-brand-orange bg-orange-50/10 dark:bg-orange-500/10"
-                      : "border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                      ? "border-brand-orange text-brand-orange bg-orange-50/10"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
                       }`}
                   >
                     {page}
@@ -731,7 +718,7 @@ export default function ClientsPage() {
                   setCurrentPage((prev) => Math.min(totalPages, prev + 1))
                 }
                 disabled={currentPage === totalPages}
-                className="w-8 h-8 flex items-center justify-center border border-gray-200 dark:border-slate-700 rounded-lg text-gray-500 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -744,7 +731,7 @@ export default function ClientsPage() {
                   setPageSize(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="border border-gray-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-600 dark:text-slate-200 bg-white dark:bg-slate-900 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange cursor-pointer"
+                className="border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-600 bg-white focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange cursor-pointer"
               >
                 <option value={5}>{t("clients.perPage", { count: 5 })}</option>
                 <option value={8}>{t("clients.perPage", { count: 8 })}</option>
