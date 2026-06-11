@@ -240,6 +240,7 @@
     "to": "to",
     "of": "of",
     "parcels": "parcels",
+    "statusLabel": "Status",
     "status": {
       "delivered": "Delivered",
       "inTransit": "In transit",
@@ -248,7 +249,9 @@
     "type": {
       "standard": "Standard",
       "express": "Express",
-      "fragile": "Fragile"
+      "fragile": "Fragile",
+      "home": "Home delivery",
+      "agence": "Agency"
     }
   },
   "addColis": {

@@ -239,6 +239,7 @@
     "to": "a",
     "of": "sur",
     "parcels": "colis",
+    "statusLabel": "Statut",
     "status": {
       "delivered": "Livre",
       "inTransit": "En transit",
@@ -247,7 +248,9 @@
     "type": {
       "standard": "Standard",
       "express": "Express",
-      "fragile": "Fragile"
+      "fragile": "Fragile",
+      "home": "À domicile",
+      "agence": "À l'agence"
     }
   },
   "addColis": {
