@@ -1,6 +1,6 @@
 ﻿// src/components/clients/EditClientModal.tsx
 import React, { useState, useEffect, useMemo } from "react";
-import { X } from "lucide-react";
+import { X, Phone } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
@@ -261,7 +261,7 @@ export default function EditClientModal({
                 {t("clients.modal.phone")} *
               </label>
               <div className="relative">
-                <Phone className="absolute left-3.5 top-[12px] h-4 w-4 text-gray-400" />
+                <Phone className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
                 <PhoneInput
                   country={formCountryCode.toLowerCase()}
                   value={formPhone}
