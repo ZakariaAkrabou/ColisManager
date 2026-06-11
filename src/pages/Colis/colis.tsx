@@ -16,11 +16,26 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
-type ColisStatus = "Livré" | "En transit" | "En attente";
-type ColisType = "Standard" | "Express" | "Fragile";
+type ColisStatus = "Livré" | "En transit" | "En attente" | "Annulé";
+type ColisType = "Agence" | "Domicile" | "Standard" | "Fragile";
+
+interface DbColis {
+  id: number;
+  tracking_number: string;
+  sender_name: string;
+  receiver_name: string;
+  receiver_city?: string;
+  receiver_region?: string;
+  delivery_type: string;
+  weight: number;
+  total_amount: number;
+  status: string;
+  created_at?: string;
+}
 
 interface ColisItem {
   id: string;
@@ -29,25 +44,16 @@ interface ColisItem {
   receiver: string;
   city: string;
   type: ColisType;
+  deliveryType?: string;
   weight: number;
   totalPrice: number;
   status: ColisStatus;
+  statusRaw?: string;
   date: string;
 }
 
 const initialColisData: ColisItem[] = [
-  {
-    id: "CLS001",
-    trackingNo: "TRK-98302-MA",
-    sender: "Zakaria Akrabou",
-    receiver: "Fatima Zahra",
-    city: "Casablanca",
-    type: "Express",
-    weight: 2.5,
-    totalPrice: 120.0,
-    status: "Livré",
-    date: "2026-05-24",
-  },
+ 
   {
     id: "CLS002",
     trackingNo: "TRK-48201-MA",
@@ -200,6 +206,49 @@ export default function Colis({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const normalizeColisStatus = (status: string): ColisStatus => {
+    const value = status?.toLowerCase();
+    if (value.includes("liv")) return "Livré";
+    if (value.includes("trans")) return "En transit";
+    if (value.includes("cancel")) return "Annulé";
+    return "En attente";
+  };
+
+  const normalizeColisType = (deliveryType: string): ColisType => {
+    const value = deliveryType?.toLowerCase();
+    if (value === "home" || value === "domicile") return "Domicile";
+    if (value === "agence" || value === "agency") return "Agence";
+    return "Standard";
+  };
+
+  const mapDbColisToItem = (item: DbColis): ColisItem => ({
+    id: String(item.id),
+    trackingNo: item.tracking_number,
+    sender: item.sender_name,
+    receiver: item.receiver_name,
+    city: item.receiver_city || item.receiver_region || "—",
+    type: normalizeColisType(item.delivery_type),
+    deliveryType: item.delivery_type,
+    weight: item.weight,
+    totalPrice: item.total_amount,
+    status: normalizeColisStatus(item.status),
+    statusRaw: item.status,
+    date: item.created_at ? item.created_at.split("T")[0] : new Date().toISOString().split("T")[0],
+  });
+
+  const loadColis = async () => {
+    try {
+      const data = await invoke<DbColis[]>("get_colis");
+      setColisList(data.map(mapDbColisToItem));
+    } catch (error) {
+      console.error("Failed to load colis:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadColis();
+  }, []);
   const itemsPerPage = 5;
 
   // Consume pending colis passed from the AddColis page via layout
@@ -260,13 +309,17 @@ export default function Colis({
   const statusLabel = (status: ColisStatus) => {
     if (status === "Livré") return t("colis.status.delivered");
     if (status === "En transit") return t("colis.status.inTransit");
+    if (status === "Annulé") return t("colis.status.cancelled") || "Annulé";
     return t("colis.status.pending");
   };
 
   const typeLabel = (type: ColisType) => {
     if (type === "Standard") return t("colis.type.standard");
-    if (type === "Express") return t("colis.type.express");
-    return t("colis.type.fragile");
+    if (type === "Agence") return t("colis.type.agence") || "À l'agence";
+    if (type === "Domicile") return t("colis.type.home") || "À domicile";
+    if (type === "Fragile") return t("colis.type.fragile");
+    if (type === "Express") return t("colis.type.express") || "Express";
+    return type;
   };
 
   // ── Handlers ──────────────────────────────────────────────────────────────
@@ -348,17 +401,26 @@ export default function Colis({
               <input id="e-city" type="text" value="${colis.city}" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
             </div>
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Type</label>
+              <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Type de livraison</label>
               <select id="e-type" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
+                <option value="Agence" ${colis.type === "Agence" ? "selected" : ""}>À l'agence</option>
+                <option value="Domicile" ${colis.type === "Domicile" ? "selected" : ""}>À domicile</option>
                 <option value="Standard" ${colis.type === "Standard" ? "selected" : ""}>Standard</option>
-                <option value="Express"  ${colis.type === "Express" ? "selected" : ""}>Express</option>
-                <option value="Fragile"  ${colis.type === "Fragile" ? "selected" : ""}>Fragile</option>
               </select>
             </div>
             <div>
               <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Poids (kg)</label>
               <input id="e-weight" type="number" step="0.1" min="0.1" value="${colis.weight}" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
             </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Statut</label>
+            <select id="e-status" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
+              <option value="En attente" ${colis.status === "En attente" ? "selected" : ""}>En attente</option>
+              <option value="En transit" ${colis.status === "En transit" ? "selected" : ""}>En transit</option>
+              <option value="Livré" ${colis.status === "Livré" ? "selected" : ""}>Livré</option>
+              <option value="Annulé" ${colis.status === "Annulé" ? "selected" : ""}>Annulé</option>
+            </select>
           </div>
           <div>
             <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Prix Total (DH)</label>
@@ -384,6 +446,9 @@ export default function Colis({
         ).value.trim();
         const type = (document.getElementById("e-type") as HTMLSelectElement)
           .value;
+        const status = (
+          document.getElementById("e-status") as HTMLSelectElement
+        ).value;
         const weight = parseFloat(
           (document.getElementById("e-weight") as HTMLInputElement).value,
         );
@@ -394,13 +459,14 @@ export default function Colis({
           !sender ||
           !receiver ||
           !city ||
+          !status ||
           isNaN(weight) ||
           isNaN(totalPrice)
         ) {
           Swal.showValidationMessage(t("colis.requiredFields"));
           return false;
         }
-        return { sender, receiver, city, type, weight, totalPrice };
+        return { sender, receiver, city, type, status, weight, totalPrice };
       },
     }).then((result) => {
       if (result.isConfirmed) {
@@ -601,6 +667,7 @@ export default function Colis({
                 <th className="px-6 py-4 text-center">
                   {t("colis.typeLabel")}
                 </th>
+                <th className="px-6 py-4 text-center">{t("colis.statusLabel")}</th>
                 <th className="px-6 py-4 text-right">{t("colis.weight")}</th>
                 <th className="px-6 py-4 text-right">
                   {t("colis.totalPrice")}
@@ -650,14 +717,31 @@ export default function Colis({
                     <td className="px-6 py-4 text-center">
                       <span
                         className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
-                          colis.type === "Express"
-                            ? "bg-red-50 text-red-700 border border-red-100"
-                            : colis.type === "Fragile"
-                              ? "bg-amber-50 text-amber-700 border border-amber-100"
-                              : "bg-blue-50 text-blue-700 border border-blue-100"
+                          colis.type === "Domicile"
+                            ? "bg-green-50 text-green-700 border border-green-100"
+                            : colis.type === "Agence"
+                              ? "bg-blue-50 text-blue-700 border border-blue-100"
+                              : colis.type === "Fragile"
+                                ? "bg-amber-50 text-amber-700 border border-amber-100"
+                                : "bg-gray-50 text-gray-700 border border-gray-100"
                         }`}
                       >
                         {typeLabel(colis.type)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span
+                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                          colis.status === "Livré"
+                            ? "bg-green-50 text-green-700 border border-green-100"
+                            : colis.status === "En transit"
+                              ? "bg-blue-50 text-blue-700 border border-blue-100"
+                              : colis.status === "Annulé"
+                                ? "bg-red-50 text-red-700 border border-red-100"
+                                : "bg-yellow-50 text-yellow-700 border border-yellow-100"
+                        }`}
+                      >
+                        {statusLabel(colis.status)}
                       </span>
                     </td>
 

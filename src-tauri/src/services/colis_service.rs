@@ -1,4 +1,4 @@
-use crate::models::colis::{Colis, CreateColisRequest, PartyPayload, ReceiverPayload};
+use crate::models::Colis::{Colis, CreateColisRequest, PartyPayload, ReceiverPayload};
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
 pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Result<Colis, String> {

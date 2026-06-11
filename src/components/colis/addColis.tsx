@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   ArrowLeft,
   Search,
@@ -19,71 +19,26 @@ import {
   Info,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
 
-const mockClients = [
-  {
-    id: "C001",
-    name: "Ahmed Mohamed",
-    phone: "0612345678",
-    address: "Rue Mohammed V, Casablanca",
-  },
-  {
-    id: "C002",
-    name: "Fatima Ali",
-    phone: "0623456789",
-    address: "Quartier Hassan, Rabat",
-  },
-  {
-    id: "C003",
-    name: "Youssef Benali",
-    phone: "0661234567",
-    address: "Bd Zerktouni, Casablanca",
-  },
-  {
-    id: "C004",
-    name: "Khadija Mansouri",
-    phone: "0698765432",
-    address: "Av. Mohammed VI, Marrakech",
-  },
-  {
-    id: "C005",
-    name: "Omar Tazi",
-    phone: "0677889900",
-    address: "Quartier Industriel, Fès",
-  },
-  {
-    id: "C006",
-    name: "Salma El Amrani",
-    phone: "0655443322",
-    address: "Rue Hassan II, Tanger",
-  },
-];
+interface ClientRow {
+  id: number;
+  full_name: string;
+  phone_number: string;
+  full_address?: string;
+  country?: string;
+  region?: string;
+  city?: string;
+}
 
-const moroccanCities: Record<string, string[]> = {
-  "Casablanca-Settat": [
-    "Casablanca",
-    "Settat",
-    "Mohammedia",
-    "El Jadida",
-    "Berrechid",
-  ],
-  "Rabat-Salé-Kénitra": ["Rabat", "Salé", "Kénitra", "Témara", "Skhirat"],
-  "Marrakech-Safi": ["Marrakech", "Safi", "Essaouira", "El Kelâa des Sraghna"],
-  "Tanger-Tétouan-Al Hoceïma": [
-    "Tanger",
-    "Tétouan",
-    "Al Hoceïma",
-    "Larache",
-    "Asilah",
-  ],
-  "Fès-Meknès": ["Fès", "Meknès", "Taza", "Ifrane", "Sefrou"],
-  "Souss-Massa": ["Agadir", "Tiznit", "Taroudant", "Inezgane"],
-  Oriental: ["Oujda", "Nador", "Berkane", "Taourirt"],
-};
-
-const regions = Object.keys(moroccanCities);
+interface LocationRow {
+  id: number;
+  country: string;
+  region: string;
+  city: string | null;
+}
 
 const DELIVERY_TYPES = [
   {
@@ -103,6 +58,7 @@ const DELIVERY_TYPES = [
 ];
 
 interface ClientInfo {
+  client_id?: number;
   name: string;
   phone: string;
   address: string;
@@ -113,25 +69,70 @@ interface DestinatairInfo extends ClientInfo {
   region: string;
 }
 
+interface CreateColisPayload {
+  tracking_number: string;
+  sender: {
+    client_id?: number;
+    name: string;
+    phone: string;
+    address?: string;
+    save_client: boolean;
+  };
+  receiver: {
+    client_id?: number;
+    name: string;
+    phone: string;
+    address: string;
+    country: string;
+    region: string;
+    city: string;
+    save_client: boolean;
+  };
+  weight: number;
+  description?: string;
+  delivery_type: string;
+  total_amount: number;
+  notes?: string;
+}
+
+type ColisListItem = {
+  id: string;
+  trackingNo: string;
+  sender: string;
+  receiver: string;
+  city: string;
+  type: string;
+  weight: number;
+  totalPrice: number;
+  status: string;
+  date: string;
+};
+
 interface AddColisPageProps {
   onBack: () => void;
-  onSave: (colis: any) => void;
+  onSave: (colis: ColisListItem) => void;
 }
 
 function ClientSearch({
+  clients,
+  query,
+  onQueryChange,
   onSelect,
 }: {
-  onSelect: (c: (typeof mockClients)[0]) => void;
+  clients: ClientRow[];
+  query: string;
+  onQueryChange: (value: string) => void;
+  onSelect: (client: ClientRow) => void;
 }) {
-  const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const filtered = query.trim()
-    ? mockClients.filter(
+    ? clients.filter(
         (c) =>
-          c.name.toLowerCase().includes(query.toLowerCase()) ||
-          c.phone.includes(query),
+          c.full_name.toLowerCase().includes(query.toLowerCase()) ||
+          c.phone_number.includes(query) ||
+          (c.full_address || "").toLowerCase().includes(query.toLowerCase()),
       )
     : [];
 
@@ -156,7 +157,7 @@ function ClientSearch({
             type="text"
             value={query}
             onChange={(e) => {
-              setQuery(e.target.value);
+              onQueryChange(e.target.value);
               setOpen(true);
             }}
             onFocus={() => setOpen(true)}
@@ -166,21 +167,21 @@ function ClientSearch({
         </div>
       </div>
       {open && filtered.length > 0 && (
-        <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-40 overflow-y-auto">
+        <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
           {filtered.map((c) => (
             <button
               key={c.id}
               type="button"
               onClick={() => {
                 onSelect(c);
-                setQuery(c.name);
+                onQueryChange(c.full_name);
                 setOpen(false);
               }}
               className="w-full text-left px-3 py-2.5 hover:bg-[#FDF1EA] transition-colors border-b border-gray-50 last:border-0 cursor-pointer"
             >
-              <p className="text-sm font-semibold text-gray-800">{c.name}</p>
+              <p className="text-sm font-semibold text-gray-800">{c.full_name}</p>
               <p className="text-xs text-gray-400">
-                {c.phone} • {c.address}
+                {c.phone_number} • {c.full_address || "—"}
               </p>
             </button>
           ))}
@@ -320,6 +321,11 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
   });
   const [saveReceiver, setSaveReceiver] = useState(false);
 
+  const [clients, setClients] = useState<ClientRow[]>([]);
+  const [locations, setLocations] = useState<LocationRow[]>([]);
+  const [senderQuery, setSenderQuery] = useState("");
+  const [receiverQuery, setReceiverQuery] = useState("");
+
   // Colis details
   const [weight, setWeight] = useState<number | "">("");
   const [description, setDescription] = useState("");
@@ -337,9 +343,55 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
   const pricePerKg = deliveryType === "agence" ? 20 : 30;
   const totalPrice =
     typeof weight === "number" && weight > 0 ? weight * pricePerKg : 0;
-  const availableCities = receiver.region
-    ? (moroccanCities[receiver.region] ?? [])
-    : [];
+
+  const countries = useMemo(
+    () => Array.from(new Set(locations.map((loc) => loc.country))).sort(),
+    [locations],
+  );
+
+  const regions = useMemo(() => {
+    const filtered = locations.filter((loc) => loc.country === receiver.country);
+    return Array.from(new Set(filtered.map((loc) => loc.region))).sort();
+  }, [locations, receiver.country]);
+
+  const cities = useMemo(() => {
+    const filtered = locations.filter(
+      (loc) => loc.country === receiver.country && loc.region === receiver.region,
+    );
+    return Array.from(new Set(filtered.map((loc) => loc.city || "")))
+      .filter(Boolean)
+      .sort();
+  }, [locations, receiver.country, receiver.region]);
+
+  const availableCities = cities;
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [clientData, locationData] = await Promise.all([
+          invoke<ClientRow[]>("get_clients"),
+          invoke<LocationRow[]>("get_locations"),
+        ]);
+        setClients(clientData);
+        setLocations(locationData);
+
+        const uniqueCountries = Array.from(
+          new Set(locationData.map((loc) => loc.country)),
+        ).sort();
+
+        if (uniqueCountries.length > 0 && !uniqueCountries.includes("Maroc")) {
+          setReceiver((p) => ({
+            ...p,
+            country: uniqueCountries[0],
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to load clients or locations:", error);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleImageUpload = (idx: number, file: File) => {
     setImages((prev) => prev.map((f, i) => (i === idx ? file : f)));
@@ -348,6 +400,9 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
   const isValid =
     sender.name.trim() &&
     receiver.name.trim() &&
+    receiver.country.trim() &&
+    receiver.region.trim() &&
+    receiver.city.trim() &&
     typeof weight === "number" &&
     weight > 0 &&
     trackingNo.trim() !== "";
@@ -365,27 +420,83 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     date: new Date().toISOString().split("T")[0],
   });
 
-  const handleSave = () => {
+  const buildPayload = (): CreateColisPayload => ({
+    tracking_number: trackingNo.trim(),
+    sender: {
+      client_id: sender.client_id,
+      name: sender.name.trim(),
+      phone: sender.phone.trim(),
+      address: sender.address.trim() || undefined,
+      save_client: saveSender,
+    },
+    receiver: {
+      client_id: receiver.client_id,
+      name: receiver.name.trim(),
+      phone: receiver.phone.trim(),
+      address: receiver.address.trim(),
+      country: receiver.country.trim(),
+      region: receiver.region.trim(),
+      city: receiver.city.trim(),
+      save_client: saveReceiver,
+    },
+    weight: typeof weight === "number" ? weight : 0,
+    description: description.trim() || undefined,
+    delivery_type: deliveryType,
+    total_amount: totalPrice,
+    notes: notes.trim() || undefined,
+  });
+
+  const mapDbColisToListItem = (item: any): ColisListItem => ({
+    id: String(item.id),
+    trackingNo: item.tracking_number,
+    sender: item.sender_name,
+    receiver: item.receiver_name,
+    city: item.receiver_city || item.receiver_region || "—",
+    type: item.delivery_type === "domicile" || item.delivery_type === "home" ? "Express" : "Standard",
+    weight: item.weight,
+    totalPrice: item.total_amount,
+    status: item.status || "En attente",
+    date: item.created_at ? item.created_at.split("T")[0] : new Date().toISOString().split("T")[0],
+  });
+
+  const handleSave = async () => {
     if (!isValid) return;
-    onSave(buildNewColis());
-    Swal.fire({
-      title: t("common.added"),
-      text: t("addColis.savedSuccess"),
-      icon: "success",
-      timer: 1400,
-      showConfirmButton: false,
-    });
-    onBack();
+
+    try {
+      const payload = buildPayload();
+      const createdColis = await invoke<any>("create_colis", { payload });
+      onSave(mapDbColisToListItem(createdColis));
+      Swal.fire({
+        title: t("common.added"),
+        text: t("addColis.savedSuccess"),
+        icon: "success",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+      onBack();
+    } catch (error) {
+      console.error("Failed to create colis:", error);
+      Swal.fire({
+        title: t("common.error"),
+        text: t("addColis.saveError") || "Failed to save colis.",
+        icon: "error",
+        confirmButtonText: t("common.close"),
+      });
+    }
   };
 
-  const handleSaveAndPrint = () => {
+  const handleSaveAndPrint = async () => {
     if (!isValid) return;
-    const newColis = buildNewColis();
-    onSave(newColis);
 
-    const win = window.open("", "_blank");
-    if (!win) return;
-    win.document.write(`<html><head><title>Bordereau ${trackingNo}</title>
+    try {
+      const payload = buildPayload();
+      const createdColis = await invoke<any>("create_colis", { payload });
+      const newColis = mapDbColisToListItem(createdColis);
+      onSave(newColis);
+
+      const win = window.open("", "_blank");
+      if (!win) return;
+      win.document.write(`<html><head><title>Bordereau ${trackingNo}</title>
       <style>
         body{font-family:'Segoe UI',sans-serif;padding:30px;color:#1f2937}
         .hdr{border-bottom:2px solid #2B4C8C;padding-bottom:16px;margin-bottom:24px;display:flex;justify-content:space-between}
@@ -425,8 +536,17 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
       <div class="price"><div class="lbl">Prix Total</div><div class="val">${totalPrice.toFixed(2)} MAD</div><div style="font-size:11px;color:#6b7280;margin-top:4px">${weight} kg × ${pricePerKg} MAD/kg</div></div>
       <script>window.onload=function(){window.print();setTimeout(()=>window.close(),500);}</script>
     </body></html>`);
-    win.document.close();
-    onBack();
+      win.document.close();
+      onBack();
+    } catch (error) {
+      console.error("Failed to create colis:", error);
+      Swal.fire({
+        title: t("common.error"),
+        text: t("addColis.saveError") || "Failed to save colis.",
+        icon: "error",
+        confirmButtonText: t("common.close"),
+      });
+    }
   };
 
   return (
@@ -485,8 +605,16 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
           {/* EXPÉDITEUR */}
           <Section icon={User} title={t("colis.sender")}>
             <ClientSearch
+              clients={clients}
+              query={senderQuery}
+              onQueryChange={setSenderQuery}
               onSelect={(c) =>
-                setSender({ name: c.name, phone: c.phone, address: c.address })
+                setSender({
+                  client_id: c.id,
+                  name: c.full_name,
+                  phone: c.phone_number,
+                  address: c.full_address || "",
+                })
               }
             />
             <div className="grid grid-cols-2 gap-3">
@@ -495,7 +623,11 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                   type="text"
                   value={sender.name}
                   onChange={(e) =>
-                    setSender((p) => ({ ...p, name: e.target.value }))
+                    setSender((p) => ({
+                      ...p,
+                      client_id: undefined,
+                      name: e.target.value,
+                    }))
                   }
                   placeholder="Nom complet"
                   className={inputCls}
@@ -506,7 +638,11 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                   type="tel"
                   value={sender.phone}
                   onChange={(e) =>
-                    setSender((p) => ({ ...p, phone: e.target.value }))
+                    setSender((p) => ({
+                      ...p,
+                      client_id: undefined,
+                      phone: e.target.value,
+                    }))
                   }
                   placeholder="0612345678"
                   className={inputCls}
@@ -518,7 +654,11 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                 type="text"
                 value={sender.address}
                 onChange={(e) =>
-                  setSender((p) => ({ ...p, address: e.target.value }))
+                  setSender((p) => ({
+                    ...p,
+                    client_id: undefined,
+                    address: e.target.value,
+                  }))
                 }
                 placeholder="Adresse complète"
                 className={inputCls}
@@ -540,12 +680,19 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
           {/* DESTINATAIRE */}
           <Section icon={MapPin} title={t("colis.receiver")}>
             <ClientSearch
+              clients={clients}
+              query={receiverQuery}
+              onQueryChange={setReceiverQuery}
               onSelect={(c) =>
                 setReceiver((p) => ({
                   ...p,
-                  name: c.name,
-                  phone: c.phone,
-                  address: c.address,
+                  client_id: c.id,
+                  name: c.full_name,
+                  phone: c.phone_number,
+                  address: c.full_address || "",
+                  country: c.country || p.country,
+                  region: c.region || p.region,
+                  city: c.city || p.city,
                 }))
               }
             />
@@ -555,7 +702,11 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                   type="text"
                   value={receiver.name}
                   onChange={(e) =>
-                    setReceiver((p) => ({ ...p, name: e.target.value }))
+                    setReceiver((p) => ({
+                      ...p,
+                      client_id: undefined,
+                      name: e.target.value,
+                    }))
                   }
                   placeholder="Nom complet"
                   className={inputCls}
@@ -566,7 +717,11 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                   type="tel"
                   value={receiver.phone}
                   onChange={(e) =>
-                    setReceiver((p) => ({ ...p, phone: e.target.value }))
+                    setReceiver((p) => ({
+                      ...p,
+                      client_id: undefined,
+                      phone: e.target.value,
+                    }))
                   }
                   placeholder="0623456789"
                   className={inputCls}
@@ -579,17 +734,24 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                   <select
                     value={receiver.country}
                     onChange={(e) =>
-                      setReceiver((p) => ({ ...p, country: e.target.value }))
+                      setReceiver((p) => ({
+                        ...p,
+                        client_id: undefined,
+                        country: e.target.value,
+                        region: "",
+                        city: "",
+                      }))
                     }
                     className={
                       inputCls + " appearance-none pr-7 cursor-pointer"
                     }
                   >
-                    <option>Maroc</option>
-                    <option>France</option>
-                    <option>Espagne</option>
-                    <option>Belgique</option>
-                    <option>Canada</option>
+                    <option value="">{t("addColis.selectOption")}</option>
+                    {countries.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
                   </select>
                   <ChevronDown
                     size={12}
@@ -604,6 +766,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                     onChange={(e) =>
                       setReceiver((p) => ({
                         ...p,
+                        client_id: undefined,
                         region: e.target.value,
                         city: "",
                       }))
@@ -626,11 +789,16 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                 </div>
               </Field>
               <Field label={t("clients.city")}>
+
                 <div className="relative">
                   <select
                     value={receiver.city}
                     onChange={(e) =>
-                      setReceiver((p) => ({ ...p, city: e.target.value }))
+                      setReceiver((p) => ({
+                        ...p,
+                        client_id: undefined,
+                        city: e.target.value,
+                      }))
                     }
                     disabled={!availableCities.length}
                     className={
@@ -657,7 +825,11 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                 type="text"
                 value={receiver.address}
                 onChange={(e) =>
-                  setReceiver((p) => ({ ...p, address: e.target.value }))
+                  setReceiver((p) => ({
+                    ...p,
+                    client_id: undefined,
+                    address: e.target.value,
+                  }))
                 }
                 placeholder="Quartier, Immeuble, Appartement..."
                 className={inputCls}

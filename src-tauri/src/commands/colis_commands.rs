@@ -1,5 +1,5 @@
 use crate::database::connection::AppState;
-use crate::models::colis::{Colis, CreateColisRequest};
+use crate::models::Colis::{Colis, CreateColisRequest};
 use crate::services::colis_service;
 use tauri::State;
 

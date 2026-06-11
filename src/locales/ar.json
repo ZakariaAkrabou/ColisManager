@@ -238,6 +238,7 @@
     "to": "إلى",
     "of": "من",
     "parcels": "طرود",
+    "statusLabel": "الحالة",
     "status": {
       "delivered": "تم التسليم",
       "inTransit": "قيد النقل",
@@ -246,7 +247,9 @@
     "type": {
       "standard": "عادي",
       "express": "سريع",
-      "fragile": "قابل للكسر"
+      "fragile": "قابل للكسر",
+      "home": "توصيل إلى المنزل",
+      "agence": "في الوكالة"
     }
   },
   "addColis": {
