@@ -108,6 +108,7 @@
       "email": "Email address",
       "emailPlaceholder": "email@domain.com",
       "phone": "Phone",
+      "phone2": "Phone 2",
       "address": "Physical address",
       "addressPlaceholder": "Full address",
       "website": "Website",

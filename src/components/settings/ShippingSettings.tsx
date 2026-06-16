@@ -1,31 +1,85 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Save, Check, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
+import Swal from "sweetalert2";
 
 export default function ShippingSettings() {
   const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-
   const [settings, setSettings] = useState({
     agencyDeliveryFee: 40, // Frais de livraison standard (en agence)
     homeDeliveryFee: 55, // Frais de livraison à domicile
   });
+  
+  const [isLoading, setIsLoading] = useState(true);
+  const loadSettings = async () => {
+  try {
+    setIsLoading(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    setSaveSuccess(false);
+    const data = await invoke<{
+      agency_delivery_fee: number;
+      home_delivery_fee: number;
+    }>("get_shipping_settings");
 
-    setTimeout(() => {
-      setIsSaving(false);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    }, 1000);
-  };
+    setSettings({
+      agencyDeliveryFee: data.agency_delivery_fee,
+      homeDeliveryFee: data.home_delivery_fee,
+    });
+  } catch (error) {
+    console.error("LOAD ERROR:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+useEffect(() => {
+  void loadSettings();
+}, []);
 
-  return (
-    <form
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  setIsSaving(true);
+  setSaveSuccess(false);
+
+ try {
+  await invoke("save_shipping_settings", {
+    settings: {
+      agency_delivery_fee: settings.agencyDeliveryFee,
+      home_delivery_fee: settings.homeDeliveryFee,
+    },
+  });
+
+  setSaveSuccess(true);
+
+  Swal.fire({
+    title: t("common.success") || "Succès",
+    text: t("settings.shipping.updated") || "Paramètres enregistrés avec succès.",
+    icon: "success",
+    timer: 1500,
+    showConfirmButton: false,
+  });
+
+} 
+catch (error) {
+    console.error("SAVE ERROR:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Erreur",
+      text: "Une erreur est survenue lors de la sauvegarde des paramètres.",
+    });
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+ return isLoading ? (
+  <div className="flex items-center justify-center h-48">
+    <RefreshCw className="w-6 h-6 animate-spin text-gray-500" />
+  </div>
+) : (
+  <form
       onSubmit={handleSubmit}
       className="space-y-6 max-w-2xl animate-fade-in dark:text-slate-100"
     >

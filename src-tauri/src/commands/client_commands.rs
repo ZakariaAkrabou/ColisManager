@@ -2,12 +2,14 @@
 
 use tauri::{command, State};
 use crate::database::connection::AppState;
-use crate::models::client::{Client, CreateClientRequest, UpdateClientRequest};
+use crate::models::Client::{Client, CreateClientRequest, UpdateClientRequest};
 use crate::services::client_service;
 
 #[command]
 pub async fn create_client(
     payload: CreateClientRequest,
+        state: State<'_, AppState>,
+
 ) -> Result<i64, String> {
     log::info!("New client: {:?}", payload.full_name);
     println!("Name: {}", payload.full_name);
