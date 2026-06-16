@@ -31,6 +31,12 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
 
     let delivery_type = normalize_delivery_type(&payload.delivery_type)?;
 
+    let calculated_amount = if payload.weight <= 10.0 {
+        if delivery_type == "agency" { 100.0 } else { 200.0 }
+    } else {
+        if delivery_type == "agency" { payload.weight * 20.0 } else { payload.weight * 30.0 }
+    };
+
     let colis_id = sqlx::query_scalar::<_, i64>(
         r#"
         INSERT INTO Colis (
@@ -67,7 +73,7 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
     .bind(payload.weight)
     .bind(optional_trim(payload.description.as_deref()))
     .bind(delivery_type)
-    .bind(payload.total_amount)
+    .bind(calculated_amount)
     .bind(optional_trim(payload.notes.as_deref()))
     .fetch_one(&mut *tx)
     .await

@@ -342,7 +342,13 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
   // Computed
   const pricePerKg = deliveryType === "agence" ? 20 : 30;
   const totalPrice =
-    typeof weight === "number" && weight > 0 ? weight * pricePerKg : 0;
+    typeof weight === "number" && weight > 0
+      ? weight <= 10
+        ? deliveryType === "agence"
+          ? 100
+          : 200
+        : weight * pricePerKg
+      : 0;
 
   const countries = useMemo(
     () => Array.from(new Set(locations.map((loc) => loc.country))).sort(),
@@ -533,7 +539,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
         <div><div class="fl">Type</div><div class="fv">${deliveryType === "domicile" ? "À domicile" : "À l'agence"}</div></div>
         <div style="grid-column:span 2"><div class="fl">Description</div><div class="fv">${description || "—"}</div></div>
       </div></div>
-      <div class="price"><div class="lbl">Prix Total</div><div class="val">${totalPrice.toFixed(2)} MAD</div><div style="font-size:11px;color:#6b7280;margin-top:4px">${weight} kg × ${pricePerKg} MAD/kg</div></div>
+      <div class="price"><div class="lbl">Prix Total</div><div class="val">${totalPrice.toFixed(2)} MAD</div><div style="font-size:11px;color:#6b7280;margin-top:4px">${typeof weight === "number" && weight <= 10 ? "Forfait (≤ 10kg)" : weight + " kg × " + pricePerKg + " MAD/kg"}</div></div>
       <script>window.onload=function(){window.print();setTimeout(()=>window.close(),500);}</script>
     </body></html>`);
       win.document.close();
@@ -989,7 +995,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
               <div className="flex justify-between text-sm text-gray-600">
                 <span>{t("addColis.unitPrice")}</span>
                 <span className="font-semibold text-gray-800">
-                  {pricePerKg} MAD/kg
+                  {typeof weight === "number" && weight <= 10 ? "Forfait (≤ 10kg)" : `${pricePerKg} MAD/kg`}
                 </span>
               </div>
               <hr className="border-gray-200" />
@@ -999,12 +1005,14 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                   {weight !== "" ? `${weight} kg` : "— kg"}
                 </span>
               </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>{t("addColis.pricePerKg")}</span>
-                <span className="font-semibold text-gray-800">
-                  × {pricePerKg} MAD/kg
-                </span>
-              </div>
+              {!(typeof weight === "number" && weight <= 10) && (
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>{t("addColis.pricePerKg")}</span>
+                  <span className="font-semibold text-gray-800">
+                    × {pricePerKg} MAD/kg
+                  </span>
+                </div>
+              )}
               <hr className="border-dashed border-gray-200" />
               <div className="flex justify-between items-center pt-1">
                 <span className="text-sm font-bold text-gray-700 uppercase tracking-wider">
