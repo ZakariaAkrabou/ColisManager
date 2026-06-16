@@ -3,7 +3,6 @@ import {
   Building2,
   Globe2,
   MapPin,
-  Phone,
   User,
   UsersRound,
   X,
@@ -347,10 +346,9 @@ export default function AddClientModal({
                 </div>
               </div>
 
-              <div className={`${fieldWrapClass} md:col-span-3`}>
+              <div className={`${fieldWrapClass} md:col-span-2`}>
                 <label className={labelClass}>{t("clients.modal.phone")} *</label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-[12px] h-4 w-4 text-gray-400" />
+                <div className="relative h-11 w-full rounded-xl border border-gray-200 bg-gray-50/70 transition-all hover:bg-white focus-within:border-brand-orange focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-orange/15">
                   <PhoneInput
                     country={formCountryCode.toLowerCase()}
                     value={formPhone}
@@ -359,10 +357,10 @@ export default function AddClientModal({
                       setFormPhone(value ? (value.startsWith("+") ? value : `+${value}`) : "");
                       if (data?.countryCode) setFormCountryCode(data.countryCode.toUpperCase());
                     }}
-                    inputClass="h-11 min-w-0 bg-transparent pl-10 pr-3.5 text-sm text-gray-800 outline-none placeholder:text-gray-400"
-                    buttonClass="h-11 border-r border-gray-200 bg-white/75"
-                    containerClass="w-full"
-                    dropdownClass="rounded-xl"
+                    inputClass="!w-full !h-11 !bg-transparent !border-none !text-sm !text-gray-800 !outline-none !pl-[48px] !pr-3.5 placeholder:!text-gray-400"
+                    buttonClass="!bg-transparent !border-0 !border-r !border-gray-200 !rounded-l-xl"
+                    containerClass="!w-full !h-full"
+                    dropdownClass="!w-max !rounded-xl !border-gray-200 !shadow-lg"
                     enableSearch
                     preferredCountries={["ma", "fr"]}
                   />

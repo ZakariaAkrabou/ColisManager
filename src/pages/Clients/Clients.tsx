@@ -6,7 +6,6 @@ import {
   Download,
   Wallet,
   Search,
-  Filter,
   Plus,
   ChevronLeft,
   ChevronRight,
@@ -469,23 +468,7 @@ export default function ClientsPage() {
               <option value="destinataire">{t("clients.destinataire")}</option>
             </select>
           </div>
-
-          <div className="col-span-1 sm:col-span-3 md:col-span-2">
-            <button
-              onClick={handleResetFilters}
-              disabled={
-                searchQuery === "" &&
-                filterPays === "Tous" &&
-                filterRegion === "Toutes" &&
-                filterVille === "Toutes" &&
-                filterClientType === "Tous"
-              }
-              className="w-full inline-flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 text-gray-600 disabled:text-gray-350 disabled:bg-gray-50/30 disabled:border-gray-100 font-medium text-sm px-4 py-2 rounded-xl transition-all cursor-pointer"
-            >
-              <Filter className="w-4 h-4" />
-              <span>{t("common.filters")}</span>
-            </button>
-          </div>
+ 
         </div>
 
         {(searchQuery ||

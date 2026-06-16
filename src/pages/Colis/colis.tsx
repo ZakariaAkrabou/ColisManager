@@ -17,11 +17,11 @@ import {
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
+import type { ColisItem, ColisType, ColisStatus } from "../../types/colis";
 
-// ─── Mock Data ────────────────────────────────────────────────────────────────
+type LocalColisItem = ColisItem & { statusRaw?: string; deliveryType?: string };
 
-type ColisStatus = "Livré" | "En transit" | "En attente" | "Annulé";
-type ColisType = "Agence" | "Domicile" | "Standard" | "Fragile";
+
 
 interface DbColis {
   id: number;
@@ -37,158 +37,7 @@ interface DbColis {
   created_at?: string;
 }
 
-interface ColisItem {
-  id: string;
-  trackingNo: string;
-  sender: string;
-  receiver: string;
-  city: string;
-  type: ColisType;
-  deliveryType?: string;
-  weight: number;
-  totalPrice: number;
-  status: ColisStatus;
-  statusRaw?: string;
-  date: string;
-}
 
-const initialColisData: ColisItem[] = [
- 
-  {
-    id: "CLS002",
-    trackingNo: "TRK-48201-MA",
-    sender: "Anass El Madi",
-    receiver: "Jean Dupont",
-    city: "Rabat",
-    type: "Standard",
-    weight: 5.0,
-    totalPrice: 85.0,
-    status: "En transit",
-    date: "2026-05-23",
-  },
-  {
-    id: "CLS003",
-    trackingNo: "TRK-74921-MA",
-    sender: "Yassine Mansouri",
-    receiver: "Khadija Bennani",
-    city: "Marrakech",
-    type: "Fragile",
-    weight: 1.2,
-    totalPrice: 150.0,
-    status: "En attente",
-    date: "2026-05-25",
-  },
-  {
-    id: "CLS004",
-    trackingNo: "TRK-10932-MA",
-    sender: "Meriem Sadiki",
-    receiver: "Omar Fassi",
-    city: "Tanger",
-    type: "Express",
-    weight: 0.8,
-    totalPrice: 110.0,
-    status: "Livré",
-    date: "2026-05-22",
-  },
-  {
-    id: "CLS005",
-    trackingNo: "TRK-88301-MA",
-    sender: "Karim Tazi",
-    receiver: "Samira Alaoui",
-    city: "Fès",
-    type: "Standard",
-    weight: 12.4,
-    totalPrice: 240.0,
-    status: "En transit",
-    date: "2026-05-21",
-  },
-  {
-    id: "CLS006",
-    trackingNo: "TRK-33491-MA",
-    sender: "Said Amrani",
-    receiver: "Lina Cherkaoui",
-    city: "Casablanca",
-    type: "Fragile",
-    weight: 3.1,
-    totalPrice: 180.0,
-    status: "En attente",
-    date: "2026-05-24",
-  },
-  {
-    id: "CLS007",
-    trackingNo: "TRK-66482-MA",
-    sender: "Noureddine Bennis",
-    receiver: "Mounir Riad",
-    city: "Oujda",
-    type: "Standard",
-    weight: 8.5,
-    totalPrice: 130.0,
-    status: "Livré",
-    date: "2026-05-20",
-  },
-  {
-    id: "CLS008",
-    trackingNo: "TRK-55209-MA",
-    sender: "Siham El Amri",
-    receiver: "Tariq Jamil",
-    city: "Agadir",
-    type: "Express",
-    weight: 1.5,
-    totalPrice: 140.0,
-    status: "Livré",
-    date: "2026-05-23",
-  },
-  {
-    id: "CLS009",
-    trackingNo: "TRK-12903-MA",
-    sender: "Youssef Filali",
-    receiver: "Rachida Benjelloun",
-    city: "Rabat",
-    type: "Fragile",
-    weight: 0.5,
-    totalPrice: 95.0,
-    status: "En transit",
-    date: "2026-05-25",
-  },
-  {
-    id: "CLS010",
-    trackingNo: "TRK-88402-MA",
-    sender: "Houda Chraibi",
-    receiver: "Amine Touimi",
-    city: "Meknès",
-    type: "Standard",
-    weight: 6.2,
-    totalPrice: 90.0,
-    status: "En attente",
-    date: "2026-05-24",
-  },
-  {
-    id: "CLS011",
-    trackingNo: "TRK-23910-MA",
-    sender: "Driss El Fassi",
-    receiver: "Zineb Berrada",
-    city: "Marrakech",
-    type: "Express",
-    weight: 4.0,
-    totalPrice: 165.0,
-    status: "Livré",
-    date: "2026-05-19",
-  },
-  {
-    id: "CLS012",
-    trackingNo: "TRK-90432-MA",
-    sender: "Amina Lahlou",
-    receiver: "Farid Kadiri",
-    city: "Casablanca",
-    type: "Standard",
-    weight: 15.0,
-    totalPrice: 310.0,
-    status: "En transit",
-    date: "2026-05-25",
-  },
-];
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 interface ColisProps {
   onNavigateToAdd: () => void;
@@ -202,7 +51,7 @@ export default function Colis({
   onPendingConsumed,
 }: ColisProps) {
   const { t, i18n } = useTranslation();
-  const [colisList, setColisList] = useState<ColisItem[]>(initialColisData);
+  const [colisList, setColisList] = useState<LocalColisItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -222,7 +71,7 @@ export default function Colis({
     return "Standard";
   };
 
-  const mapDbColisToItem = (item: DbColis): ColisItem => ({
+  const mapDbColisToItem = (item: DbColis): LocalColisItem => ({
     id: String(item.id),
     trackingNo: item.tracking_number,
     sender: item.sender_name,
@@ -289,13 +138,13 @@ export default function Colis({
     totalPages,
   ]);
 
-  // ── Unique cities for filter ───────────────────────────────────────────────
+ 
   const cities = useMemo(
     () => Array.from(new Set(colisList.map((c) => c.city))).sort(),
     [colisList],
   );
 
-  // ── KPI Stats ─────────────────────────────────────────────────────────────
+
   const stats = useMemo(
     () => ({
       total: colisList.length,
@@ -322,10 +171,8 @@ export default function Colis({
     return type;
   };
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-
-  // DETAILS
-  const handleDetails = (colis: ColisItem) => {
+ 
+  const handleDetails = (colis: LocalColisItem) => {
     const statusColor =
       colis.status === "Livré"
         ? "bg-green-100 text-green-800"
@@ -378,8 +225,7 @@ export default function Colis({
     });
   };
 
-  // EDIT
-  const handleEdit = (colis: ColisItem) => {
+  const handleEdit = (colis: LocalColisItem) => {
     Swal.fire({
       title: t("colis.editTitle"),
       html: `

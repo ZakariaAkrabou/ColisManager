@@ -1,6 +1,5 @@
-﻿// src/components/clients/EditClientModal.tsx
-import React, { useState, useEffect, useMemo } from "react";
-import { X, Phone } from "lucide-react";
+﻿import React, { useState, useEffect, useMemo } from "react";
+import { X } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
@@ -20,7 +19,7 @@ interface LocationRow {
   city: string | null;
 }
 
-// Country codes with flags and phone codes
+
 const COUNTRY_CODES = [
   { name: "Morocco", code: "MA", flag: "🇲🇦", phoneCode: "+212" },
   { name: "France", code: "FR", flag: "🇫🇷", phoneCode: "+33" },
@@ -118,11 +117,9 @@ export default function EditClientModal({
   useEffect(() => {
     if (client) {
       setFormName(client.full_name);
-      // Use full phone number if available (server stores with +country)
       const phoneStr = client.phone_number || "";
       setFormPhone(phoneStr.startsWith("+") ? phoneStr : phoneStr ? `+${phoneStr}` : "");
 
-      // Try to detect country code from stored phone
       let extractedCountryCode = "MA";
       for (const country of COUNTRY_CODES) {
         if (phoneStr.startsWith(country.phoneCode) || phoneStr.startsWith(`+${country.phoneCode.replace("+", "")}`)) {
@@ -260,8 +257,7 @@ export default function EditClientModal({
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {t("clients.modal.phone")} *
               </label>
-              <div className="relative">
-                <Phone className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
+              <div className="relative h-11 w-full rounded-xl border border-gray-200 bg-gray-50/50 transition-all hover:bg-gray-50 focus-within:border-brand-orange focus-within:ring-1 focus-within:ring-brand-orange">
                 <PhoneInput
                   country={formCountryCode.toLowerCase()}
                   value={formPhone}
@@ -269,10 +265,10 @@ export default function EditClientModal({
                     setFormPhone(value ? (value.startsWith("+") ? value : `+${value}`) : "");
                     if (data?.countryCode) setFormCountryCode(data.countryCode.toUpperCase());
                   }}
-                  inputClass="flex-1 h-11 min-w-0 bg-transparent pl-10 pr-3.5 text-sm text-gray-700 outline-none placeholder:text-gray-400"
-                  buttonClass="h-11 border-r border-gray-200 bg-white/75"
-                  containerClass="w-full"
-                  dropdownClass="rounded-xl"
+                  inputClass="!w-full !h-11 !bg-transparent !border-none !text-sm !text-gray-700 !outline-none !pl-[48px] !pr-3.5 placeholder:!text-gray-400"
+                  buttonClass="!bg-transparent !border-0 !border-r !border-gray-200 !rounded-l-xl"
+                  containerClass="!w-full !h-full"
+                  dropdownClass="!w-max !rounded-xl !border-gray-200 !shadow-lg"
                   enableSearch
                   preferredCountries={["ma", "fr"]}
                 />

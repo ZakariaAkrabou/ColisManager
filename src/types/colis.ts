@@ -1,5 +1,5 @@
-export type ColisStatus = 'Livré' | 'En transit' | 'En attente';
-export type ColisType = 'Standard' | 'Express' | 'Fragile';
+export type ColisStatus = 'Livré' | 'En transit' | 'En attente' | 'Annulé';
+export type ColisType = 'Standard' | 'Express' | 'Fragile' | 'Domicile' | 'Agence';
 
 export interface ColisItem {
     id: string;
