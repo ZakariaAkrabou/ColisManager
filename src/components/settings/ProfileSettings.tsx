@@ -100,7 +100,7 @@ export default function ProfileSettings() {
         onSubmit={handleSubmit}
         className="space-y-6 max-w-2xl animate-fade-in dark:text-slate-100"
       >
-        <div className="flex items-center gap-4 p-4 rounded-xl bg-orange-50/50 border border-orange-100/50 dark:bg-slate-900 dark:border-slate-800">
+        {/* <div className="flex items-center gap-4 p-4 rounded-xl bg-orange-50/50 border border-orange-100/50 dark:bg-slate-900 dark:border-slate-800">
           <div className="w-16 h-16 rounded-xl bg-orange-100 flex items-center justify-center text-brand-orange font-bold text-xl uppercase shrink-0 shadow-inner dark:bg-orange-200">
             {settings.companyName.substring(0, 2)}
           </div>
@@ -121,7 +121,7 @@ export default function ProfileSettings() {
               {t("settings.profile.changeImage")}
             </button>
           </div>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">

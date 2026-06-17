@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { FileText } from "lucide-react";
 import { generateFacture } from "../facture/generateFacture";
-
+import { generateBonCommande } from "../bonCommande/generateBonCommande";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ReportColis {
@@ -180,7 +180,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                 <th className="px-5 py-4">Destinataire</th>
                 <th className="px-5 py-4">Ville</th>
                 <th className="px-5 py-4 text-center">Statut</th>
-               
+
                 <th className="px-5 py-4 text-right">Total</th>
                 <th className="px-5 py-4 text-center">Facture</th>
                 <th className="px-5 py-4 text-center">Bon De Commande</th>
@@ -194,7 +194,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                 const date = colis.created_at
                   ? colis.created_at.split("T")[0]
                   : "—";
-               
+
                 return (
 
                   <tr
@@ -233,7 +233,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                       </div>
                     </td>
 
-                 
+
 
                     {/* Status */}
                     <td className="px-5 py-3.5 text-center">
@@ -242,7 +242,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                       </span>
                     </td>
 
-                 
+
 
                     {/* Total */}
                     <td className="px-5 py-3.5 text-right font-bold text-gray-800 dark:text-slate-200">
@@ -250,8 +250,8 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                       <span className="text-[10px] text-gray-400 dark:text-slate-500 font-medium">DH</span>
                     </td>
 
-                  
-                  {/* Facture Button */}
+
+                    {/* Facture Button */}
                     <td className="px-5 py-3.5 text-center">
                       <button
                         onClick={() => handleFacture(colis)}
@@ -260,12 +260,13 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                         <FileText size={14} />
                         Facture
                       </button>
-                      
+
                     </td>
 
                     {/* Bon De Commande Button */}
                     <td className="px-5 py-3.5 text-center">
                       <button
+                        onClick={() => generateBonCommande(colis)}
                         className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium transition"
                       >
                         <FileText size={14} />
