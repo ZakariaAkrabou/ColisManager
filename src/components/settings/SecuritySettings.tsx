@@ -4,21 +4,21 @@ export default function SecuritySettings() {
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6 max-w-2xl animate-fade-in">
-      <div className="border-t border-gray-100 pt-5">
-        <h4 className="text-sm font-semibold text-gray-850 mb-3">
+    <div className="space-y-6 max-w-2xl animate-fade-in dark:text-slate-100">
+      <div className="border-t border-gray-100 pt-5 dark:border-slate-700">
+        <h4 className="text-sm font-semibold text-gray-850 dark:text-slate-100 mb-3">
           {t("settings.security.changeAdminPassword")}
         </h4>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <input
             type="password"
             placeholder={t("settings.security.currentPassword")}
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
           />
           <input
             type="password"
             placeholder={t("settings.security.newPassword")}
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all"
+            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-800 focus:outline-none transition-all dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
           />
           <button
             type="button"

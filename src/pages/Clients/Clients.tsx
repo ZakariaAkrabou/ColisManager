@@ -21,8 +21,8 @@ import ClientDetailsModal from "../../components/clients/ClientDetailsModal";
 import { invoke } from "@tauri-apps/api/core";
 import Swal from "sweetalert2";
 export interface Client {
-  id: number;
   client_type: "expediteur" | "destinataire";
+  id: number;
   full_name: string;
   phone_number: string;
   country: string;
@@ -144,10 +144,8 @@ export default function ClientsPage() {
         filterRegion === "Toutes" || client.region === filterRegion;
       const matchesVille =
         filterVille === "Toutes" || client.city === filterVille;
-      const matchesType =
-        filterClientType === "Tous" || client.client_type === filterClientType;
 
-      return matchesSearch && matchesPays && matchesRegion && matchesVille && matchesType;
+      return matchesSearch && matchesPays && matchesRegion && matchesVille;
     });
   }, [clients, searchQuery, filterPays, filterRegion, filterVille]);
 
@@ -177,9 +175,30 @@ export default function ClientsPage() {
     setIsAddModalOpen(true);
   };
 
-  const handleAddClientSubmit = (newClient: Client) => {
+  const handleAddClientSubmit = (newClientData: Omit<Client, "id">) => {
+    const newId = Date.now();
+
+    const newClient: Client = {
+      id: newId,
+      ...newClientData,
+      totalSent: newClientData.totalSent ?? 0,
+      totalReceived: newClientData.totalReceived ?? 0,
+      totalAmount: newClientData.totalAmount ?? 0,
+    };
+
     setClients([newClient, ...clients]);
     setIsAddModalOpen(false);
+    Swal.fire({
+      icon: "success",
+      title: t("common.success"),
+      text: t("clients.clientAdded", {
+        name: newClientData.full_name,
+        id: newId,
+      }),
+      timer: 2000,
+      showConfirmButton: false,
+    });
+    
   };
 
   const handleOpenEditModal = (client: Client) => {
@@ -256,7 +275,6 @@ export default function ClientsPage() {
     setFilterPays("Tous");
     setFilterRegion("Toutes");
     setFilterVille("Toutes");
-    setFilterClientType("Tous");
     setCurrentPage(1);
   };
 
@@ -523,17 +541,6 @@ export default function ClientsPage() {
                   </button>
                 </span>
               )}
-              {filterClientType !== "Tous" && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-brand-orange text-xs font-semibold">
-                  {t("clients.clientType")} : {t(`clients.${filterClientType}`)}
-                  <button
-                    onClick={() => setFilterClientType("Tous")}
-                    className="hover:bg-orange-100 p-0.5 rounded-md cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
               <button
                 onClick={handleResetFilters}
                 className="text-xs text-slate-400 hover:text-brand-orange underline font-semibold ml-auto cursor-pointer"
@@ -551,9 +558,6 @@ export default function ClientsPage() {
               <tr className="bg-gray-50/75 border-b border-gray-100">
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   {t("clients.fullName")}
-                </th>
-                <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  {t("clients.type")}
                 </th>
                 <th className="px-6 py-4.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   {t("clients.phone")}
@@ -590,9 +594,6 @@ export default function ClientsPage() {
                   >
                     <td className="px-6 py-4 text-sm font-semibold text-slate-800">
                       {client.full_name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 capitalize">
-                      {t(`clients.${client.client_type}`)}
                     </td>
                     <td className=" text-sm text-green-700  rounded font-mono whitespace-nowrap">
                       {client.phone_number}
@@ -655,7 +656,7 @@ export default function ClientsPage() {
               ) : (
                 <tr>
                   <td
-                    colSpan={10}
+                    colSpan={8}
                     className="px-6 py-12 text-center text-gray-400 text-sm"
                   >
                     <Info className="w-8 h-8 text-gray-300 mx-auto mb-2" />

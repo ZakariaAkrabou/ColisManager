@@ -40,22 +40,7 @@ interface LocationRow {
   city: string | null;
 }
 
-const DELIVERY_TYPES = [
-  {
-    id: "agence",
-    label: "À l'agence",
-    icon: Truck,
-    pricePerKg: 20,
-    description: "Client récupère à l'agence",
-  },
-  {
-    id: "domicile",
-    label: "À domicile",
-    icon: Home,
-    pricePerKg: 30,
-    description: "Livraison à l'adresse",
-  },
-];
+
 
 interface ClientInfo {
   client_id?: number;
@@ -302,6 +287,28 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     () => `C${Math.floor(100000 + Math.random() * 900000)}`,
   );
 
+  const [shippingSettings, setShippingSettings] = useState({
+    agencyDeliveryFee: 20,
+    homeDeliveryFee: 30,
+  });
+
+  const DELIVERY_TYPES = [
+    {
+      id: "agence",
+      label: "À l'agence",
+      icon: Truck,
+      pricePerKg: shippingSettings.agencyDeliveryFee,
+      description: "Client récupère à l'agence",
+    },
+    {
+      id: "domicile",
+      label: "À domicile",
+      icon: Home,
+      pricePerKg: shippingSettings.homeDeliveryFee,
+      description: "Livraison à l'adresse",
+    },
+  ];
+
   // Expéditeur
   const [sender, setSender] = useState<ClientInfo>({
     name: "",
@@ -340,7 +347,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
   const [notes, setNotes] = useState("");
 
   // Computed
-  const pricePerKg = deliveryType === "agence" ? 20 : 30;
+  const pricePerKg = deliveryType === "agence" ? shippingSettings.agencyDeliveryFee : shippingSettings.homeDeliveryFee;
   const totalPrice =
     typeof weight === "number" && weight > 0
       ? weight <= 10
@@ -374,12 +381,19 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [clientData, locationData] = await Promise.all([
+        const [clientData, locationData, shippingData] = await Promise.all([
           invoke<ClientRow[]>("get_clients"),
           invoke<LocationRow[]>("get_locations"),
+          invoke<{ agency_delivery_fee: number; home_delivery_fee: number }>("get_shipping_settings").catch(() => null),
         ]);
         setClients(clientData);
         setLocations(locationData);
+        if (shippingData) {
+          setShippingSettings({
+            agencyDeliveryFee: shippingData.agency_delivery_fee,
+            homeDeliveryFee: shippingData.home_delivery_fee,
+          });
+        }
 
         const uniqueCountries = Array.from(
           new Set(locationData.map((loc) => loc.country)),

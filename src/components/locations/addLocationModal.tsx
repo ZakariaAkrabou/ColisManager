@@ -23,16 +23,14 @@ export default function AddLocationModal({
   onClose,
 }: AddLocationModalProps) {
   const { t } = useTranslation();
-  const [selectedCountry, setSelectedCountry] = useState<{
-    value: string;
-    label: string;
-    countryCode: string;
-  } | null>(null);
+
+  const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
+
     if (!selectedCountry || !region.trim()) {
       Swal.fire({
         title: t("common.error") || "Erreur",
@@ -41,16 +39,16 @@ export default function AddLocationModal({
       });
       return;
     }
-    
+
     try {
       await invoke("create_location", {
         payload: {
           country: selectedCountry.value,
           region: region.trim(),
           city: city.trim() || null,
-        }
+        },
       });
-      
+
       Swal.fire({
         title: t("common.success") || "Succès",
         text: "Location ajoutée avec succès.",
@@ -58,12 +56,12 @@ export default function AddLocationModal({
         timer: 1500,
         showConfirmButton: false,
       });
+
       onClose();
       setSelectedCountry(null);
       setRegion("");
       setCity("");
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: t("common.error") || "Erreur",
         text: String(error),
@@ -86,116 +84,168 @@ export default function AddLocationModal({
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between p-5 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+
+      {/* MODAL */}
+      <div className="
+        w-full max-w-lg
+        flex flex-col
+        rounded-xl shadow-xl
+        bg-white dark:bg-slate-900
+        border border-gray-100 dark:border-slate-700
+        transition-colors
+      ">
+
+        {/* HEADER */}
+        <div className="
+          flex items-center justify-between p-5
+          border-b border-gray-100 dark:border-slate-700
+        ">
+          <h2 className="text-xl font-bold text-gray-800 dark:text-white">
             {t("locations.addNewLocation")}
           </h2>
+
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+            className="
+              p-2 rounded-full
+              text-gray-400 hover:text-gray-600
+              hover:bg-gray-100 dark:hover:bg-slate-800
+              transition
+            "
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto">
-          <form className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">
-                {t("locations.country")}
-              </label>
-              <Select
-                options={countryOptions}
-                value={selectedCountry}
-                onChange={(option) => setSelectedCountry(option as any)}
-                placeholder={t("locations.selectCountry")}
-                isSearchable
-                formatOptionLabel={formatOptionLabel}
-                className="react-select-container"
-                classNamePrefix="react-select"
-                styles={{
-                  control: (base) => ({
-                    ...base,
-                    backgroundColor: "#F9FAFB",
-                    borderColor: "#E5E7EB",
-                    borderRadius: "0.5rem",
-                    padding: "2px",
-                    boxShadow: "none",
-                    cursor: "pointer",
-                    "&:hover": {
-                      borderColor: "#D1D5DB",
-                    },
-                  }),
-                  valueContainer: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
-                  input: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
-                  placeholder: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
-                  singleValue: (base) => ({
-                    ...base,
-                    cursor: "pointer",
-                  }),
-                  option: (base, state) => ({
-                    ...base,
-                    backgroundColor: state.isFocused ? "#FFF3EB" : "white",
-                    color: state.isFocused ? "#E85D04" : "#374151",
-                    cursor: "pointer",
-                  }),
-                }}
-              />
-            </div>
+        {/* BODY */}
+        <div className="p-6 space-y-5">
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">
-                {t("locations.region")}
-              </label>
-              <input
-                type="text"
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                placeholder={t("locations.regionPlaceholder")}
-                className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
-              />
-            </div>
+          {/* COUNTRY */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
+              {t("locations.country")}
+            </label>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-gray-700">
-                {t("locations.city")}
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder={t("locations.cityPlaceholder")}
-                className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white w-full transition-all"
-              />
-            </div>
-          </form>
+            <Select
+              options={countryOptions}
+              value={selectedCountry}
+              onChange={(option) => setSelectedCountry(option as any)}
+              placeholder={t("locations.selectCountry")}
+              isSearchable
+              formatOptionLabel={formatOptionLabel}
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  backgroundColor: "transparent",
+                  borderColor: "#334155",
+                  borderRadius: "0.5rem",
+                  padding: "2px",
+                  boxShadow: "none",
+                }),
+                menu: (base) => ({
+                  ...base,
+                  backgroundColor: "#0f172a",
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  backgroundColor: state.isFocused
+                    ? "#1e293b"
+                    : "#0f172a",
+                  color: "#fff",
+                  cursor: "pointer",
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  color: "#fff",
+                }),
+                input: (base) => ({
+                  ...base,
+                  color: "#fff",
+                }),
+              }}
+            />
+          </div>
+
+          {/* REGION */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
+              {t("locations.region")}
+            </label>
+
+            <input
+              type="text"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              placeholder={t("locations.regionPlaceholder")}
+              className="
+                px-4 py-2 rounded-lg text-sm
+                bg-gray-50 dark:bg-slate-800
+                border border-gray-200 dark:border-slate-700
+                text-gray-900 dark:text-white
+                focus:ring-2 focus:ring-brand-orange
+                outline-none transition
+              "
+            />
+          </div>
+
+          {/* CITY */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
+              {t("locations.city")}
+            </label>
+
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder={t("locations.cityPlaceholder")}
+              className="
+                px-4 py-2 rounded-lg text-sm
+                bg-gray-50 dark:bg-slate-800
+                border border-gray-200 dark:border-slate-700
+                text-gray-900 dark:text-white
+                focus:ring-2 focus:ring-brand-orange
+                outline-none transition
+              "
+            />
+          </div>
         </div>
 
-        <div className="p-5 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3">
+        {/* FOOTER */}
+        <div className="
+          p-5 flex justify-end gap-3
+          border-t border-gray-100 dark:border-slate-700
+          bg-gray-50 dark:bg-slate-900
+        ">
+
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="
+              px-4 py-2 rounded-lg text-sm font-medium
+              bg-white dark:bg-slate-800
+              border border-gray-200 dark:border-slate-700
+              text-gray-600 dark:text-white
+              hover:bg-gray-100 dark:hover:bg-slate-700
+              transition
+            "
           >
             {t("common.cancel")}
           </button>
-          <button 
+
+          <button
             onClick={handleSave}
-            className="px-4 py-2 bg-brand-orange text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors cursor-pointer"
+            className="
+              px-4 py-2 rounded-lg text-sm font-medium
+              bg-brand-orange hover:bg-orange-600
+              text-white transition
+            "
           >
             {t("locations.saveLocation")}
           </button>
         </div>
+
       </div>
     </div>
   );

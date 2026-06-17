@@ -76,3 +76,68 @@ CREATE TABLE IF NOT EXISTS Backups (
     BackupPath TEXT NOT NULL,
     CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE IF NOT EXISTS Settings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+
+    CompanyName TEXT NOT NULL,
+    OwnerName TEXT NOT NULL,
+    Email TEXT NOT NULL,
+
+    Phone TEXT NOT NULL,
+    Phone2 TEXT,
+
+    Address TEXT NOT NULL,
+    Website TEXT,
+
+    LogoPath TEXT,
+
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT OR IGNORE INTO Settings (
+    id,
+    CompanyName,
+    OwnerName,
+    Email,
+    Phone,
+    Phone2,
+    Address,
+    Website,
+    LogoPath
+)
+VALUES (
+    1,
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    ''
+);
+
+
+CREATE TABLE IF NOT EXISTS ShippingSettings (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+
+    AgencyDeliveryFee REAL NOT NULL DEFAULT 40,
+    HomeDeliveryFee REAL NOT NULL DEFAULT 55,
+
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT OR IGNORE INTO ShippingSettings (
+    id,
+    AgencyDeliveryFee,
+    HomeDeliveryFee
+)
+VALUES (
+    1,
+    40,
+    55
+);

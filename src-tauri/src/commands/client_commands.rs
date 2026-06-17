@@ -1,5 +1,5 @@
 use crate::database::connection::AppState;
-use crate::models::client::{Client, CreateClientRequest, UpdateClientRequest};
+use crate::models::Client::{Client, CreateClientRequest, UpdateClientRequest};
 use crate::services::client_service;
 use tauri::State;
 

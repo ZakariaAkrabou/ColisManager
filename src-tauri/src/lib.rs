@@ -50,6 +50,12 @@ pub fn run() {
 
             commands::colis_commands::create_colis,
             commands::colis_commands::get_colis,
+
+            commands::settings_commandes::save_settings,
+            commands::settings_commandes::get_settings,
+
+            commands::shipping_settings_commands::get_shipping_settings,
+            commands::shipping_settings_commands::save_shipping_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

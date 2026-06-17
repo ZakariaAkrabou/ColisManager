@@ -1,5 +1,5 @@
 use sqlx::SqlitePool;
-use crate::models::client::{Client, CreateClientRequest, UpdateClientRequest};
+use crate::models::Client::{Client, CreateClientRequest, UpdateClientRequest};
 
 pub async fn create_client(
     pool: &SqlitePool,

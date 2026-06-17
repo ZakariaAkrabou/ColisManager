@@ -108,6 +108,7 @@
       "email": "Email address",
       "emailPlaceholder": "email@domain.com",
       "phone": "Phone",
+      "phone2": "Phone 2",
       "address": "Physical address",
       "addressPlaceholder": "Full address",
       "website": "Website",
@@ -131,6 +132,8 @@
     }
   },
   "locations": {
+    "title": "Locations",
+    "subtitle": "Manage and browse your geographical location list.",
     "totalLocations": "Total Locations",
     "managementTitle": "Location Management",
     "search": "Search",

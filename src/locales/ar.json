@@ -108,6 +108,7 @@
       "email": "البريد الإلكتروني",
       "emailPlaceholder": "email@domain.com",
       "phone": "الهاتف",
+      "phone2": "الهاتف 2",
       "address": "العنوان",
       "addressPlaceholder": "العنوان الكامل",
       "website": "الموقع الإلكتروني",
@@ -131,6 +132,8 @@
     }
   },
   "locations": {
+    "title": "المواقع",
+    "subtitle": "إدارة واستعراض قائمة المواقع الجغرافية.",
     "totalLocations": "إجمالي المواقع",
     "managementTitle": "إدارة المواقع",
     "search": "بحث",

@@ -1,4 +1,5 @@
 use crate::models::Colis::{Colis, CreateColisRequest, PartyPayload, ReceiverPayload};
+use crate::models::shipping_settings::ShippingSettings;
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
 pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Result<Colis, String> {
@@ -31,10 +32,26 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
 
     let delivery_type = normalize_delivery_type(&payload.delivery_type)?;
 
+    let settings = sqlx::query_as::<_, ShippingSettings>(
+        r#"
+        SELECT
+            AgencyDeliveryFee as agency_delivery_fee,
+            HomeDeliveryFee as home_delivery_fee
+        FROM ShippingSettings
+        WHERE id = 1
+        "#
+    )
+    .fetch_one(&mut *tx)
+    .await
+    .unwrap_or(ShippingSettings {
+        agency_delivery_fee: 20.0,
+        home_delivery_fee: 30.0,
+    });
+
     let calculated_amount = if payload.weight <= 10.0 {
         if delivery_type == "agency" { 100.0 } else { 200.0 }
     } else {
-        if delivery_type == "agency" { payload.weight * 20.0 } else { payload.weight * 30.0 }
+        if delivery_type == "agency" { payload.weight * settings.agency_delivery_fee } else { payload.weight * settings.home_delivery_fee }
     };
 
     let colis_id = sqlx::query_scalar::<_, i64>(
