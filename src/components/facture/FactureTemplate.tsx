@@ -1,101 +1,223 @@
-interface FactureTemplateProps {
-  colis: {
-    trackingNo: string;
-    sender: string;
-    receiver: string;
-    city: string;
-    type: string;
-    weight: number;
-    totalPrice: number;
-    date: string;
-    status: string;
-  };
+import { ReportColis } from "../reports/ReportsTable";
+
+type Settings = {
+  company_name: string;
+  owner_name: string;
+  email: string;
+  phone: string;
+  phone2?: string;
+  address: string;
+  logo_path?: string;
+};
+
+export function factureTemplate(colis: ReportColis, settings: Settings) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Facture</title>
+
+<style>
+@page { size: A4 portrait; margin: 12mm; }
+
+body{
+  font-family: Arial;
+  margin:0;
+  background:#fff;
+  color:#222;
 }
 
-export default function FactureTemplate({
-  colis,
-}: FactureTemplateProps) {
-  return (
-    <div
-      id="facture-content"
-      className="bg-white text-black p-10 w-[800px]"
-    >
-      {/* Header */}
-      <div className="flex justify-between border-b pb-4">
-        <div>
-          <h1 className="text-3xl font-bold">FACTURE</h1>
-          <p>N° {colis.trackingNo}</p>
-        </div>
+.container{
+  border:3px solid #2b6cb0;
+  padding:15px;
+  border-radius:10px;
+}
 
-        <div className="text-right">
-          <h2 className="text-2xl font-bold">
-            ASFAR TARIQ
-          </h2>
-          <p>Transport & Livraison</p>
-          <p>{colis.date}</p>
-        </div>
-      </div>
+/* HEADER */
+.header{
+  text-align:center;
+  border-bottom:3px solid #e63946;
+  padding-bottom:10px;
+}
 
-      {/* Client */}
-      <div className="mt-8">
-        <h3 className="font-bold text-lg mb-2">
-          Informations Client
-        </h3>
+.logo{
+  height:50px;
+  margin-bottom:5px;
+}
 
-        <p>
-          <strong>Expéditeur :</strong>{" "}
-          {colis.sender}
-        </p>
+.title{
+  font-size:20px;
+  font-weight:bold;
+  color:#2b6cb0;
+}
 
-        <p>
-          <strong>Destinataire :</strong>{" "}
-          {colis.receiver}
-        </p>
+.subtitle{
+  font-size:11px;
+  color:#555;
+  line-height:1.5;
+}
 
-        <p>
-          <strong>Ville :</strong>{" "}
-          {colis.city}
-        </p>
-      </div>
+.tracking{
+  margin-top:8px;
+  background:#e63946;
+  color:white;
+  padding:6px 10px;
+  display:inline-block;
+  border-radius:6px;
+  font-weight:bold;
+}
 
-      {/* Table */}
-      <table className="w-full mt-8 border-collapse border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-3">Suivi</th>
-            <th className="border p-3">Type</th>
-            <th className="border p-3">Poids</th>
-            <th className="border p-3">Montant</th>
-          </tr>
-        </thead>
+/* SECTIONS */
+.section{
+  margin-top:15px;
+  border:1px solid #eee;
+  padding:10px;
+  border-radius:8px;
+}
 
-        <tbody>
-          <tr>
-            <td className="border p-3">
-              {colis.trackingNo}
-            </td>
+.section h4{
+  margin:0 0 6px 0;
+  font-size:12px;
+  color:#e63946;
+  border-left:4px solid #2b6cb0;
+  padding-left:6px;
+}
 
-            <td className="border p-3">
-              {colis.type}
-            </td>
+.info{
+  font-size:12px;
+  line-height:1.6;
+}
 
-            <td className="border p-3">
-              {colis.weight} KG
-            </td>
+/* TABLE */
+table{
+  width:100%;
+  margin-top:10px;
+  border-collapse:collapse;
+  font-size:12px;
+}
 
-            <td className="border p-3">
-              {colis.totalPrice} DH
-            </td>
-          </tr>
-        </tbody>
-      </table>
+th{
+  background:#000;
+  color:#fff;
+  padding:10px;
+  font-weight:bold;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
 
-      {/* Total */}
-      <div className="mt-8 text-right">
-        <h2 className="text-2xl font-bold">
-          Total : {colis.totalPrice} DH
-        </h2>
-      </div>
+td{
+  border:1px solid #eee;
+  padding:8px;
+  text-align:center;
+}
+
+.status{
+  background:#e63946;
+  color:black;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:11px;
+}
+
+/* TOTAL */
+.total{
+  margin-top:15px;
+  text-align:right;
+  font-size:16px;
+  font-weight:bold;
+  color:#e63946;
+}
+
+.footer{
+  margin-top:10px;
+  text-align:center;
+  font-size:30px;
+  color:green;
+}
+</style>
+</head>
+
+<body onload="window.print()">
+
+<div class="container">
+
+  <!-- COMPANY HEADER -->
+  <div class="header">
+
+    ${settings.logo_path ? `<img src="${settings.logo_path}" class="logo"/>` : ""}
+
+    <div class="title">${settings.company_name}</div>
+
+    <div class="subtitle">
+      ${settings.owner_name}<br/>
+      ${settings.phone} ${settings.phone2 ? " | " + settings.phone2 : ""}<br/>
+      ${settings.email}<br/>
+      ${settings.address}
     </div>
-  );
+
+    <div class="tracking">
+      Tracking: ${colis.tracking_number}
+    </div>
+  </div>
+
+  <!-- SENDER -->
+  <div class="section">
+    <h4>Expéditeur</h4>
+    <div class="info">
+      ${colis.sender_name}<br/>
+      ${colis.sender_phone}<br/>
+      ${colis.sender_address}
+    </div>
+  </div>
+
+  <!-- RECEIVER -->
+  <div class="section">
+    <h4>Destinataire</h4>
+    <div class="info">
+      ${colis.receiver_name}<br/>
+      ${colis.receiver_phone}<br/>
+      ${colis.receiver_full_address}<br/>
+      ${colis.receiver_country} - ${colis.receiver_region} - ${colis.receiver_city}
+    </div>
+  </div>
+
+  <!-- DETAILS -->
+  <div class="section">
+    <h4>Détails du colis</h4>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tracking</th>
+          <th>Poids</th>
+          <th>Type</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>${colis.tracking_number}</td>
+          <td>${colis.weight} KG</td>
+          <td>${colis.delivery_type}</td>
+          <td><span class="status">${colis.status}</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="total">
+    TOTAL: ${colis.total_amount} DH
+  </div>
+
+  <div class="footer">
+ PAYE
+  </div>
+
+</div>
+
+</body>
+</html>
+`;
 }
