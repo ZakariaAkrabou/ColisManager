@@ -1,3 +1,4 @@
+// path = src/components/facture/generateFacture.tsff
 import { invoke } from "@tauri-apps/api/core";
 import { factureTemplate } from "./FactureTemplate";
 

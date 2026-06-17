@@ -1,3 +1,6 @@
+
+// path = src/components/facture/FactureTemplate.tsx
+
 import { ReportColis } from "../reports/ReportsTable";
 
 type Settings = {
@@ -19,200 +22,276 @@ export function factureTemplate(colis: ReportColis, settings: Settings) {
 <title>Facture</title>
 
 <style>
-@page { size: A4 portrait; margin: 12mm; }
-
-body{
-  font-family: Arial;
+@page{
+  size:80mm auto;
   margin:0;
+}
+
+html,
+body{
+  margin:0;
+  padding:0;
   background:#fff;
-  color:#222;
+  color:#000;
+  font-family:Arial,sans-serif;
+  width:100%;
+}
+
+*{
+  box-sizing:border-box;
 }
 
 .container{
-  border:3px solid #2b6cb0;
-  padding:15px;
-  border-radius:10px;
+  width:90%;
+  margin:2 auto;
+  padding:4mm;
+  border:1px solid #000;
 }
 
 /* HEADER */
+
 .header{
   text-align:center;
-  border-bottom:3px solid #e63946;
-  padding-bottom:10px;
+  border-bottom:1px dashed #000;
+  padding-bottom:6px;
 }
 
 .logo{
-  height:50px;
-  margin-bottom:5px;
+  height:45px;
+  max-width:100%;
+  object-fit:contain;
+  margin-bottom:4px;
 }
 
 .title{
-  font-size:20px;
+  font-size:34px;
   font-weight:bold;
-  color:#2b6cb0;
+  text-transform:uppercase;
 }
 
 .subtitle{
-  font-size:11px;
-  color:#555;
-  line-height:1.5;
+  margin-top:4px;
+  font-size:20px;
+  line-height:1.4;
 }
 
 .tracking{
-  margin-top:8px;
-  background:#e63946;
-  color:white;
-  padding:6px 10px;
-  display:inline-block;
-  border-radius:6px;
+  margin-top:6px;
+  border:1px solid #000;
+  padding:4px;
+  font-size:20px;
   font-weight:bold;
 }
 
-/* SECTIONS */
+/* SECTION */
+
 .section{
-  margin-top:15px;
-  border:1px solid #eee;
-  padding:10px;
-  border-radius:8px;
+  margin-top:8px;
+  padding-top:6px;
+  border-top:1px dashed #000;
 }
 
-.section h4{
-  margin:0 0 6px 0;
-  font-size:12px;
-  color:#e63946;
-  border-left:4px solid #2b6cb0;
-  padding-left:6px;
+.section-title{
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  margin-bottom:5px;
+  text-transform:uppercase;
 }
 
 .info{
-  font-size:12px;
-  line-height:1.6;
+  font-size:20px;
+  line-height:1.4;
 }
 
-/* TABLE */
-table{
-  width:100%;
-  margin-top:10px;
-  border-collapse:collapse;
-  font-size:12px;
+/* DETAILS */
+
+.details{
+  margin-top:4px;
+  font-size:15px;
 }
 
-th{
-  background:#000;
-  color:#fff;
-  padding:10px;
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:2px;
+}
+
+.label{
+ font-size : 20px;
   font-weight:bold;
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-}
-
-td{
-  border:1px solid #eee;
-  padding:8px;
-  text-align:center;
-}
-
-.status{
-  background:#e63946;
-  color:black;
-  padding:4px 8px;
-  border-radius:6px;
-  font-size:11px;
 }
 
 /* TOTAL */
-.total{
-  margin-top:15px;
-  text-align:right;
-  font-size:16px;
-  font-weight:bold;
-  color:#e63946;
-}
 
-.footer{
-  margin-top:10px;
+.total{
+  margin-top:8px;
+  padding-top:6px;
+  border-top:1px dashed #000;
   text-align:center;
   font-size:30px;
-  color:green;
+  font-weight:bold;
+}
+
+/* FOOTER */
+
+.footer{
+  margin-top:8px;
+  padding-top:6px;
+  border-top:1px dashed #000;
+  text-align:center;
+}
+
+.paid{
+  font-size:28px;
+  font-weight:bold;
+}
+
+.thankyou{
+  font-size:19px;
+  margin-top:4px;
+}
+
+.date{
+  font-size:18px;
+  margin-top:2px;
+}
+
+@media print{
+  html,
+  body{
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  .container{
+    margin:0 auto !important;
+  }
 }
 </style>
+
 </head>
 
-<body onload="window.print()">
+<body>
 
 <div class="container">
 
-  <!-- COMPANY HEADER -->
   <div class="header">
 
-    ${settings.logo_path ? `<img src="${settings.logo_path}" class="logo"/>` : ""}
+    ${
+      settings.logo_path
+        ? `<img src="${settings.logo_path}" class="logo" />`
+        : ""
+    }
 
     <div class="title">${settings.company_name}</div>
 
     <div class="subtitle">
       ${settings.owner_name}<br/>
-      ${settings.phone} ${settings.phone2 ? " | " + settings.phone2 : ""}<br/>
+      ${settings.phone}
+      ${settings.phone2 ? " / " + settings.phone2 : ""}<br/>
       ${settings.email}<br/>
       ${settings.address}
     </div>
 
     <div class="tracking">
-      Tracking: ${colis.tracking_number}
+      TRACKING<br/>
+      ${colis.tracking_number}
     </div>
+
   </div>
 
-  <!-- SENDER -->
+  <!-- EXPEDITEUR -->
   <div class="section">
-    <h4>Expéditeur</h4>
+
+    <div class="section-title">
+      EXPÉDITEUR
+    </div>
+
     <div class="info">
       ${colis.sender_name}<br/>
       ${colis.sender_phone}<br/>
       ${colis.sender_address}
     </div>
+
   </div>
 
-  <!-- RECEIVER -->
+  <!-- DESTINATAIRE -->
   <div class="section">
-    <h4>Destinataire</h4>
+
+    <div class="section-title">
+      DESTINATAIRE
+    </div>
+
     <div class="info">
       ${colis.receiver_name}<br/>
       ${colis.receiver_phone}<br/>
       ${colis.receiver_full_address}<br/>
-      ${colis.receiver_country} - ${colis.receiver_region} - ${colis.receiver_city}
+      ${colis.receiver_country} -
+      ${colis.receiver_region} -
+      ${colis.receiver_city}
     </div>
+
   </div>
 
   <!-- DETAILS -->
   <div class="section">
-    <h4>Détails du colis</h4>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Tracking</th>
-          <th>Poids</th>
-          <th>Type</th>
-          <th>Statut</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>${colis.tracking_number}</td>
-          <td>${colis.weight} KG</td>
-          <td>${colis.delivery_type}</td>
-          <td><span class="status">${colis.status}</span></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="section-title">
+      DÉTAILS DU COLIS
+    </div>
+
+    <div class="details">
+
+      <div class="row">
+        <span class="label">Tracking:</span>
+        <span>${colis.tracking_number}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Poids:</span>
+        <span>${colis.weight} KG</span>
+      </div>
+          <div class="row">
+        <span class="label">Number De Colis:</span>
+        <span> 1 </span>
+      </div>
+    
+      <div class="row">
+        <span class="label">Type:</span>
+        <span>${colis.delivery_type}</span>
+      </div>
+
+      <div class="row">
+        <span class="label">Statut:</span>
+        <span>${colis.status}</span>
+      </div>
+
+    </div>
+
   </div>
 
   <!-- TOTAL -->
   <div class="total">
-    TOTAL: ${colis.total_amount} DH
+    TOTAL : ${colis.total_amount} DH
   </div>
 
+  <!-- FOOTER -->
   <div class="footer">
- PAYE
+
+    <div class="paid">
+      PAYÉ
+    </div>
+
+    <div class="thankyou">
+      Merci pour votre confiance
+    </div>
+
+    <div class="date">
+      ${new Date().toLocaleDateString("fr-FR")}
+    </div>
+
   </div>
 
 </div>
@@ -221,3 +300,4 @@ td{
 </html>
 `;
 }
+
