@@ -1,4 +1,3 @@
-// path commands/shipping_settings_commands.rs
 use crate::database::connection::AppState;
 use crate::models::shipping_settings::ShippingSettings;
 use tauri::State;

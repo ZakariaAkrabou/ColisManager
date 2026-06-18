@@ -1,4 +1,3 @@
-// path commands/settings_commands.rs
 use crate::database::connection::AppState;
 
 use crate::models::Settings::Settings;
