@@ -14,6 +14,7 @@
     "settings": "الإعدادات"
   },
   "common": {
+    
     "arabic": "العربية",
     "french": "الفرنسية",
     "english": "الإنجليزية",
@@ -82,7 +83,8 @@
       "profile": "الملف والشركة",
       "shipping": "الشحن والتسعير",
       "app": "تفضيلات التطبيق",
-      "security": "الأمان والوصول"
+      "security": "الأمان والوصول",
+      "backup": "النسخ الاحتياطي والصيانة"
     },
     "app": {
       "defaultLanguage": "اللغة الافتراضية",
@@ -283,5 +285,24 @@
     "descriptionPlaceholder": "ملابس، إلكترونيات...",
     "homeDeliveryDesc": "تسليم إلى العنوان",
     "agencyDeliveryDesc": "العميل يستلم من الوكالة"
+  },
+  
+  "backup": {
+    "description": "يمكنك إنشاء نسخ احتياطية واسترجاع بيانات التطبيق.",
+    "create": "إنشاء نسخة",
+    "existingBackups": "النسخ الاحتياطية الموجودة",
+    "noBackups": "لا توجد نسخ احتياطية حالياً",
+    "restore": "استرجاع",
+    "delete": "حذف",
+    "success": "نجاح",
+    "error": "خطأ",
+    "deleted": "تم الحذف",
+    "createSuccess": "تم إنشاء النسخة الاحتياطية بنجاح",
+    "restoreSuccess": "تم استرجاع النسخة الاحتياطية",
+    "deleteSuccess": "تم حذف النسخة الاحتياطية",
+    "restoreConfirm": "استرجاع النسخة؟",
+    "deleteConfirm": "حذف النسخة؟"
   }
-}
+  }
+
+

@@ -82,7 +82,8 @@
       "profile": "Profil & Entreprise",
       "shipping": "Livraison & Tarifs",
       "app": "Preferences App",
-      "security": "Securite & Acces"
+      "security": "Securite & Acces",
+      "backup": "Sauvegarde & Maintenance"
     },
     "app": {
       "defaultLanguage": "Langue par defaut",
@@ -130,6 +131,21 @@
       "currentPassword": "Mot de passe actuel",
       "newPassword": "Nouveau mot de passe"
     }
+  },"backup": {
+    "description": "You can create backups and restore application data.",
+    "create": "Create Backup",
+    "existingBackups": "Existing Backups",
+    "noBackups": "No backups available currently",
+    "restore": "Restore",
+    "delete": "Delete",
+    "success": "Success",
+    "error": "Error",
+    "deleted": "Deleted",
+    "createSuccess": "Backup created successfully",
+    "restoreSuccess": "Backup restored successfully",
+    "deleteSuccess": "Backup deleted successfully",
+    "restoreConfirm": "Restore backup?",
+    "deleteConfirm": "Delete backup?"
   },
   "locations": {
     "title": "Locations",
