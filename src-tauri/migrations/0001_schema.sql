@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS Locations (
     Country TEXT NOT NULL,
     City TEXT,
     Region TEXT NOT NULL,
-    UNIQUE(Country, City, Region)
+    UNIQUE(Country, City, Region) 
 );
 
 CREATE TABLE IF NOT EXISTS Clients (

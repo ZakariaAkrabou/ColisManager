@@ -56,6 +56,14 @@ pub fn run() {
 
             commands::shipping_settings_commands::get_shipping_settings,
             commands::shipping_settings_commands::save_shipping_settings,
+
+            commands::backup_commands::create_backup,
+            commands::backup_commands::restore_backup,
+            commands::backup_commands::get_backups,
+            commands::backup_commands::delete_backup,
+            commands::backup_commands::restore_backup_file,
+            // commands::backup_commands::restart_app,
+            
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -82,8 +82,26 @@
       "profile": "Profile & Company",
       "shipping": "Shipping & Rates",
       "app": "App Preferences",
-      "security": "Security & Access"
+      "security": "Security & Access",
+      "backup": "Backup & Maintenance"
+
     },
+    "backup": {
+    "description": "You can create backups and restore application data.",
+    "create": "Create Backup",
+    "existingBackups": "Existing Backups",
+    "noBackups": "No backups available currently",
+    "restore": "Restore",
+    "delete": "Delete",
+    "success": "Success",
+    "error": "Error",
+    "deleted": "Deleted",
+    "createSuccess": "Backup created successfully",
+    "restoreSuccess": "Backup restored successfully",
+    "deleteSuccess": "Backup deleted successfully",
+    "restoreConfirm": "Restore backup?",
+    "deleteConfirm": "Delete backup?"
+  },
     "app": {
       "defaultLanguage": "Default language",
       "languageFrench": "French",

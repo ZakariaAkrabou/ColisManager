@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { User, Truck, Globe, Shield } from "lucide-react";
+import { User, Truck, Globe, Shield, Database } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ProfileSettings from "./ProfileSettings";
 import ShippingSettings from "./ShippingSettings";
 import AppSettings from "./AppSettings";
 import SecuritySettings from "./SecuritySettings";
-
+import BackupSettings from "./Backupcomponent";
 interface SettingTab {
   id: string;
   labelKey: string;
@@ -17,6 +17,8 @@ const tabs: SettingTab[] = [
   { id: "shipping", labelKey: "settings.tabs.shipping", icon: Truck },
   { id: "app", labelKey: "settings.tabs.app", icon: Globe },
   { id: "security", labelKey: "settings.tabs.security", icon: Shield },
+    { id: "backup", labelKey: "settings.tabs.backup", icon: Database },
+
 ];
 
 export default function SettingsComponent() {
@@ -77,6 +79,7 @@ export default function SettingsComponent() {
           {activeTab === "shipping" && <ShippingSettings />}
           {activeTab === "app" && <AppSettings />}
           {activeTab === "security" && <SecuritySettings />}
+          {activeTab === "backup" && <BackupSettings />}
         </div>
       </div>
     </div>

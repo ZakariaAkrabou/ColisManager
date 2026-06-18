@@ -1,3 +1,4 @@
+// path = src/components/reports/ReportsTable.tsx
 import {
   Package,
   Truck,
@@ -8,21 +9,34 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { FileText } from "lucide-react";
-
+import { generateFacture } from "../facture/generateFacture";
+import { generateBonCommande } from "../bonCommande/generateBonCommande";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface ReportColis {
   id: number;
   tracking_number: string;
+
   sender_name: string;
+  sender_phone: string;
+  sender_address: string;
+
   receiver_name: string;
-  receiver_city?: string;
-  receiver_region?: string;
+  receiver_phone: string;
+  receiver_full_address: string;
+  receiver_city: string;
+  receiver_region: string;
+  receiver_country: string;
+
   delivery_type: string;
+  description: string;
+  notes: string;
+
   weight: number;
   total_amount: number;
+
   status: string;
-  created_at?: string;
+  created_at: string;
 }
 
 interface ReportsTableProps {
@@ -65,6 +79,9 @@ const statusConfig = {
   },
 };
 
+const handleFacture = async (colis: ReportColis) => {
+  await generateFacture(colis);
+};
 const normalizeDeliveryType = (type: string) => {
   const v = type?.toLowerCase() ?? "";
   if (v === "home" || v === "domicile") return "À domicile";
@@ -162,12 +179,11 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                 <th className="px-5 py-4">Expéditeur</th>
                 <th className="px-5 py-4">Destinataire</th>
                 <th className="px-5 py-4">Ville</th>
-                <th className="px-5 py-4 text-center">Type</th>
                 <th className="px-5 py-4 text-center">Statut</th>
-                <th className="px-5 py-4 text-right">Poids</th>
+
                 <th className="px-5 py-4 text-right">Total</th>
-                <th className="px-5 py-4 text-center">Date</th>
                 <th className="px-5 py-4 text-center">Facture</th>
+                <th className="px-5 py-4 text-center">Bon De Commande</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
@@ -178,11 +194,11 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                 const date = colis.created_at
                   ? colis.created_at.split("T")[0]
                   : "—";
-                const handleFacture = (colis: ReportColis) => {
-  console.log(colis);
-};
+
                 return (
+
                   <tr
+
                     key={colis.id}
                     className="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors group"
                   >
@@ -217,12 +233,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                       </div>
                     </td>
 
-                    {/* Delivery Type */}
-                    <td className="px-5 py-3.5 text-center">
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-50 dark:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-600">
-                        {normalizeDeliveryType(colis.delivery_type)}
-                      </span>
-                    </td>
+
 
                     {/* Status */}
                     <td className="px-5 py-3.5 text-center">
@@ -231,11 +242,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                       </span>
                     </td>
 
-                    {/* Weight */}
-                    <td className="px-5 py-3.5 text-right font-semibold text-gray-600 dark:text-slate-300">
-                      {colis.weight.toFixed(1)}{" "}
-                      <span className="text-xs text-gray-400 dark:text-slate-500 font-normal">kg</span>
-                    </td>
+
 
                     {/* Total */}
                     <td className="px-5 py-3.5 text-right font-bold text-gray-800 dark:text-slate-200">
@@ -243,11 +250,8 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                       <span className="text-[10px] text-gray-400 dark:text-slate-500 font-medium">DH</span>
                     </td>
 
-                    {/* Date */}
-                    <td className="px-5 py-3.5 text-center text-gray-500 dark:text-slate-400 text-xs">
-                      {date}
-                    </td>
 
+                    {/* Facture Button */}
                     <td className="px-5 py-3.5 text-center">
                       <button
                         onClick={() => handleFacture(colis)}
@@ -256,7 +260,18 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                         <FileText size={14} />
                         Facture
                       </button>
-                      
+
+                    </td>
+
+                    {/* Bon De Commande Button */}
+                    <td className="px-5 py-3.5 text-center">
+                      <button
+                        onClick={() => generateBonCommande(colis)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium transition"
+                      >
+                        <FileText size={14} />
+                        Bon De Commande
+                      </button>
                     </td>
                   </tr>
                 );
