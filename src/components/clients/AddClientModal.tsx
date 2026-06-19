@@ -41,11 +41,11 @@ const COUNTRY_CODES = [
 
 const fieldWrapClass = "space-y-1.5";
 const labelClass =
-  "text-xs font-bold text-gray-500 uppercase tracking-wider";
+  "text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider";
 const controlClass =
-  "h-11 w-full rounded-xl border border-gray-200 bg-gray-50/70 px-3.5 text-sm text-gray-800 outline-none transition-all placeholder:text-gray-400 hover:bg-white focus:border-brand-orange focus:bg-white focus:ring-2 focus:ring-brand-orange/15";
+  "h-11 w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/70 dark:bg-slate-800/60 px-3.5 text-sm text-gray-800 dark:text-slate-200 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500 hover:bg-white dark:hover:bg-slate-800 focus:border-brand-orange focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand-orange/15";
 const selectClass = `${controlClass} cursor-pointer appearance-none pr-9`;
-const iconClass = "pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400";
+const iconClass = "pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500";
 const iconControlClass = `${controlClass} pl-10`;
 
 export default function AddClientModal({
@@ -263,24 +263,24 @@ export default function AddClientModal({
       <button
         type="button"
         aria-label={t("common.close") || "Close"}
-        className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-slate-950/45 dark:bg-black/70 backdrop-blur-[2px]"
         onClick={onClose}
       />
 
-      <div className="relative z-10 flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/60 px-6 py-4">
+      <div className="relative z-10 flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 bg-gray-50/60 dark:bg-slate-800/40 px-6 py-4">
           <div>
-            <h3 className="text-lg font-bold text-gray-950">
+            <h3 className="text-lg font-bold text-gray-950 dark:text-white">
               {t("clients.modal.addTitle")}
             </h3>
-            <p className="mt-0.5 text-xs font-medium text-gray-400">
+            <p className="mt-0.5 text-xs font-medium text-gray-400 dark:text-slate-500">
               {t("clients.modal.addSubtitle")}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 transition-colors hover:bg-white hover:text-gray-700"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 transition-colors hover:bg-white dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-white"
           >
             <X className="h-5 w-5" />
           </button>
@@ -291,11 +291,11 @@ export default function AddClientModal({
           className="flex-1 space-y-4 overflow-y-auto p-5"
         >
           <section className="space-y-3.5">
-            <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 text-brand-orange">
+            <div className="flex items-center gap-2 border-b border-gray-100 dark:border-slate-800 pb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 dark:bg-orange-500/10 text-brand-orange">
                 <User className="h-4 w-4" />
               </div>
-              <span className="text-sm font-bold text-gray-800">
+              <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
                 {t("clients.modal.clientType")}
               </span>
             </div>
@@ -333,14 +333,14 @@ export default function AddClientModal({
                         }
                         className={`${iconControlClass} appearance-none pr-10 cursor-pointer`}
                       >
-                        <option value="destinataire">
+                        <option value="destinataire" className="dark:bg-slate-900">
                           {t("clients.modal.destinataire")}
                         </option>
-                        <option value="expediteur">
+                        <option value="expediteur" className="dark:bg-slate-900">
                           {t("clients.modal.expediteur")}
                         </option>
                       </select>
-                      <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                      <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
                         <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                 </div>
@@ -348,7 +348,7 @@ export default function AddClientModal({
 
               <div className={`${fieldWrapClass} md:col-span-2`}>
                 <label className={labelClass}>{t("clients.modal.phone")} *</label>
-                <div className="relative h-11 w-full rounded-xl border border-gray-200 bg-gray-50/70 transition-all hover:bg-white focus-within:border-brand-orange focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-orange/15">
+                <div className="relative h-11 w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/70 dark:bg-slate-800/60 transition-all hover:bg-white dark:hover:bg-slate-800 focus-within:border-brand-orange focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-2 focus-within:ring-brand-orange/15">
                   <PhoneInput
                     country={formCountryCode.toLowerCase()}
                     value={formPhone}
@@ -357,10 +357,10 @@ export default function AddClientModal({
                       setFormPhone(value ? (value.startsWith("+") ? value : `+${value}`) : "");
                       if (data?.countryCode) setFormCountryCode(data.countryCode.toUpperCase());
                     }}
-                    inputClass="!w-full !h-11 !bg-transparent !border-none !text-sm !text-gray-800 !outline-none !pl-[48px] !pr-3.5 placeholder:!text-gray-400"
-                    buttonClass="!bg-transparent !border-0 !border-r !border-gray-200 !rounded-l-xl"
+                    inputClass="!w-full !h-11 !bg-transparent !border-none !text-sm !text-gray-800 dark:!text-slate-200 !outline-none !pl-[48px] !pr-3.5 placeholder:!text-gray-400 dark:placeholder:!text-slate-500"
+                    buttonClass="!bg-transparent !border-0 !border-r !border-gray-200 dark:!border-slate-700 !rounded-l-xl"
                     containerClass="!w-full !h-full"
-                    dropdownClass="!w-max !rounded-xl !border-gray-200 !shadow-lg"
+                    dropdownClass="!w-max !rounded-xl !border-gray-200 dark:!border-slate-700 !shadow-lg dark:!bg-slate-850 dark:!text-slate-200"
                     enableSearch
                     preferredCountries={["ma", "fr"]}
                   />
@@ -371,11 +371,11 @@ export default function AddClientModal({
 
           {formClientType === "destinataire" ? (
             <section className="space-y-3.5">
-              <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-slate-800 pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600">
                   <MapPin className="h-4 w-4" />
                 </div>
-                <span className="text-sm font-bold text-gray-800">
+                <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
                   {t("clients.modal.addressAndLocation")}
                 </span>
               </div>
@@ -393,12 +393,12 @@ export default function AddClientModal({
                       className={`${selectClass} pl-10`}
                     >
                       {countries.length === 0 ? (
-                        <option value="">
+                        <option value="" className="dark:bg-slate-900">
                           {t("common.loading") || "Loading..."}
                         </option>
                       ) : (
                         countries.map((country) => (
-                          <option key={country} value={country}>
+                          <option key={country} value={country} className="dark:bg-slate-900">
                             {country}
                           </option>
                         ))
@@ -419,10 +419,10 @@ export default function AddClientModal({
                       className={`${selectClass} pl-10`}
                     >
                       {regions.length === 0 ? (
-                        <option value="">-</option>
+                        <option value="" className="dark:bg-slate-900">-</option>
                       ) : (
                         regions.map((region) => (
-                          <option key={region} value={region}>
+                          <option key={region} value={region} className="dark:bg-slate-900">
                             {region}
                           </option>
                         ))
@@ -441,10 +441,10 @@ export default function AddClientModal({
                       className={`${selectClass} pl-10`}
                     >
                       {cities.length === 0 ? (
-                        <option value="">-</option>
+                        <option value="" className="dark:bg-slate-900">-</option>
                       ) : (
                         cities.map((city) => (
-                          <option key={city} value={city}>
+                          <option key={city} value={city} className="dark:bg-slate-900">
                             {city}
                           </option>
                         ))
@@ -474,16 +474,16 @@ export default function AddClientModal({
           </div>
 
           {submitError && (
-            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            <div className="rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
               {submitError}
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+          <div className="flex items-center justify-end gap-3 border-t border-gray-100 dark:border-slate-800 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="h-10 rounded-xl border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-50"
+              className="h-10 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 text-sm font-semibold text-gray-600 dark:text-slate-300 transition-colors hover:border-gray-300 dark:hover:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
             >
               {t("common.cancel")}
             </button>

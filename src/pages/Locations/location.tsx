@@ -86,7 +86,7 @@ export default function LocationPage() {
 
     {/* HEADER CARD */}
     <div className="
-      bg-white dark:bg-gray-950
+      bg-white dark:bg-gray-900
       p-5 rounded-xl shadow-sm
       border border-gray-100 dark:border-gray-800
       flex items-center gap-4
@@ -108,7 +108,7 @@ export default function LocationPage() {
 
     {/* TABLE CARD */}
     <div className="
-      bg-white dark:bg-gray-950
+      bg-white dark:bg-slate-950
       rounded-xl shadow-sm
       border border-gray-100 dark:border-gray-800
       overflow-hidden flex flex-col

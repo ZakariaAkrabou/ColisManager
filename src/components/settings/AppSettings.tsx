@@ -42,7 +42,7 @@ className="
   border
   border-gray-200
 
-  dark:bg-slate-900
+  dark:bg-slate-950
   dark:text-white
   dark:border-slate-700
 "    >
