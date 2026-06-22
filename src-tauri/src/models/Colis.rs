@@ -78,6 +78,9 @@ pub struct CreateColisRequest {
     pub delivery_type: String,
     pub total_amount: f64,
     pub notes: Option<String>,
+    pub image_1: Option<Vec<u8>>,
+    pub image_2: Option<Vec<u8>>,
+    pub image_3: Option<Vec<u8>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -90,5 +93,17 @@ pub struct UpdateColisRequest {
     pub status: String,
     pub weight: f64,
     pub total_amount: f64,
+    pub image_1: Option<Vec<u8>>,
+    pub image_2: Option<Vec<u8>>,
+    pub image_3: Option<Vec<u8>>,
 }
 
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct ColisImages {
+    #[sqlx(rename = "Image1")]
+    pub image_1: Option<Vec<u8>>,
+    #[sqlx(rename = "Image2")]
+    pub image_2: Option<Vec<u8>>,
+    #[sqlx(rename = "Image3")]
+    pub image_3: Option<Vec<u8>>,
+}

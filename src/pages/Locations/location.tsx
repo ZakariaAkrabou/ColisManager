@@ -158,7 +158,7 @@ export default function LocationPage() {
               border border-gray-200 dark:border-gray-800
               text-gray-600 dark:text-gray-200
               hover:bg-gray-100 dark:hover:bg-gray-800
-              flex items-center gap-2 transition
+              flex items-center gap-2 transition cursor-pointer
             ">
               <Filter size={16} />
               <span className="hidden sm:inline">{t("common.filters")}</span>
@@ -169,7 +169,7 @@ export default function LocationPage() {
               className="
                 px-4 py-2 rounded-lg text-sm
                 bg-brand-orange hover:bg-orange-600
-                text-white transition
+                text-white transition cursor-pointer
               "
             >
               {t("locations.addLocation")}
@@ -229,14 +229,14 @@ export default function LocationPage() {
 
                       <button
                         onClick={() => setEditTarget(location)}
-                        className="p-2 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                        className="p-2 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition cursor-pointer"
                       >
                         <Edit size={18} />
                       </button>
 
                       <button
                         onClick={() => handleDelete(location.id)}
-                        className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
+                        className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition cursor-pointer"
                       >
                         <Trash2 size={18} />
                       </button>

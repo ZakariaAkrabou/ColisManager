@@ -18,6 +18,7 @@ import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import type { ColisItem, ColisType, ColisStatus } from "../../types/colis";
+import { DetailColisModal } from "../../components/colis/detailColis";
 
 type LocalColisItem = ColisItem & { statusRaw?: string; deliveryType?: string };
 
@@ -55,6 +56,7 @@ export default function Colis({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedDetailColis, setSelectedDetailColis] = useState<LocalColisItem | null>(null);
 
   const normalizeColisStatus = (status: string): ColisStatus => {
     const value = status?.toLowerCase();
@@ -173,56 +175,7 @@ export default function Colis({
 
  
   const handleDetails = (colis: LocalColisItem) => {
-    const statusColor =
-      colis.status === "Livré"
-        ? "bg-green-100 text-green-800"
-        : colis.status === "En transit"
-          ? "bg-blue-100 text-blue-800"
-          : "bg-yellow-100 text-yellow-800";
-
-    Swal.fire({
-      title: t("colis.detailsTitle"),
-      html: `
-        <div style="text-align:left;font-family:sans-serif;font-size:14px">
-          <div style="display:flex;align-items:center;gap:10px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #f3f4f6">
-            <div style="background:#FDF1EA;padding:8px;border-radius:8px;color:#E26D28;display:flex;align-items:center;justify-content:center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
-            </div>
-            <div>
-              <div style="font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em">Numéro de Suivi</div>
-              <div style="font-family:monospace;font-weight:700;font-size:16px;color:#111827">${colis.trackingNo}</div>
-            </div>
-            <span style="margin-left:auto;padding:2px 10px;border-radius:9999px;font-size:11px;font-weight:600" class="${statusColor}">${statusLabel(colis.status)}</span>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #f3f4f6">
-            <div><div style="font-size:11px;color:#9ca3af">Expéditeur</div><div style="font-weight:600;color:#374151;margin-top:2px">${colis.sender}</div></div>
-            <div><div style="font-size:11px;color:#9ca3af">Destinataire</div><div style="font-weight:600;color:#374151;margin-top:2px">${colis.receiver}</div></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #f3f4f6">
-            <div>
-              <div style="font-size:11px;color:#9ca3af">Ville</div>
-              <div style="font-weight:600;color:#374151;margin-top:2px;display:flex;align-items:center;gap:4px">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#9ca3af"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                ${colis.city}
-              </div>
-            </div>
-            <div><div style="font-size:11px;color:#9ca3af">Type</div><div style="margin-top:4px"><span style="padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600">${colis.type}</span></div></div>
-            <div><div style="font-size:11px;color:#9ca3af">Date</div><div style="font-weight:600;color:#374151;margin-top:2px">${colis.date}</div></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div><div style="font-size:11px;color:#9ca3af">Poids</div><div style="font-weight:700;font-size:18px;color:#111827;margin-top:2px">${colis.weight.toFixed(1)} <span style="font-size:12px;color:#9ca3af">kg</span></div></div>
-            <div><div style="font-size:11px;color:#9ca3af">Prix Total</div><div style="font-weight:900;font-size:22px;color:#E26D28;margin-top:2px">${colis.totalPrice.toFixed(2)} <span style="font-size:12px;color:#9ca3af">DH</span></div></div>
-          </div>
-        </div>
-      `,
-      showCloseButton: true,
-      confirmButtonText: t("common.close"),
-      confirmButtonColor: "#2B4C8C",
-      customClass: {
-        popup: "rounded-xl",
-        confirmButton: "rounded-lg px-6 py-2",
-      },
-    });
+    setSelectedDetailColis(colis);
   };
 
   const handleEdit = async (colis: LocalColisItem) => {
@@ -773,6 +726,15 @@ export default function Colis({
           </div>
         )}
       </div>
+
+      {/* Render the Details Modal Component */}
+      {selectedDetailColis && (
+        <DetailColisModal
+          colis={selectedDetailColis}
+          isOpen={true}
+          onClose={() => setSelectedDetailColis(null)}
+        />
+      )}
     </div>
   );
 }

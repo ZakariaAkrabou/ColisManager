@@ -174,7 +174,7 @@ const Reports: React.FC = () => {
             <p className="text-red-500 font-medium">{error}</p>
             <button
               onClick={loadColis}
-              className="text-sm text-orange-500 hover:underline"
+              className="text-sm text-orange-500 hover:underline cursor-pointer"
             >
               Réessayer
             </button>
@@ -197,7 +197,7 @@ const Reports: React.FC = () => {
             <button
               disabled={safePage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
-              className="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 transition text-sm"
+              className="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 transition text-sm cursor-pointer disabled:cursor-not-allowed"
             >
               Précédent
             </button>
@@ -206,7 +206,7 @@ const Reports: React.FC = () => {
               <button
                 key={i + 1}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`w-9 h-9 rounded-lg transition text-sm font-medium ${
+                className={`w-9 h-9 rounded-lg transition text-sm font-medium cursor-pointer ${
                   safePage === i + 1
                     ? "bg-orange-500 text-white"
                     : "border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800"
@@ -219,7 +219,7 @@ const Reports: React.FC = () => {
             <button
               disabled={safePage === totalPages}
               onClick={() => setCurrentPage((p) => p + 1)}
-              className="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 transition text-sm"
+              className="px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 disabled:opacity-50 transition text-sm cursor-pointer disabled:cursor-not-allowed"
             >
               Suivant
             </button>

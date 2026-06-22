@@ -78,6 +78,9 @@ interface CreateColisPayload {
   delivery_type: string;
   total_amount: number;
   notes?: string;
+  image_1?: number[] | null;
+  image_2?: number[] | null;
+  image_3?: number[] | null;
 }
 
 type ColisListItem = {
@@ -479,11 +482,28 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     date: item.created_at ? item.created_at.split("T")[0] : new Date().toISOString().split("T")[0],
   });
 
+  const fileToByteArray = async (file: File | null): Promise<number[] | null> => {
+    if (!file) return null;
+    const buffer = await file.arrayBuffer();
+    return Array.from(new Uint8Array(buffer));
+  };
+
   const handleSave = async () => {
     if (!isValid) return;
 
     try {
-      const payload = buildPayload();
+      const basePayload = buildPayload();
+      const img1 = await fileToByteArray(images[0]);
+      const img2 = await fileToByteArray(images[1]);
+      const img3 = await fileToByteArray(images[2]);
+      
+      const payload: CreateColisPayload = {
+        ...basePayload,
+        image_1: img1,
+        image_2: img2,
+        image_3: img3,
+      };
+
       const createdColis = await invoke<any>("create_colis", { payload });
       onSave(mapDbColisToListItem(createdColis));
       Swal.fire({
@@ -509,7 +529,18 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     if (!isValid) return;
 
     try {
-      const payload = buildPayload();
+      const basePayload = buildPayload();
+      const img1 = await fileToByteArray(images[0]);
+      const img2 = await fileToByteArray(images[1]);
+      const img3 = await fileToByteArray(images[2]);
+
+      const payload: CreateColisPayload = {
+        ...basePayload,
+        image_1: img1,
+        image_2: img2,
+        image_3: img3,
+      };
+
       const createdColis = await invoke<any>("create_colis", { payload });
       const newColis = mapDbColisToListItem(createdColis);
       onSave(newColis);

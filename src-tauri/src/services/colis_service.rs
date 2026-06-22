@@ -1,4 +1,4 @@
-use crate::models::Colis::{Colis, CreateColisRequest, PartyPayload, ReceiverPayload, UpdateColisRequest};
+use crate::models::Colis::{Colis, ColisImages, CreateColisRequest, PartyPayload, ReceiverPayload, UpdateColisRequest};
 use crate::models::shipping_settings::ShippingSettings;
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
@@ -71,9 +71,12 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
             Description,
             DeliveryType,
             TotalAmount,
-            Notes
+            Notes,
+            Image1,
+            Image2,
+            Image3
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING ColisID
         "#,
     )
@@ -92,6 +95,9 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
     .bind(delivery_type)
     .bind(calculated_amount)
     .bind(optional_trim(payload.notes.as_deref()))
+    .bind(payload.image_1.as_deref())
+    .bind(payload.image_2.as_deref())
+    .bind(payload.image_3.as_deref())
     .fetch_one(&mut *tx)
     .await
     .map_err(|e| e.to_string())?;
@@ -169,6 +175,16 @@ pub async fn update_colis(pool: &SqlitePool, payload: UpdateColisRequest) -> Res
     tx.commit().await.map_err(|e| e.to_string())?;
 
     get_colis_by_id(pool, payload.id).await
+}
+
+pub async fn get_colis_images(pool: &SqlitePool, id: i64) -> Result<ColisImages, String> {
+    sqlx::query_as::<_, ColisImages>(
+        "SELECT Image1, Image2, Image3 FROM Colis WHERE ColisID = ?"
+    )
+    .bind(id)
+    .fetch_one(pool)
+    .await
+    .map_err(|e| e.to_string())
 }
 
 pub async fn get_colis(pool: &SqlitePool) -> Result<Vec<Colis>, String> {

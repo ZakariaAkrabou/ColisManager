@@ -1,5 +1,5 @@
 use crate::database::connection::AppState;
-use crate::models::Colis::{Colis, CreateColisRequest, UpdateColisRequest};
+use crate::models::Colis::{Colis, ColisImages, CreateColisRequest, UpdateColisRequest};
 use crate::services::colis_service;
 use tauri::State;
 
@@ -24,3 +24,10 @@ pub async fn update_colis(
     colis_service::update_colis(&state.db, payload).await
 }
 
+#[tauri::command]
+pub async fn get_colis_images(
+    state: State<'_, AppState>,
+    id: i64,
+) -> Result<ColisImages, String> {
+    colis_service::get_colis_images(&state.db, id).await
+}

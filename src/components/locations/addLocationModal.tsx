@@ -111,7 +111,7 @@ export default function AddLocationModal({
               p-2 rounded-full
               text-gray-400 hover:text-gray-600
               hover:bg-gray-100 dark:hover:bg-slate-800
-              transition
+              transition cursor-pointer
             "
           >
             <X size={20} />
@@ -228,7 +228,7 @@ export default function AddLocationModal({
               border border-gray-200 dark:border-slate-700
               text-gray-600 dark:text-white
               hover:bg-gray-100 dark:hover:bg-slate-700
-              transition
+              transition cursor-pointer
             "
           >
             {t("common.cancel")}
@@ -239,7 +239,7 @@ export default function AddLocationModal({
             className="
               px-4 py-2 rounded-lg text-sm font-medium
               bg-brand-orange hover:bg-orange-600
-              text-white transition
+              text-white transition cursor-pointer
             "
           >
             {t("locations.saveLocation")}
