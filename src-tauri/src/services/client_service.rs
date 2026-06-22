@@ -48,9 +48,22 @@ pub async fn get_clients(pool: &SqlitePool) -> Result<Vec<Client>, String> {
             COALESCE(l.Region, '') AS region,
             l.City AS city,
             c.Address AS Address,
-            0.0 AS total_sent,
-            0.0 AS total_received,
-            0.0 AS total_amount
+            COALESCE((
+                SELECT SUM(co.Weight)
+                FROM Colis co
+                WHERE co.SenderClientID = c.ClientID
+            ), 0.0) AS total_sent,
+            COALESCE((
+                SELECT SUM(co.Weight)
+                FROM Colis co
+                WHERE co.ReceiverClientID = c.ClientID
+            ), 0.0) AS total_received,
+            COALESCE((
+                SELECT SUM(co.TotalAmount)
+                FROM Colis co
+                WHERE co.SenderClientID = c.ClientID
+                   OR co.ReceiverClientID = c.ClientID
+            ), 0.0) AS total_amount
         FROM Clients c
         LEFT JOIN Locations l ON c.LocationID = l.LocationID
         ORDER BY c.ClientID DESC

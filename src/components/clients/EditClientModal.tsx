@@ -1,10 +1,29 @@
-﻿import React, { useState, useEffect, useMemo } from "react";
-import { X } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  Building2,
+  Globe2,
+  MapPin,
+  User,
+  UsersRound,
+  X,
+  Send,
+  Download,
+  Wallet,
+} from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { Client } from "../../pages/Clients/Clients";
 import Swal from "sweetalert2";
+
+const fieldWrapClass = "space-y-1.5";
+const labelClass =
+  "text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider";
+const controlClass =
+  "h-11 w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/70 dark:bg-slate-800/60 px-3.5 text-sm text-gray-800 dark:text-slate-200 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500 hover:bg-white dark:hover:bg-slate-800 focus:border-brand-orange focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand-orange/15";
+const selectClass = `${controlClass} cursor-pointer appearance-none pr-9`;
+const iconClass = "pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500";
+const iconControlClass = `${controlClass} pl-10`;
 interface EditClientModalProps {
   isOpen: boolean;
   client: Client | null;
@@ -55,13 +74,6 @@ export default function EditClientModal({
   const [locations, setLocations] = useState<LocationRow[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const selectedCountry = useMemo(() => {
-    return (
-      COUNTRY_CODES.find((c) => c.code === formCountryCode) ||
-      COUNTRY_CODES[0]
-    );
-  }, [formCountryCode]);
 
   const countries = useMemo(() => {
     return Array.from(new Set(locations.map((loc) => loc.country)));
@@ -215,441 +227,298 @@ export default function EditClientModal({
 
   if (!isOpen || !client) return null;
 
-return (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <div
-      className="absolute inset-0 bg-black/40 dark:bg-black/70 backdrop-blur-xs transition-opacity"
-      onClick={onClose}
-    ></div>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        type="button"
+        aria-label={t("common.close") || "Close"}
+        className="absolute inset-0 bg-slate-950/45 dark:bg-black/70 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
 
-    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-150 dark:border-slate-700 w-full max-w-2xl overflow-hidden relative z-10 transform transition-all duration-300 scale-100 flex flex-col max-h-[90vh]">
-
-      <div className="flex items-center justify-between px-6 py-4.5 border-b border-gray-100 dark:border-slate-700">
-
-        <div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            {t("clients.modal.editTitle", { id: client.id })}
-          </h3>
-
-          <p className="text-xs text-gray-400 dark:text-slate-400 mt-0.5">
-            {t("clients.modal.editSubtitle")}
-          </p>
-        </div>
-
-        <button
-          onClick={onClose}
-          className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:text-slate-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.fullName")} *
-              </label>
-              <input
-                type="text"
-                required
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 text-gray-700"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.phone")} *
-              </label>
-              <div className="relative h-11 w-full rounded-xl border border-gray-200 bg-gray-50/50 transition-all hover:bg-gray-50 focus-within:border-brand-orange focus-within:ring-1 focus-within:ring-brand-orange">
-                <PhoneInput
-                  country={formCountryCode.toLowerCase()}
-                  value={formPhone}
-                  onChange={(value: string, data: any) => {
-                    setFormPhone(value ? (value.startsWith("+") ? value : `+${value}`) : "");
-                    if (data?.countryCode) setFormCountryCode(data.countryCode.toUpperCase());
-                  }}
-                  inputClass="!w-full !h-11 !bg-transparent !border-none !text-sm !text-gray-700 !outline-none !pl-[48px] !pr-3.5 placeholder:!text-gray-400"
-                  buttonClass="!bg-transparent !border-0 !border-r !border-gray-200 !rounded-l-xl"
-                  containerClass="!w-full !h-full"
-                  dropdownClass="!w-max !rounded-xl !border-gray-200 !shadow-lg"
-                  enableSearch
-                  preferredCountries={["ma", "fr"]}
-                />
-              </div>
-            </div>
+      <div className="relative z-10 flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-800 bg-gray-50/60 dark:bg-slate-800/40 px-6 py-4">
+          <div>
+            <h3 className="text-lg font-bold text-gray-950 dark:text-white">
+              {t("clients.modal.editTitle", { id: client.id })}
+            </h3>
+            <p className="mt-0.5 text-xs font-medium text-gray-400 dark:text-slate-500">
+              {t("clients.modal.editSubtitle")}
+            </p>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5 relative">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.clientType")} *
-              </label>
-              <select
-                value={formClientType}
-                onChange={(e) => setFormClientType(e.target.value as "expediteur" | "destinataire")}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 pr-10 text-gray-700 focus:outline-none transition-all cursor-pointer appearance-none"
-              >
-                <option value="destinataire">{t("clients.modal.destinataire")}</option>
-                <option value="expediteur">{t("clients.modal.expediteur")}</option>
-              </select>
-              <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-          </div>
-
-          {formClientType === "destinataire" ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  {t("clients.modal.country")} *
-                </label>
-                <select
-                  value={formPays}
-                  onChange={(e) => handleCountryChange(e.target.value)}
-                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-                >
-                  {countries.length === 0 ? (
-                    <option value="">{t("common.loading") || "Loading..."}</option>
-                  ) : (
-                    countries.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  {t("clients.modal.region")} *
-                </label>
-                <select
-                  value={formRegion}
-                  onChange={(e) => handleRegionChange(e.target.value)}
-                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-                >
-                  {regions.length === 0 ? (
-                    <option value="">—</option>
-                  ) : (
-                    regions.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  {t("clients.modal.city")} *
-                </label>
-                <select
-                  value={formVille}
-                  onChange={(e) => setFormVille(e.target.value)}
-                  className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-                >
-                  {cities.length === 0 ? (
-                    <option value="">—</option>
-                  ) : (
-                    cities.map((v) => (
-                      <option key={v} value={v}>
-                        {v}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-            </div>
-          ) : null}
-
-          {false ? (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.country")} *
-              </label>
-              <select
-                value={formPays}
-                onChange={(e) => handleCountryChange(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-              >
-                {countries.length === 0 ? (
-                  <option value="">{t("common.loading") || "Loading..."}</option>
-                ) : (
-                  countries.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.region")} *
-              </label>
-              <select
-                value={formRegion}
-                onChange={(e) => handleRegionChange(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-              >
-                {regions.length === 0 ? (
-                  <option value="">—</option>
-                ) : (
-                  regions.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {t("clients.modal.city")} *
-              </label>
-              <select
-                value={formVille}
-                onChange={(e) => setFormVille(e.target.value)}
-                className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 focus:outline-none transition-all cursor-pointer"
-              >
-                {cities.length === 0 ? (
-                  <option value="">—</option>
-                ) : (
-                  cities.map((v) => (
-                    <option key={v} value={v}>
-                      {v}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
-          </div>
-          ) : null}
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.modal.fullName")} *
-            </label>
-
-            <input
-              type="text"
-              required
-              value={formName}
-              onChange={(e) => setFormName(e.target.value)}
-              className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500 text-gray-700 dark:text-slate-200"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.modal.phone")} *
-            </label>
-
-            <div className="flex items-center bg-gray-50/50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 focus-within:border-brand-orange focus-within:ring-1 focus-within:ring-brand-orange rounded-xl overflow-hidden relative">
-
-              <select
-                value={formCountryCode}
-                onChange={(e) => {
-                  setFormCountryCode(e.target.value);
-                  setFormPhone("");
-                }}
-                className="absolute left-0 top-0 w-20 h-full opacity-0 cursor-pointer z-10"
-              >
-                {COUNTRY_CODES.map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.flag} {country.name} {country.phoneCode}
-                  </option>
-                ))}
-              </select>
-
-              <div className="flex items-center gap-2 px-3 py-2.5 bg-gray-100 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 cursor-pointer hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors">
-                <span className="text-lg">{selectedCountry.flag}</span>
-                <span className="text-xs font-semibold text-gray-600 dark:text-slate-300">
-                  {selectedCountry.phoneCode}
-                </span>
-              </div>
-
-              <input
-                type="tel"
-                required
-                inputMode="numeric"
-                placeholder="612345678"
-                value={formPhone}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "");
-                  setFormPhone(value);
-                }}
-                className="flex-1 bg-transparent px-3.5 py-2.5 text-sm text-gray-700 dark:text-slate-200 focus:outline-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
-              />
-
-            </div>
-          </div>
-          </form>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.modal.country")} *
-            </label>
-
-            <select
-              value={formPays}
-              onChange={(e) => handleCountryChange(e.target.value)}
-              className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 dark:text-slate-200 focus:outline-none transition-all cursor-pointer"
-            >
-              {countries.length === 0 ? (
-                <option value="">{t("common.loading") || "Loading..."}</option>
-              ) : (
-                countries.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.modal.region")} *
-            </label>
-
-            <select
-              value={formRegion}
-              onChange={(e) => handleRegionChange(e.target.value)}
-              className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 dark:text-slate-200 focus:outline-none transition-all cursor-pointer"
-            >
-              {regions.length === 0 ? (
-                <option value="">—</option>
-              ) : (
-                regions.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.modal.city")} *
-            </label>
-
-            <select
-              value={formVille}
-              onChange={(e) => setFormVille(e.target.value)}
-              className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3 py-2.5 text-gray-700 dark:text-slate-200 focus:outline-none transition-all cursor-pointer"
-            >
-              {cities.length === 0 ? (
-                <option value="">—</option>
-              ) : (
-                cities.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-            {t("clients.modal.fullAddress")} *
-          </label>
-
-          <textarea
-            required
-            rows={2}
-            value={formAddress}
-            onChange={(e) => setFormAddress(e.target.value)}
-            className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700 dark:text-slate-200 resize-none"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.totalSent")}
-            </label>
-
-            <input
-              type="number"
-              value={formSent}
-              onChange={(e) => setFormSent(Number(e.target.value))}
-              className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700 dark:text-slate-200"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.totalReceived")}
-            </label>
-
-            <input
-              type="number"
-              value={formReceived}
-              onChange={(e) => setFormReceived(Number(e.target.value))}
-              className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700 dark:text-slate-200"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-              {t("clients.totalAmount")}
-            </label>
-
-            <input
-              type="number"
-              value={formAmount}
-              onChange={(e) => setFormAmount(Number(e.target.value))}
-              className="w-full bg-gray-50/50 dark:bg-slate-800/60 hover:bg-gray-50 dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 focus:outline-none transition-all text-gray-700 dark:text-slate-200"
-            />
-          </div>
-
-        </div>
-
-        {submitError && (
-          <div className="px-4 py-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm">
-            <strong>Error:</strong> {submitError}
-          </div>
-        )}
-
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-700">
-
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-semibold border border-gray-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl text-gray-600 dark:text-slate-300 transition-colors cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 transition-colors hover:bg-white dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-white"
           >
-            {t("common.cancel")}
+            <X className="h-5 w-5" />
           </button>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-5 py-2 text-sm font-semibold bg-brand-orange hover:bg-brand-orange/90 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl shadow-md shadow-brand-orange/10 transition-colors cursor-pointer"
-          >
-            {isSubmitting ? t("common.saving") || "Saving..." : t("common.save")}
-          </button>
-
         </div>
 
-      </form>
+        <form
+          onSubmit={handleSubmit}
+          className="flex-1 space-y-4 overflow-y-auto p-5"
+        >
+          <section className="space-y-3.5">
+            <div className="flex items-center gap-2 border-b border-gray-100 dark:border-slate-800 pb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 dark:bg-orange-500/10 text-brand-orange">
+                <User className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
+                {t("clients.modal.clientType")}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className={`${fieldWrapClass} md:col-span-2`}>
+                <label className={labelClass}>
+                  {t("clients.modal.fullName")} *
+                </label>
+                <div className="relative">
+                  <User className={iconClass} />
+                  <input
+                    type="text"
+                    required
+                    placeholder={t("clients.modal.fullNameExample")}
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className={iconControlClass}
+                  />
+                </div>
+              </div>
+
+              <div className={fieldWrapClass}>
+                <label className={labelClass}>
+                  {t("clients.modal.clientType")} *
+                </label>
+                <div className="relative">
+                  <UsersRound className={iconClass} />
+                  <select
+                    value={formClientType}
+                    onChange={(e) =>
+                      setFormClientType(
+                        e.target.value as "expediteur" | "destinataire",
+                      )
+                    }
+                    className={`${iconControlClass} appearance-none pr-10 cursor-pointer`}
+                  >
+                    <option value="destinataire" className="dark:bg-slate-900">
+                      {t("clients.modal.destinataire")}
+                    </option>
+                    <option value="expediteur" className="dark:bg-slate-900">
+                      {t("clients.modal.expediteur")}
+                    </option>
+                  </select>
+                  <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                    <path d="M6 8L10 12L14 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              </div>
+
+              <div className={`${fieldWrapClass} md:col-span-2`}>
+                <label className={labelClass}>{t("clients.modal.phone")} *</label>
+                <div className="relative h-11 w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50/70 dark:bg-slate-800/60 transition-all hover:bg-white dark:hover:bg-slate-800 focus-within:border-brand-orange focus-within:bg-white dark:focus-within:bg-slate-800 focus-within:ring-2 focus-within:ring-brand-orange/15">
+                  <PhoneInput
+                    country={formCountryCode.toLowerCase()}
+                    value={formPhone}
+                    onChange={(value: string, data: any) => {
+                      setFormPhone(value ? (value.startsWith("+") ? value : `+${value}`) : "");
+                      if (data?.countryCode) setFormCountryCode(data.countryCode.toUpperCase());
+                    }}
+                    inputClass="!w-full !h-11 !bg-transparent !border-none !text-sm !text-gray-800 dark:!text-slate-200 !outline-none !pl-[48px] !pr-3.5 placeholder:!text-gray-400 dark:placeholder:!text-slate-500"
+                    buttonClass="!bg-transparent !border-0 !border-r !border-gray-200 dark:!border-slate-700 !rounded-l-xl"
+                    containerClass="!w-full !h-full"
+                    dropdownClass="!w-max !rounded-xl !border-gray-200 dark:!border-slate-700 !shadow-lg dark:!bg-slate-850 dark:!text-slate-200"
+                    enableSearch
+                    preferredCountries={["ma", "fr"]}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {formClientType === "destinataire" ? (
+            <section className="space-y-3.5">
+              <div className="flex items-center gap-2 border-b border-gray-100 dark:border-slate-800 pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600">
+                  <MapPin className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
+                  {t("clients.modal.addressAndLocation")}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className={fieldWrapClass}>
+                  <label className={labelClass}>
+                    {t("clients.modal.country")} *
+                  </label>
+                  <div className="relative">
+                    <Globe2 className={iconClass} />
+                    <select
+                      value={formPays}
+                      onChange={(e) => handleCountryChange(e.target.value)}
+                      className={`${selectClass} pl-10`}
+                    >
+                      {countries.length === 0 ? (
+                        <option value="" className="dark:bg-slate-900">
+                          {t("common.loading") || "Loading..."}
+                        </option>
+                      ) : (
+                        countries.map((country) => (
+                          <option key={country} value={country} className="dark:bg-slate-900">
+                            {country}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div className={fieldWrapClass}>
+                  <label className={labelClass}>
+                    {t("clients.modal.region")} *
+                  </label>
+                  <div className="relative">
+                    <Building2 className={iconClass} />
+                    <select
+                      value={formRegion}
+                      onChange={(e) => handleRegionChange(e.target.value)}
+                      className={`${selectClass} pl-10`}
+                    >
+                      {regions.length === 0 ? (
+                        <option value="" className="dark:bg-slate-900">-</option>
+                      ) : (
+                        regions.map((region) => (
+                          <option key={region} value={region} className="dark:bg-slate-900">
+                            {region}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div className={fieldWrapClass}>
+                  <label className={labelClass}>{t("clients.modal.city")} *</label>
+                  <div className="relative">
+                    <MapPin className={iconClass} />
+                    <select
+                      value={formVille}
+                      onChange={(e) => setFormVille(e.target.value)}
+                      className={`${selectClass} pl-10`}
+                    >
+                      {cities.length === 0 ? (
+                        <option value="" className="dark:bg-slate-900">-</option>
+                      ) : (
+                        cities.map((city) => (
+                          <option key={city} value={city} className="dark:bg-slate-900">
+                            {city}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </section>
+          ) : null}
+
+          <div className={fieldWrapClass}>
+            <label className={labelClass}>
+              {t("clients.modal.fullAddress")} *
+            </label>
+            <div className="relative">
+              <MapPin className={iconClass} />
+              <textarea
+                required
+                rows={2}
+                placeholder={t("clients.modal.addressExample")}
+                value={formAddress}
+                onChange={(e) => setFormAddress(e.target.value)}
+                className="w-full bg-gray-50/70 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:border-brand-orange focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-brand-orange/15 text-sm rounded-xl px-3.5 py-2.5 pl-10 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500 text-gray-800 dark:text-slate-200 resize-none"
+              />
+            </div>
+          </div>
+
+          <section className="space-y-3.5">
+            <div className="flex items-center gap-2 border-b border-gray-100 dark:border-slate-800 pb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 dark:bg-orange-500/10 text-brand-orange">
+                <Wallet className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
+                {t("clients.modal.activityStats")}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className={fieldWrapClass}>
+                <label className={labelClass}>{t("clients.totalSent")} (kg)</label>
+                <div className="relative">
+                  <Send className={iconClass} />
+                  <input
+                    type="number"
+                    value={formSent}
+                    onChange={(e) => setFormSent(Number(e.target.value))}
+                    className={iconControlClass}
+                  />
+                </div>
+              </div>
+
+              <div className={fieldWrapClass}>
+                <label className={labelClass}>{t("clients.totalReceived")} (kg)</label>
+                <div className="relative">
+                  <Download className={iconClass} />
+                  <input
+                    type="number"
+                    value={formReceived}
+                    onChange={(e) => setFormReceived(Number(e.target.value))}
+                    className={iconControlClass}
+                  />
+                </div>
+              </div>
+
+              <div className={fieldWrapClass}>
+                <label className={labelClass}>{t("clients.totalAmount")} (DH)</label>
+                <div className="relative">
+                  <Wallet className={iconClass} />
+                  <input
+                    type="number"
+                    value={formAmount}
+                    onChange={(e) => setFormAmount(Number(e.target.value))}
+                    className={iconControlClass}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {submitError && (
+            <div className="rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
+              {submitError}
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-3 border-t border-gray-100 dark:border-slate-800 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-10 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 text-sm font-semibold text-gray-600 dark:text-slate-300 transition-colors hover:border-gray-300 dark:hover:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
+            >
+              {t("common.cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="h-10 rounded-xl bg-brand-orange px-5 text-sm font-semibold text-white shadow-md shadow-brand-orange/10 transition-colors hover:bg-brand-orange/90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting
+                ? t("common.saving") || "Saving..."
+                : t("common.save")}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
 }

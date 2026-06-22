@@ -117,20 +117,14 @@ export default function BackupSettings() {
 
   return (
     <div className="space-y-6">
-      <div className="p-5 border rounded-xl dark:border-slate-800">
-        <h3 className="font-bold text-lg mb-2">
-          {t("settings.tabs.backup")}
-        </h3>
-
-        <p className="text-sm text-gray-500 mb-5">
-          {t("backup.description")}
-        </p>
+      <div className="p-5 border border-gray-200 rounded-xl dark:border-slate-800">
+       
 
         <div className="flex flex-wrap gap-3">
           <button
             onClick={createBackup}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-orange text-white rounded-lg hover:opacity-90 disabled:opacity-50"
           >
             <Download size={16} />
             {t("backup.create")}
@@ -144,7 +138,7 @@ export default function BackupSettings() {
           </h4>
 
           {backups.length === 0 ? (
-            <div className="text-sm text-gray-500 p-4 border rounded-lg dark:border-slate-800">
+            <div className="text-sm text-gray-500 p-4 border border-gray-200 rounded-lg dark:border-slate-800">
               {t("backup.noBackups")}
             </div>
           ) : (
@@ -152,7 +146,7 @@ export default function BackupSettings() {
               {backups.map((backup) => (
                 <div
                   key={backup}
-                  className="flex items-center justify-between p-3 border rounded-lg dark:border-slate-800"
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg dark:border-slate-800"
                 >
                   <span className="text-sm font-medium break-all">
                     {backup}

@@ -42,7 +42,7 @@ className="
   border
   border-gray-200
 
-  dark:bg-slate-900
+  dark:bg-slate-950
   dark:text-white
   dark:border-slate-700
 "    >
@@ -64,39 +64,7 @@ className="
           </select>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
-            {t("settings.app.mainCurrency")}
-          </label>
-          <select
-            value={settings.currency}
-            onChange={(e) =>
-              setSettings({ ...settings, currency: e.target.value })
-            }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-750 focus:outline-none transition-all cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
-          >
-            <option value="MAD">MAD (Dirham Marocain)</option>
-            <option value="USD">USD ($ Dollars)</option>
-            <option value="EUR">EUR (€ Euros)</option>
-          </select>
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
-            {t("settings.app.dateFormat")}
-          </label>
-          <select
-            value={settings.dateFormat}
-            onChange={(e) =>
-              setSettings({ ...settings, dateFormat: e.target.value })
-            }
-            className="w-full bg-gray-50/50 hover:bg-gray-50 border border-gray-200 focus:border-brand-orange focus:ring-1 focus:ring-brand-orange text-sm rounded-xl px-3.5 py-2.5 text-gray-750 focus:outline-none transition-all cursor-pointer dark:bg-slate-800 dark:hover:bg-slate-700 dark:border-slate-700 dark:text-slate-100"
-          >
-            <option value="dd/MM/yyyy">JJ/MM/AAAA (ex: 25/05/2026)</option>
-            <option value="MM/dd/yyyy">MM/JJ/AAAA (ex: 05/25/2026)</option>
-            <option value="yyyy-MM-dd">AAAA-MM-JJ (ex: 2026-05-25)</option>
-          </select>
-        </div>
+    
 
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
