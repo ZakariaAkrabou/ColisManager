@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import Select from "react-select";
 import { countries } from "countries-list";
@@ -13,23 +13,53 @@ const countryOptions = Object.entries(countries).map(([code, country]) => ({
   countryCode: code,
 }));
 
-interface AddLocationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+export interface Location {
+  id: number;
+  country: string;
+  region: string;
+  city: string | null;
 }
 
-export default function AddLocationModal({
+interface EditLocationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  location: Location | null;
+  onSuccess: () => void;
+}
+
+export default function EditLocationModal({
   isOpen,
   onClose,
-}: AddLocationModalProps) {
+  location,
+  onSuccess,
+}: EditLocationModalProps) {
   const { t } = useTranslation();
 
   const [selectedCountry, setSelectedCountry] = useState<any>(null);
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
 
+  useEffect(() => {
+    if (location) {
+      const option = countryOptions.find((o) => o.value === location.country) || {
+        value: location.country,
+        label: location.country,
+        countryCode: "",
+      };
+      setSelectedCountry(option);
+      setRegion(location.region);
+      setCity(location.city || "");
+    } else {
+      setSelectedCountry(null);
+      setRegion("");
+      setCity("");
+    }
+  }, [location, isOpen]);
+
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
+
+    if (!location) return;
 
     if (!selectedCountry || !region.trim()) {
       Swal.fire({
@@ -41,8 +71,9 @@ export default function AddLocationModal({
     }
 
     try {
-      await invoke("create_location", {
+      await invoke("update_location", {
         payload: {
+          id: location.id,
           country: selectedCountry.value,
           region: region.trim(),
           city: city.trim() || null,
@@ -51,16 +82,14 @@ export default function AddLocationModal({
 
       Swal.fire({
         title: t("common.success") || "Succès",
-        text: "Location ajoutée avec succès.",
+        text: "Location modifiée avec succès.",
         icon: "success",
         timer: 1500,
         showConfirmButton: false,
       });
 
+      onSuccess();
       onClose();
-      setSelectedCountry(null);
-      setRegion("");
-      setCity("");
     } catch (error) {
       Swal.fire({
         title: t("common.error") || "Erreur",
@@ -70,23 +99,23 @@ export default function AddLocationModal({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !location) return null;
 
   const formatOptionLabel = ({ label, countryCode }: any) => (
     <div className="flex items-center gap-2">
-      <ReactCountryFlag
-        countryCode={countryCode}
-        svg
-        style={{ width: "1.2em", height: "1.2em", borderRadius: "2px" }}
-      />
+      {countryCode && (
+        <ReactCountryFlag
+          countryCode={countryCode}
+          svg
+          style={{ width: "1.2em", height: "1.2em", borderRadius: "2px" }}
+        />
+      )}
       <span>{label}</span>
     </div>
   );
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-
-      {/* Modal */}
       <div className="
         bg-white dark:bg-slate-900
         rounded-xl shadow-xl
@@ -95,14 +124,12 @@ export default function AddLocationModal({
         border border-gray-100 dark:border-slate-700
         transition-colors
       ">
-
-        {/* Header */}
         <div className="
           flex items-center justify-between p-5
           border-b border-gray-100 dark:border-slate-700
         ">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-            {t("locations.addNewLocation")}
+            {t("locations.editLocation") || "Modifier la location"}
           </h2>
 
           <button
@@ -118,10 +145,7 @@ export default function AddLocationModal({
           </button>
         </div>
 
-        {/* Body */}
         <div className="p-6 space-y-5">
-
-          {/* Country */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               {t("locations.country")}
@@ -168,7 +192,6 @@ export default function AddLocationModal({
             />
           </div>
 
-          {/* Region */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               {t("locations.region")}
@@ -190,7 +213,6 @@ export default function AddLocationModal({
             />
           </div>
 
-          {/* City */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
               {t("locations.city")}
@@ -213,13 +235,11 @@ export default function AddLocationModal({
           </div>
         </div>
 
-        {/* Footer */}
         <div className="
           p-5 flex justify-end gap-3
           border-t border-gray-100 dark:border-slate-700
           bg-gray-50 dark:bg-slate-900
         ">
-
           <button
             onClick={onClose}
             className="
@@ -242,9 +262,8 @@ export default function AddLocationModal({
               text-white transition
             "
           >
-            {t("locations.saveLocation")}
+            {t("common.save") || "Enregistrer"}
           </button>
-
         </div>
       </div>
     </div>

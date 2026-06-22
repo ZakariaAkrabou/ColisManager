@@ -227,7 +227,10 @@ export default function LocationPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
 
-                      <button className="p-2 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition">
+                      <button
+                        onClick={() => setEditTarget(location)}
+                        className="p-2 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                      >
                         <Edit size={18} />
                       </button>
 

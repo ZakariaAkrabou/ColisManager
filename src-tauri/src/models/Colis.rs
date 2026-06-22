@@ -79,3 +79,16 @@ pub struct CreateColisRequest {
     pub total_amount: f64,
     pub notes: Option<String>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateColisRequest {
+    pub id: i64,
+    pub sender_name: String,
+    pub receiver_name: String,
+    pub city: String,
+    pub delivery_type: String,
+    pub status: String,
+    pub weight: f64,
+    pub total_amount: f64,
+}
+

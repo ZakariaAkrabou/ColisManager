@@ -50,6 +50,7 @@ pub fn run() {
 
             commands::colis_commands::create_colis,
             commands::colis_commands::get_colis,
+            commands::colis_commands::update_colis,
 
             commands::settings_commandes::save_settings,
             commands::settings_commandes::get_settings,

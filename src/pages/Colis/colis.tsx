@@ -225,7 +225,20 @@ export default function Colis({
     });
   };
 
-  const handleEdit = (colis: LocalColisItem) => {
+  const handleEdit = async (colis: LocalColisItem) => {
+    let shippingSettings = { agencyDeliveryFee: 20, homeDeliveryFee: 30 };
+    try {
+      const dbSettings = await invoke<{ agency_delivery_fee: number; home_delivery_fee: number }>("get_shipping_settings");
+      if (dbSettings) {
+        shippingSettings = {
+          agencyDeliveryFee: dbSettings.agency_delivery_fee,
+          homeDeliveryFee: dbSettings.home_delivery_fee,
+        };
+      }
+    } catch (e) {
+      console.warn("Could not load shipping settings, using defaults", e);
+    }
+
     Swal.fire({
       title: t("colis.editTitle"),
       html: `
@@ -249,9 +262,8 @@ export default function Colis({
             <div>
               <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Type de livraison</label>
               <select id="e-type" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
-                <option value="Agence" ${colis.type === "Agence" ? "selected" : ""}>À l'agence</option>
+                <option value="Agence" ${colis.type === "Agence" || colis.type === "Standard" ? "selected" : ""}>À l'agence</option>
                 <option value="Domicile" ${colis.type === "Domicile" ? "selected" : ""}>À domicile</option>
-                <option value="Standard" ${colis.type === "Standard" ? "selected" : ""}>Standard</option>
               </select>
             </div>
             <div>
@@ -280,6 +292,31 @@ export default function Colis({
       confirmButtonColor: "#E26D28",
       cancelButtonColor: "#6B7280",
       customClass: { popup: "rounded-xl" },
+      didOpen: () => {
+        const typeEl = document.getElementById("e-type") as HTMLSelectElement;
+        const weightEl = document.getElementById("e-weight") as HTMLInputElement;
+        const priceEl = document.getElementById("e-price") as HTMLInputElement;
+
+        const updatePrice = () => {
+          const deliveryType = typeEl.value;
+          const weight = parseFloat(weightEl.value);
+          if (isNaN(weight) || weight <= 0) {
+            priceEl.value = "0.00";
+            return;
+          }
+          const pricePerKg = deliveryType === "Agence" ? shippingSettings.agencyDeliveryFee : shippingSettings.homeDeliveryFee;
+          const calculatedPrice =
+            weight <= 10
+              ? deliveryType === "Agence"
+                ? 100
+                : 200
+              : weight * pricePerKg;
+          priceEl.value = calculatedPrice.toFixed(2);
+        };
+
+        typeEl.addEventListener("change", updatePrice);
+        weightEl.addEventListener("input", updatePrice);
+      },
       preConfirm: () => {
         const sender = (
           document.getElementById("e-sender") as HTMLInputElement
@@ -316,18 +353,40 @@ export default function Colis({
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        setColisList((prev) =>
-          prev.map((item) =>
-            item.id === colis.id ? { ...item, ...result.value } : item,
-          ),
-        );
-        Swal.fire({
-          title: t("common.updated"),
-          text: t("colis.updatedText"),
-          icon: "success",
-          timer: 1400,
-          showConfirmButton: false,
-        });
+        invoke<DbColis>("update_colis", {
+          payload: {
+            id: parseInt(colis.id),
+            sender_name: result.value.sender,
+            receiver_name: result.value.receiver,
+            city: result.value.city,
+            delivery_type: result.value.type,
+            status: result.value.status,
+            weight: result.value.weight,
+            total_amount: result.value.totalPrice,
+          },
+        })
+          .then((updatedDbColis) => {
+            const mapped = mapDbColisToItem(updatedDbColis);
+            setColisList((prev) =>
+              prev.map((item) => (item.id === colis.id ? mapped : item))
+            );
+            Swal.fire({
+              title: t("common.updated"),
+              text: t("colis.updatedText"),
+              icon: "success",
+              timer: 1400,
+              showConfirmButton: false,
+            });
+          })
+          .catch((err) => {
+            console.error("Failed to update colis:", err);
+            Swal.fire({
+              title: t("common.error"),
+              text: err.toString() || "Failed to update colis.",
+              icon: "error",
+              confirmButtonText: t("common.close"),
+            });
+          });
       }
     });
   };

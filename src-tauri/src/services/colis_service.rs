@@ -1,4 +1,4 @@
-use crate::models::Colis::{Colis, CreateColisRequest, PartyPayload, ReceiverPayload};
+use crate::models::Colis::{Colis, CreateColisRequest, PartyPayload, ReceiverPayload, UpdateColisRequest};
 use crate::models::shipping_settings::ShippingSettings;
 use sqlx::{Sqlite, SqlitePool, Transaction};
 
@@ -99,6 +99,76 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
     tx.commit().await.map_err(|e| e.to_string())?;
 
     get_colis_by_id(pool, colis_id).await
+}
+
+pub async fn update_colis(pool: &SqlitePool, payload: UpdateColisRequest) -> Result<Colis, String> {
+    let mut tx = pool.begin().await.map_err(|e| e.to_string())?;
+
+    #[derive(sqlx::FromRow)]
+    struct LocationInfo {
+        #[sqlx(rename = "Country")]
+        country: String,
+        #[sqlx(rename = "Region")]
+        region: String,
+    }
+
+    let loc_info = sqlx::query_as::<_, LocationInfo>(
+        r#"
+        SELECT l.Country, l.Region
+        FROM Colis c
+        JOIN Locations l ON c.ReceiverLocationID = l.LocationID
+        WHERE c.ColisID = ?
+        "#
+    )
+    .bind(payload.id)
+    .fetch_one(&mut *tx)
+    .await
+    .unwrap_or(LocationInfo {
+        country: "Morocco".to_string(),
+        region: "Default Region".to_string(),
+    });
+
+    let receiver_location_id = get_or_create_location(
+        &mut tx,
+        &loc_info.country,
+        &loc_info.region,
+        &payload.city,
+    )
+    .await?;
+
+    let delivery_type = normalize_delivery_type(&payload.delivery_type)?;
+    let status = normalize_status(&payload.status)?;
+
+    sqlx::query(
+        r#"
+        UPDATE Colis
+        SET
+            SenderName = ?,
+            ReceiverName = ?,
+            ReceiverLocationID = ?,
+            DeliveryType = ?,
+            Weight = ?,
+            Status = ?,
+            TotalAmount = ?,
+            UpdatedAt = CURRENT_TIMESTAMP
+        WHERE ColisID = ?
+        "#
+    )
+    .bind(payload.sender_name.trim())
+    .bind(payload.receiver_name.trim())
+    .bind(receiver_location_id)
+    .bind(delivery_type)
+    .bind(payload.weight)
+    .bind(status)
+    .bind(payload.total_amount)
+    .bind(payload.id)
+    .execute(&mut *tx)
+    .await
+    .map_err(|e| e.to_string())?;
+
+    tx.commit().await.map_err(|e| e.to_string())?;
+
+    get_colis_by_id(pool, payload.id).await
 }
 
 pub async fn get_colis(pool: &SqlitePool) -> Result<Vec<Colis>, String> {
@@ -247,10 +317,20 @@ fn validate_colis_payload(payload: &CreateColisRequest) -> Result<(), String> {
 }
 
 fn normalize_delivery_type(delivery_type: &str) -> Result<&'static str, String> {
-    match delivery_type {
-        "agency" | "agence" => Ok("agency"),
+    match delivery_type.trim().to_lowercase().as_str() {
+        "agency" | "agence" | "standard" => Ok("agency"),
         "home" | "domicile" => Ok("home"),
         _ => Err("Invalid delivery type".to_string()),
+    }
+}
+
+fn normalize_status(status: &str) -> Result<&'static str, String> {
+    match status.trim().to_lowercase().as_str() {
+        "en attente" | "pending" => Ok("pending"),
+        "en transit" | "transit" => Ok("transit"),
+        "livré" | "livre" | "delivered" => Ok("delivered"),
+        "annulé" | "annule" | "cancelled" => Ok("cancelled"),
+        _ => Err("Invalid status".to_string()),
     }
 }
 
