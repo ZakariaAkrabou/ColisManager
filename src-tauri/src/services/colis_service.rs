@@ -177,6 +177,16 @@ pub async fn update_colis(pool: &SqlitePool, payload: UpdateColisRequest) -> Res
     get_colis_by_id(pool, payload.id).await
 }
 
+pub async fn delete_colis(pool: &SqlitePool, id: i64) -> Result<(), String> {
+    sqlx::query("DELETE FROM Colis WHERE ColisID = ?")
+        .bind(id)
+        .execute(pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
 pub async fn get_colis_images(pool: &SqlitePool, id: i64) -> Result<ColisImages, String> {
     sqlx::query_as::<_, ColisImages>(
         "SELECT Image1, Image2, Image3 FROM Colis WHERE ColisID = ?"

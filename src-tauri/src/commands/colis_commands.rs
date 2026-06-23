@@ -31,3 +31,12 @@ pub async fn get_colis_images(
 ) -> Result<ColisImages, String> {
     colis_service::get_colis_images(&state.db, id).await
 }
+
+#[tauri::command]
+pub async fn delete_colis(
+    state: State<'_, AppState>,
+    id: i64,
+) -> Result<(), String> {
+    colis_service::delete_colis(&state.db, id).await
+}
+

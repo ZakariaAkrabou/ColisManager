@@ -363,14 +363,25 @@ export default function Colis({
       },
     });
     if (result.isConfirmed) {
-      setColisList((prev) => prev.filter((c) => c.id !== id));
-      await Swal.fire({
-        title: t("common.deleted"),
-        text: t("colis.deletedText"),
-        icon: "success",
-        timer: 1400,
-        showConfirmButton: false,
-      });
+      try {
+        await invoke("delete_colis", { id: parseInt(id) });
+        setColisList((prev) => prev.filter((c) => c.id !== id));
+        await Swal.fire({
+          title: t("common.deleted"),
+          text: t("colis.deletedText"),
+          icon: "success",
+          timer: 1400,
+          showConfirmButton: false,
+        });
+      } catch (err: any) {
+        console.error("Failed to delete colis:", err);
+        await Swal.fire({
+          title: t("common.error"),
+          text: err.toString() || "Failed to delete colis.",
+          icon: "error",
+          confirmButtonText: t("common.close"),
+        });
+      }
     }
   };
 
