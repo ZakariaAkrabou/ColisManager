@@ -152,7 +152,9 @@
     "selectCountry": "اختر دولة...",
     "regionPlaceholder": "مثال: Casablanca-Settat",
     "cityPlaceholder": "مثال: Casablanca",
-    "saveLocation": "حفظ الموقع"
+    "saveLocation": "حفظ الموقع",
+    "showingRange": "عرض {{from}} إلى {{to}} من أصل {{total}} موقع",
+    "perPage": "{{count}} / الصفحة"
   },
   "clients": {
     "title": "العملاء",

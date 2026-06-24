@@ -168,7 +168,9 @@
     "selectCountry": "Select a country...",
     "regionPlaceholder": "Ex: Casablanca-Settat",
     "cityPlaceholder": "Ex: Casablanca",
-    "saveLocation": "Save Location"
+    "saveLocation": "Save Location",
+    "showingRange": "Showing {{from}} to {{to}} of {{total}} locations",
+    "perPage": "{{count}} / page"
   },
   "clients": {
     "title": "Clients",

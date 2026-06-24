@@ -124,7 +124,7 @@ export default function BackupSettings() {
           <button
             onClick={createBackup}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-orange text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-orangen text-white rounded-lg hover:opacity-90 disabled:opacity-50"
           >
             <Download size={16} />
             {t("backup.create")}

@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { Search, Filter, Edit, Trash2, MapPin } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Search, Filter, Edit, Trash2, MapPin, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
@@ -13,6 +13,14 @@ export default function LocationPage() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [editTarget, setEditTarget] = useState<Location | null>(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  // Sorting states
+  const [sortField, setSortField] = useState<"country" | "region" | "city" | null>("country");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const fetchLocations = useCallback(async () => {
     try {
@@ -64,17 +72,87 @@ export default function LocationPage() {
     }
   };
 
-  const filteredLocations = locations.filter((loc) => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      loc.country.toLowerCase().includes(q) ||
-      loc.region.toLowerCase().includes(q) ||
-      (loc.city ?? "").toLowerCase().includes(q)
-    );
-  });
+  // Reset pagination when search query or page size changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, pageSize]);
 
- return (
+  // Handle header sorting click
+  const handleSort = (field: "country" | "region" | "city") => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+    setCurrentPage(1);
+  };
+
+  // Filter and sort locations
+  const filteredLocations = useMemo(() => {
+    // 1. Filter
+    const filtered = locations.filter((loc) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        loc.country.toLowerCase().includes(q) ||
+        loc.region.toLowerCase().includes(q) ||
+        (loc.city ?? "").toLowerCase().includes(q)
+      );
+    });
+
+    // 2. Sort
+    if (sortField) {
+      filtered.sort((a, b) => {
+        const valA = (a[sortField] ?? "").toLowerCase();
+        const valB = (b[sortField] ?? "").toLowerCase();
+        if (valA < valB) return sortDirection === "asc" ? -1 : 1;
+        if (valA > valB) return sortDirection === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [locations, searchQuery, sortField, sortDirection]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredLocations.length / pageSize));
+
+  // Adjust page index if it goes out of bounds
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  const paginatedLocations = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredLocations.slice(startIndex, startIndex + pageSize);
+  }, [filteredLocations, currentPage, pageSize]);
+
+  const paginationRange = useMemo(() => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const startPages = [1];
+    const endPages = [totalPages];
+
+    const showLeftDots = currentPage > 3;
+    const showRightDots = currentPage < totalPages - 2;
+
+    if (!showLeftDots && showRightDots) {
+      const middlePages = [2, 3, 4];
+      return [...startPages, ...middlePages, "ellipsis", ...endPages];
+    } else if (showLeftDots && !showRightDots) {
+      const middlePages = [totalPages - 3, totalPages - 2, totalPages - 1];
+      return [...startPages, "ellipsis", ...middlePages, ...endPages];
+    } else {
+      const middlePages = [currentPage - 1, currentPage, currentPage + 1];
+      return [...startPages, "ellipsis", ...middlePages, "ellipsis", ...endPages];
+    }
+  }, [totalPages, currentPage]);
+
+  return (
   <div className="flex flex-col gap-6 w-full animate-fade-in">
 
     {/* PAGE TITLE */}
@@ -86,7 +164,7 @@ export default function LocationPage() {
 
     {/* HEADER CARD */}
     <div className="
-      bg-white dark:bg-gray-900
+      bg-white dark:bg-slate-900
       p-5 rounded-xl shadow-sm
       border border-gray-100 dark:border-gray-800
       flex items-center gap-4
@@ -106,19 +184,11 @@ export default function LocationPage() {
       </div>
     </div>
 
-    {/* TABLE CARD */}
-    <div className="
-      bg-white dark:bg-slate-950
-      rounded-xl shadow-sm
-      border border-gray-100 dark:border-gray-800
-      overflow-hidden flex flex-col
-      transition-colors
-    ">
 
       {/* HEADER */}
       <div className="
         p-5 border-b
-        border-gray-100 dark:border-gray-800
+        border-gray-100 dark:border-gray-800 dark:bg-slate-900 rounded-lg
         flex flex-col md:flex-row md:items-center justify-between gap-4
       ">
         <h3 className="text-lg font-bold text-gray-800 dark:text-white">
@@ -178,6 +248,16 @@ export default function LocationPage() {
           </div>
         </div>
       </div>
+    {/* TABLE CARD */}
+    <div className="
+      bg-white dark:bg-slate-950
+      rounded-xl shadow-sm
+      border border-gray-100 dark:border-gray-800
+      overflow-hidden flex flex-col
+      transition-colors
+    ">
+
+  
 
       {/* TABLE */}
       <div className="overflow-x-auto w-full">
@@ -190,23 +270,71 @@ export default function LocationPage() {
             border-b border-gray-200 dark:border-gray-800
           ">
             <tr>
-              <th className="px-6 py-4 font-medium">{t("locations.country")}</th>
-              <th className="px-6 py-4 font-medium">{t("locations.region")}</th>
-              <th className="px-6 py-4 font-medium">{t("locations.city")}</th>
+              <th
+                onClick={() => handleSort("country")}
+                className="px-6 py-4 font-medium cursor-pointer select-none group hover:text-gray-800 dark:hover:text-white"
+              >
+                <div className="flex items-center gap-1.5">
+                  <span>{t("locations.country")}</span>
+                  {sortField === "country" ? (
+                    sortDirection === "asc" ? (
+                      <ChevronUp size={14} className="text-brand-orange" />
+                    ) : (
+                      <ChevronDown size={14} className="text-brand-orange" />
+                    )
+                  ) : (
+                    <ChevronsUpDown size={14} className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort("region")}
+                className="px-6 py-4 font-medium cursor-pointer select-none group hover:text-gray-800 dark:hover:text-white"
+              >
+                <div className="flex items-center gap-1.5">
+                  <span>{t("locations.region")}</span>
+                  {sortField === "region" ? (
+                    sortDirection === "asc" ? (
+                      <ChevronUp size={14} className="text-brand-orange" />
+                    ) : (
+                      <ChevronDown size={14} className="text-brand-orange" />
+                    )
+                  ) : (
+                    <ChevronsUpDown size={14} className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort("city")}
+                className="px-6 py-4 font-medium cursor-pointer select-none group hover:text-gray-800 dark:hover:text-white"
+              >
+                <div className="flex items-center gap-1.5">
+                  <span>{t("locations.city")}</span>
+                  {sortField === "city" ? (
+                    sortDirection === "asc" ? (
+                      <ChevronUp size={14} className="text-brand-orange" />
+                    ) : (
+                      <ChevronDown size={14} className="text-brand-orange" />
+                    )
+                  ) : (
+                    <ChevronsUpDown size={14} className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
+                </div>
+              </th>
               <th className="px-6 py-4 font-medium text-right">{t("common.actions")}</th>
             </tr>
           </thead>
 
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
 
-            {filteredLocations.length === 0 ? (
+            {paginatedLocations.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-gray-400 dark:text-gray-500">
                   {searchQuery ? t("common.noResults") : t("locations.noLocations")}
                 </td>
               </tr>
             ) : (
-              filteredLocations.map((location) => (
+              paginatedLocations.map((location) => (
                 <tr
                   key={location.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
@@ -253,6 +381,93 @@ export default function LocationPage() {
         </table>
 
       </div>
+
+      {/* PAGINATION */}
+      {filteredLocations.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4.5 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800">
+          <div className="text-xs text-gray-500 dark:text-slate-400 font-medium order-2 sm:order-1">
+            {t("locations.showingRange", {
+              from: Math.min(
+                filteredLocations.length,
+                (currentPage - 1) * pageSize + 1
+              ),
+              to: Math.min(filteredLocations.length, currentPage * pageSize),
+              total: filteredLocations.length,
+            })}
+          </div>
+
+          <div className="flex items-center justify-center gap-1.5 order-1 sm:order-2">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="w-8 h-8 flex items-center justify-center border border-gray-200 dark:border-slate-700 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {paginationRange.map((page, index) => {
+              if (page === "ellipsis") {
+                return (
+                  <span
+                    key={`ellipsis-${index}`}
+                    className="w-8 h-8 flex items-center justify-center text-gray-400 dark:text-slate-600 text-xs select-none"
+                  >
+                    ...
+                  </span>
+                );
+              }
+              const isActive = currentPage === page;
+              return (
+                <button
+                  key={`page-${page}`}
+                  onClick={() => setCurrentPage(page as number)}
+                  className={`w-8 h-8 flex items-center justify-center text-sm font-semibold rounded-lg border transition-all cursor-pointer ${
+                    isActive
+                      ? "border-brand-orange text-brand-orange bg-orange-50/10 dark:bg-orange-500/10"
+                      : "border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
+              disabled={currentPage === totalPages}
+              className="w-8 h-8 flex items-center justify-center border border-gray-200 dark:border-slate-700 rounded-lg text-gray-500 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-transparent transition-all cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 order-3 ml-auto sm:ml-0">
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="border border-gray-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-gray-600 dark:text-slate-300 bg-white dark:bg-slate-800 focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange cursor-pointer"
+            >
+              <option value={5} className="dark:bg-slate-900">
+                {t("locations.perPage", { count: 5 })}
+              </option>
+              <option value={10} className="dark:bg-slate-900">
+                {t("locations.perPage", { count: 10 })}
+              </option>
+              <option value={20} className="dark:bg-slate-900">
+                {t("locations.perPage", { count: 20 })}
+              </option>
+              <option value={50} className="dark:bg-slate-900">
+                {t("locations.perPage", { count: 50 })}
+              </option>
+            </select>
+          </div>
+        </div>
+      )}
 
     </div>
 
