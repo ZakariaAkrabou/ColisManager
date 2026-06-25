@@ -1,17 +1,15 @@
-// path = src/components/reports/ReportsTable.tsx
 import {
   Package,
   Truck,
   CheckCircle,
   Clock,
-  XCircle,
   MapPin,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { FileText } from "lucide-react";
 import { generateFacture } from "../facture/generateFacture";
 import { generateBonCommande } from "../bonCommande/generateBonCommande";
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 export interface ReportColis {
   id: number;
@@ -82,14 +80,8 @@ const statusConfig = {
 const handleFacture = async (colis: ReportColis) => {
   await generateFacture(colis);
 };
-const normalizeDeliveryType = (type: string) => {
-  const v = type?.toLowerCase() ?? "";
-  if (v === "home" || v === "domicile") return "À domicile";
-  if (v === "agency" || v === "agence") return "Agence";
-  return type;
-};
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 
 const ReportsTable = ({ data, stats }: ReportsTableProps) => {
   const { t } = useTranslation();
@@ -192,9 +184,6 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                 const statusKey = normalizeStatus(colis.status);
                 const cfg = statusConfig[statusKey];
                 const city = colis.receiver_city || colis.receiver_region || "—";
-                const date = colis.created_at
-                  ? colis.created_at.split("T")[0]
-                  : "—";
 
                 return (
 
@@ -256,7 +245,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                     <td className="px-5 py-3.5 text-center">
                       <button
                         onClick={() => handleFacture(colis)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-medium transition"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-medium transition cursor-pointer"
                       >
                         <FileText size={14} />
                         Facture
@@ -268,7 +257,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                     <td className="px-5 py-3.5 text-center">
                       <button
                         onClick={() => generateBonCommande(colis)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium transition"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium transition cursor-pointer"
                       >
                         <FileText size={14} />
                         Bon De Commande

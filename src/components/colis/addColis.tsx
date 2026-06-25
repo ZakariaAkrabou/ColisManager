@@ -10,8 +10,6 @@ import {
   Home,
   Calculator,
   FileText,
-  Save,
-  Printer,
   ChevronDown,
   Image,
   Star,
@@ -150,12 +148,12 @@ function ClientSearch({
             }}
             onFocus={() => setOpen(true)}
             placeholder={i18n.t("addColis.searchClient")}
-            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white transition-all text-gray-700"
+            className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-800 transition-all text-gray-700 dark:text-slate-200"
           />
         </div>
       </div>
       {open && filtered.length > 0 && (
-        <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
+        <div className="absolute top-full mt-1 left-0 right-0 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
           {filtered.map((c) => (
             <button
               key={c.id}
@@ -165,10 +163,10 @@ function ClientSearch({
                 onQueryChange(c.full_name);
                 setOpen(false);
               }}
-              className="w-full text-left px-3 py-2.5 hover:bg-[#FDF1EA] transition-colors border-b border-gray-50 last:border-0 cursor-pointer"
+              className="w-full text-left px-3 py-2.5 hover:bg-[#FDF1EA] dark:hover:bg-orange-500/10 transition-colors border-b border-gray-50 dark:border-slate-800/50 last:border-0 cursor-pointer"
             >
-              <p className="text-sm font-semibold text-gray-800">{c.full_name}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-sm font-semibold text-gray-800 dark:text-slate-200">{c.full_name}</p>
+              <p className="text-xs text-gray-400 dark:text-slate-500">
                 {c.phone_number} • {c.full_address || "—"}
               </p>
             </button>
@@ -194,8 +192,8 @@ function ImageSlot({
       onClick={() => ref.current?.click()}
       className={`flex flex-col items-center justify-center w-16 h-16 rounded-lg border-2 border-dashed cursor-pointer transition-all ${
         file
-          ? "border-emerald-400 bg-emerald-50"
-          : "border-gray-200 bg-gray-50 hover:border-brand-orange hover:bg-[#FDF1EA]"
+          ? "border-emerald-400 dark:border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10"
+          : "border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 hover:border-brand-orange hover:bg-[#FDF1EA] dark:hover:bg-orange-500/10"
       }`}
     >
       {file ? (
@@ -238,14 +236,14 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+    <div className="border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900">
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-800">
         <Icon size={14} className="text-brand-orange" />
-        <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wider">
+        <span className="text-[11px] font-bold text-gray-700 dark:text-slate-200 uppercase tracking-wider">
           {title}
         </span>
         {badge && (
-          <span className="ml-auto flex items-center gap-1 text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">
+          <span className="ml-auto flex items-center gap-1 text-[9px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 px-1.5 py-0.5 rounded-full">
             <Star size={8} /> {badge}
           </span>
         )}
@@ -266,8 +264,8 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
-        {label} {required && <span className="text-red-400">*</span>}
+      <label className="text-[11px] font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide">
+        {label} {required && <span className="text-red-400 dark:text-red-500">*</span>}
       </label>
       {children}
     </div>
@@ -275,7 +273,7 @@ function Field({
 }
 
 const inputCls =
-  "w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white transition-all text-gray-700 placeholder-gray-300";
+  "w-full px-3 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-800 transition-all text-gray-700 dark:text-slate-200 placeholder-gray-300 dark:placeholder-gray-500";
 
 export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
   const { t, i18n } = useTranslation();
@@ -430,18 +428,6 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     weight > 0 &&
     trackingNo.trim() !== "";
 
-  const buildNewColis = () => ({
-    id: `CLS${Math.floor(100 + Math.random() * 900)}`,
-    trackingNo,
-    sender: sender.name,
-    receiver: receiver.name,
-    city: receiver.city || receiver.region || "—",
-    type: deliveryType === "domicile" ? "Express" : "Standard",
-    weight: typeof weight === "number" ? weight : 0,
-    totalPrice,
-    status: "En attente" as const,
-    date: new Date().toISOString().split("T")[0],
-  });
 
   const buildPayload = (): CreateColisPayload => ({
     tracking_number: trackingNo.trim(),
@@ -525,80 +511,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     }
   };
 
-  const handleSaveAndPrint = async () => {
-    if (!isValid) return;
 
-    try {
-      const basePayload = buildPayload();
-      const img1 = await fileToByteArray(images[0]);
-      const img2 = await fileToByteArray(images[1]);
-      const img3 = await fileToByteArray(images[2]);
-
-      const payload: CreateColisPayload = {
-        ...basePayload,
-        image_1: img1,
-        image_2: img2,
-        image_3: img3,
-      };
-
-      const createdColis = await invoke<any>("create_colis", { payload });
-      const newColis = mapDbColisToListItem(createdColis);
-      onSave(newColis);
-
-      const win = window.open("", "_blank");
-      if (!win) return;
-      win.document.write(`<html><head><title>Bordereau ${trackingNo}</title>
-      <style>
-        body{font-family:'Segoe UI',sans-serif;padding:30px;color:#1f2937}
-        .hdr{border-bottom:2px solid #2B4C8C;padding-bottom:16px;margin-bottom:24px;display:flex;justify-content:space-between}
-        .title{font-size:22px;font-weight:bold;color:#2B4C8C;margin:0}
-        .track{font-family:monospace;font-size:16px;font-weight:bold;color:#E26D28}
-        .sec{border:1px solid #e5e7eb;border-radius:8px;margin-bottom:16px;overflow:hidden}
-        .sec-t{background:#f9fafb;padding:8px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb}
-        .sec-b{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-        .fl{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em}
-        .fv{font-size:13px;font-weight:600;color:#111827;margin-top:2px}
-        .price{border:2px solid #E26D28;border-radius:8px;padding:16px;text-align:center;margin-top:16px}
-        .price .lbl{font-size:11px;color:#9ca3af;text-transform:uppercase}
-        .price .val{font-size:28px;font-weight:900;color:#E26D28}
-        @media print{button{display:none}}
-      </style></head><body>
-      <div class="hdr">
-        <div><h1 class="title">Bordereau d'Expédition</h1><p style="margin:4px 0 0;font-size:12px;color:#6b7280">ColisManager</p></div>
-        <div style="text-align:right"><div class="track">${trackingNo}</div><div style="font-size:11px;color:#6b7280;margin-top:4px">Date: ${today}</div></div>
-      </div>
-      <div class="sec"><div class="sec-t">Expéditeur</div><div class="sec-b">
-        <div><div class="fl">Nom</div><div class="fv">${sender.name}</div></div>
-        <div><div class="fl">Téléphone</div><div class="fv">${sender.phone || "—"}</div></div>
-        <div style="grid-column:span 2"><div class="fl">Adresse</div><div class="fv">${sender.address || "—"}</div></div>
-      </div></div>
-      <div class="sec"><div class="sec-t">Destinataire</div><div class="sec-b">
-        <div><div class="fl">Nom</div><div class="fv">${receiver.name}</div></div>
-        <div><div class="fl">Téléphone</div><div class="fv">${receiver.phone || "—"}</div></div>
-        <div><div class="fl">Ville</div><div class="fv">${receiver.city || "—"}</div></div>
-        <div><div class="fl">Pays</div><div class="fv">${receiver.country}</div></div>
-        <div style="grid-column:span 2"><div class="fl">Adresse</div><div class="fv">${receiver.address || "—"}</div></div>
-      </div></div>
-      <div class="sec"><div class="sec-t">Détails du Colis</div><div class="sec-b">
-        <div><div class="fl">Poids</div><div class="fv">${weight} kg</div></div>
-        <div><div class="fl">Type</div><div class="fv">${deliveryType === "domicile" ? "À domicile" : "À l'agence"}</div></div>
-        <div style="grid-column:span 2"><div class="fl">Description</div><div class="fv">${description || "—"}</div></div>
-      </div></div>
-      <div class="price"><div class="lbl">Prix Total</div><div class="val">${totalPrice.toFixed(2)} MAD</div><div style="font-size:11px;color:#6b7280;margin-top:4px">${typeof weight === "number" && weight <= 10 ? "Forfait (≤ 10kg)" : weight + " kg × " + pricePerKg + " MAD/kg"}</div></div>
-      <script>window.onload=function(){window.print();setTimeout(()=>window.close(),500);}</script>
-    </body></html>`);
-      win.document.close();
-      onBack();
-    } catch (error) {
-      console.error("Failed to create colis:", error);
-      Swal.fire({
-        title: t("common.error"),
-        text: t("addColis.saveError") || "Failed to save colis.",
-        icon: "error",
-        confirmButtonText: t("common.close"),
-      });
-    }
-  };
 
   return (
     <div className="flex flex-col gap-5 w-full">
@@ -607,44 +520,37 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="p-2 text-gray-500 hover:text-brand-blue hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+            className="p-2 text-gray-500 dark:text-slate-400 hover:text-brand-blue hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
             title="Retour à la liste"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
               <Package size={20} className="text-brand-orange" />
               {t("addColis.newParcel")}
             </h2>
-            <p className="text-xs text-gray-400 font-mono mt-0.5">
+            <p className="text-xs text-gray-400 dark:text-slate-500 font-mono mt-0.5">
               {t("addColis.trackingNo")} {trackingNo} &nbsp;•&nbsp;{" "}
               {t("header.date")}: {today}
             </p>
           </div>
         </div>
 
-        {/* Save actions (also repeated at the bottom for comfort) */}
+        {/* Save action */}
         <div className="hidden md:flex items-center gap-2">
           <button
             onClick={onBack}
-            className="px-3 py-1.5 text-sm text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="px-3 py-1.5 text-sm text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             {t("common.cancel")}
           </button>
           <button
-            onClick={handleSaveAndPrint}
-            disabled={!isValid}
-            className="px-3 py-1.5 text-sm font-semibold text-brand-blue bg-white border-2 border-brand-blue rounded-lg hover:bg-brand-blue hover:text-white transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Printer size={14} /> {t("addColis.saveAndPrint")}
-          </button>
-          <button
             onClick={handleSave}
             disabled={!isValid}
-            className="px-4 py-1.5 text-sm font-semibold bg-brand-orange text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-1.5 text-sm font-semibold bg-brand-orange text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Save size={14} /> {t("common.save")}
+            {t("common.save")}
           </button>
         </div>
       </div>
@@ -720,9 +626,9 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                 type="checkbox"
                 checked={saveSender}
                 onChange={(e) => setSaveSender(e.target.checked)}
-                className="w-3.5 h-3.5 rounded accent-brand-orange cursor-pointer"
+                className="w-3.5 h-3.5 rounded accent-brand-orange cursor-pointer dark:bg-slate-850 dark:border-slate-700"
               />
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 {t("addColis.saveAsClient")}
               </span>
             </label>
@@ -797,16 +703,16 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                       inputCls + " appearance-none pr-7 cursor-pointer"
                     }
                   >
-                    <option value="">{t("addColis.selectOption")}</option>
+                    <option value="" className="dark:bg-slate-900">{t("addColis.selectOption")}</option>
                     {countries.map((country) => (
-                      <option key={country} value={country}>
+                      <option key={country} value={country} className="dark:bg-slate-900">
                         {country}
                       </option>
                     ))}
                   </select>
                   <ChevronDown
                     size={12}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 pointer-events-none"
                   />
                 </div>
               </Field>
@@ -826,16 +732,16 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                       inputCls + " appearance-none pr-7 cursor-pointer"
                     }
                   >
-                    <option value="">{t("addColis.selectOption")}</option>
+                    <option value="" className="dark:bg-slate-900">{t("addColis.selectOption")}</option>
                     {regions.map((r) => (
-                      <option key={r} value={r}>
+                      <option key={r} value={r} className="dark:bg-slate-900">
                         {r}
                       </option>
                     ))}
                   </select>
                   <ChevronDown
                     size={12}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 pointer-events-none"
                   />
                 </div>
               </Field>
@@ -857,16 +763,16 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                       " appearance-none pr-7 cursor-pointer disabled:opacity-50"
                     }
                   >
-                    <option value="">{t("addColis.selectOption")}</option>
+                    <option value="" className="dark:bg-slate-900">{t("addColis.selectOption")}</option>
                     {availableCities.map((c) => (
-                      <option key={c} value={c}>
+                      <option key={c} value={c} className="dark:bg-slate-900">
                         {c}
                       </option>
                     ))}
                   </select>
                   <ChevronDown
                     size={12}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 pointer-events-none"
                   />
                 </div>
               </Field>
@@ -891,9 +797,9 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                 type="checkbox"
                 checked={saveReceiver}
                 onChange={(e) => setSaveReceiver(e.target.checked)}
-                className="w-3.5 h-3.5 rounded accent-brand-orange cursor-pointer"
+                className="w-3.5 h-3.5 rounded accent-brand-orange cursor-pointer dark:bg-slate-850 dark:border-slate-700"
               />
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-slate-400">
                 {t("addColis.saveAsClient")}
               </span>
             </label>
@@ -1090,29 +996,20 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
       </div>
 
       {/* ── Bottom Action Bar ── */}
-      <div className="flex items-center justify-between py-4 border-t border-gray-200 bg-white sticky bottom-0">
+      <div className="flex items-center justify-between py-4 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 sticky bottom-0">
         <button
           onClick={onBack}
-          className="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
         >
           {t("common.cancel")}
         </button>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleSaveAndPrint}
-            disabled={!isValid}
-            className="px-4 py-2 text-sm font-semibold text-brand-blue bg-white border-2 border-brand-blue rounded-lg hover:bg-brand-blue hover:text-white transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Printer size={15} /> {t("addColis.saveAndPrint")}
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!isValid}
-            className="px-5 py-2 text-sm font-semibold bg-brand-orange text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Save size={15} /> {t("common.save")}
-          </button>
-        </div>
+        <button
+          onClick={handleSave}
+          disabled={!isValid}
+          className="px-5 py-2 text-sm font-semibold bg-brand-orange text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {t("common.save")}
+        </button>
       </div>
     </div>
   );

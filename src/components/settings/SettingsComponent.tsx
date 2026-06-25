@@ -47,9 +47,9 @@ export default function SettingsComponent() {
                 }`}
               >
                 <Icon
-                  className={`w-5 h-5 shrink-0 ${isActive ? "text-brand-orange" : "text-gray-400"}`}
+                  className={`w-5 h-5 shrink-0 mt-0.5 ${isActive ? "text-brand-orange" : "text-gray-400"}`}
                 />
-                <span>{t(tab.labelKey)}</span>
+                <span className="text-left leading-tight">{t(tab.labelKey)}</span>
               </button>
             );
           })}
