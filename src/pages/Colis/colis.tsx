@@ -392,7 +392,6 @@ export default function Colis({
           {t("colis.pageTitle")}
         </h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t("colis.subtitle")}</p>
-        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t("colis.subtitle")}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -404,16 +403,12 @@ export default function Colis({
             icon: Package,
             bg: "bg-brand-blue/10 dark:bg-brand-blue/20",
             color: "text-brand-blue dark:text-blue-400",
-            bg: "bg-brand-blue/10 dark:bg-brand-blue/20",
-            color: "text-brand-blue dark:text-blue-400",
           },
           {
             label: t("colis.totalWeight"),
             value: stats.weight,
             suffix: "kg",
             icon: Scale,
-            bg: "bg-brand-orange/10 dark:bg-brand-orange/20",
-            color: "text-brand-orange dark:text-orange-400",
             bg: "bg-brand-orange/10 dark:bg-brand-orange/20",
             color: "text-brand-orange dark:text-orange-400",
           },
@@ -443,7 +438,6 @@ export default function Colis({
           <div
             key={label}
             className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 flex items-center gap-4 transition-all hover:-translate-y-1 hover:shadow-md duration-300"
-            className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 flex items-center gap-4 transition-all hover:-translate-y-1 hover:shadow-md duration-300"
           >
             <div className={`${bg} p-3 rounded-xl ${color} shadow-sm`}>
               <Icon size={22} />
@@ -455,7 +449,6 @@ export default function Colis({
               <p className="text-2xl font-semibold text-gray-800 dark:text-white mt-0.5">
                 {value}{" "}
                 {suffix && (
-                  <span className="text-sm font-medium text-gray-500 dark:text-slate-400">
                   <span className="text-sm font-medium text-gray-500 dark:text-slate-400">
                     {suffix}
                   </span>
@@ -483,7 +476,6 @@ export default function Colis({
             {/* Search */}
             <div className="relative w-64">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 size={16}
               />
@@ -517,7 +509,6 @@ export default function Colis({
                 ))}
               </select>
               <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-slate-500">
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-slate-500">
                 <Filter size={13} />
               </div>
             </div>
@@ -532,10 +523,6 @@ export default function Colis({
             </button>
           </div>
         </div>
-
-      {/* ── Table Card ── */}
-      <div className="bg-white  dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col">
-    
 
         {/* Table */}
         <div className="overflow-x-auto w-full">
@@ -563,7 +550,6 @@ export default function Colis({
                   <tr
                     key={colis.id}
                     className="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors group"
-                    className="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors group"
                   >
                     {/* N°Track */}
                     <td className="px-6 py-4">
@@ -571,9 +557,7 @@ export default function Colis({
                         <Package
                           size={15}
                           className="text-gray-400 dark:text-slate-500 group-hover:text-brand-orange transition-colors shrink-0"
-                          className="text-gray-400 dark:text-slate-500 group-hover:text-brand-orange transition-colors shrink-0"
                         />
-                        <span className="font-bold font-mono text-gray-800 dark:text-slate-200">
                         <span className="font-bold font-mono text-gray-800 dark:text-slate-200">
                           {colis.trackingNo}
                         </span>
@@ -582,12 +566,10 @@ export default function Colis({
 
                     {/* Expéditeur */}
                     <td className="px-6 py-4 font-medium text-gray-700 dark:text-slate-200">
-                    <td className="px-6 py-4 font-medium text-gray-700 dark:text-slate-200">
                       {colis.sender}
                     </td>
 
                     {/* Destinataire */}
-                    <td className="px-6 py-4 text-gray-600 dark:text-slate-300">
                     <td className="px-6 py-4 text-gray-600 dark:text-slate-300">
                       {colis.receiver}
                     </td>
@@ -595,7 +577,6 @@ export default function Colis({
                     {/* Ville */}
                     <td className="px-6 py-4 text-gray-600 dark:text-slate-350">
                       <div className="flex items-center gap-1.5">
-                        <MapPin size={13} className="text-gray-400 dark:text-slate-500 shrink-0" />
                         <MapPin size={13} className="text-gray-400 dark:text-slate-500 shrink-0" />
                         {colis.city}
                       </div>
@@ -635,9 +616,7 @@ export default function Colis({
 
                     {/* Poids */}
                     <td className="px-6 py-4 text-right font-semibold text-gray-600 dark:text-slate-300">
-                    <td className="px-6 py-4 text-right font-semibold text-gray-600 dark:text-slate-300">
                       {colis.weight.toFixed(1)}{" "}
-                      <span className="text-xs text-gray-400 dark:text-slate-500 font-normal">
                       <span className="text-xs text-gray-400 dark:text-slate-500 font-normal">
                         kg
                       </span>
@@ -645,9 +624,7 @@ export default function Colis({
 
                     {/* Total Price */}
                     <td className="px-6 py-4 text-right font-semibold text-gray-800 dark:text-slate-200">
-                    <td className="px-6 py-4 text-right font-semibold text-gray-800 dark:text-slate-200">
                       {colis.totalPrice.toFixed(2)}{" "}
-                      <span className="text-[10px] text-gray-400 dark:text-slate-500 font-medium">
                       <span className="text-[10px] text-gray-400 dark:text-slate-500 font-medium">
                         DH
                       </span>
@@ -659,14 +636,12 @@ export default function Colis({
                         <button
                           onClick={() => handleDetails(colis)}
                           className="p-1.5 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30 rounded-lg transition-colors cursor-pointer"
-                          className="p-1.5 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30 rounded-lg transition-colors cursor-pointer"
                           title={t("common.details")}
                         >
                           <Eye size={16} />
                         </button>
                         <button
                           onClick={() => handleEdit(colis)}
-                          className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors cursor-pointer"
                           className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors cursor-pointer"
                           title={t("common.edit")}
                         >
@@ -676,7 +651,6 @@ export default function Colis({
                           onClick={() =>
                             handleDelete(colis.id, colis.trackingNo)
                           }
-                          className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
                           className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
                           title={t("common.delete")}
                         >
@@ -692,7 +666,6 @@ export default function Colis({
                     <div className="flex flex-col items-center gap-2">
                       <Package
                         size={36}
-                        className="text-gray-300 dark:text-slate-600 stroke-[1.5]"
                         className="text-gray-300 dark:text-slate-600 stroke-[1.5]"
                       />
                       <span className="font-medium text-gray-400 dark:text-slate-500 text-sm">
