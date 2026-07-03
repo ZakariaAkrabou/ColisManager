@@ -122,7 +122,7 @@ export default function ClientDetailsModal({
             </span>
 
             <div className="grid grid-cols-3 gap-3.5">
-              <div className="bg-slate-950 dark:bg-slate-850 p-3.5 rounded-xl border border-gray-100 dark:border-slate-800 text-center">
+              <div className="bg-gray-50 dark:bg-slate-800 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 text-center">
                 <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wide">
                   {t("clients.totalSent")}
                 </p>
@@ -131,7 +131,7 @@ export default function ClientDetailsModal({
                 </p>
               </div>
 
-              <div className="bg-slate-950 dark:bg-slate-850 p-3.5 rounded-xl border border-gray-100 dark:border-slate-800 text-center">
+              <div className="bg-gray-50 dark:bg-slate-800 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 text-center">
                 <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wide">
                   {t("clients.totalReceived")}
                 </p>
@@ -140,11 +140,11 @@ export default function ClientDetailsModal({
                 </p>
               </div>
 
-              <div className="bg-slate-950 dark:bg-slate-850 p-3.5 rounded-xl border border-gray-100 dark:border-slate-800 text-center">
+              <div className="bg-gray-50 dark:bg-slate-800 p-3.5 rounded-xl border border-gray-100 dark:border-slate-700 text-center">
                 <p className="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wide">
                   {t("clients.totalAmount")}
                 </p>
-                <p className="text-base font-extrabold text-slate-800 dark:text-slate-200 mt-1.5 whitespace-nowrap">
+                <p className="text-base font-extrabold text-gray-800 dark:text-slate-200 mt-1.5 whitespace-nowrap">
                   {(client.totalAmount ?? 0).toLocaleString()} MAD
                 </p>
               </div>

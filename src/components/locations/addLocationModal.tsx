@@ -72,6 +72,8 @@ export default function AddLocationModal({
 
   if (!isOpen) return null;
 
+  const isDark = document.documentElement.classList.contains("dark");
+
   const formatOptionLabel = ({ label, countryCode }: any) => (
     <div className="flex items-center gap-2">
       <ReactCountryFlag
@@ -138,31 +140,39 @@ export default function AddLocationModal({
               styles={{
                 control: (base) => ({
                   ...base,
-                  backgroundColor: "transparent",
-                  borderColor: "#334155",
+                  backgroundColor: isDark ? "#1e293b" : "#f9fafb",
+                  borderColor: isDark ? "#334155" : "#e5e7eb",
                   borderRadius: "0.5rem",
                   padding: "2px",
                   boxShadow: "none",
+                  color: isDark ? "#f1f5f9" : "#111827",
+                  "&:hover": { borderColor: isDark ? "#475569" : "#d1d5db" },
+                  cursor: "pointer",
                 }),
                 menu: (base) => ({
                   ...base,
-                  backgroundColor: "#0f172a",
+                  backgroundColor: isDark ? "#0f172a" : "#ffffff",
+                  border: isDark ? "1px solid #334155" : "1px solid #e5e7eb",
                 }),
                 option: (base, state) => ({
                   ...base,
                   backgroundColor: state.isFocused
-                    ? "#1e293b"
-                    : "#0f172a",
-                  color: "#fff",
+                    ? isDark ? "#1e293b" : "#f3f4f6"
+                    : isDark ? "#0f172a" : "#ffffff",
+                  color: isDark ? "#f1f5f9" : "#111827",
                   cursor: "pointer",
                 }),
                 singleValue: (base) => ({
                   ...base,
-                  color: "#fff",
+                  color: isDark ? "#f1f5f9" : "#111827",
                 }),
                 input: (base) => ({
                   ...base,
-                  color: "#fff",
+                  color: isDark ? "#f1f5f9" : "#111827",
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  color: isDark ? "#64748b" : "#9ca3af",
                 }),
               }}
             />

@@ -18,7 +18,7 @@ const Reports: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 6;
 
   // ── Load data ────────────────────────────────────────────────────────────
   const loadColis = async () => {
@@ -185,7 +185,7 @@ const Reports: React.FC = () => {
       </div>
 
       {/* ── Pagination ── */}
-      {!loading && !error && totalPages > 1 && (
+      {!loading && !error && (
         <div className="mt-4 bg-white dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-800 px-6 py-4 flex items-center justify-between transition-colors">
           <span className="text-sm text-gray-500 dark:text-slate-400">
             Affichage de {(safePage - 1) * pageSize + 1} à{" "}
