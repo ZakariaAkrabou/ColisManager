@@ -20,6 +20,15 @@ export default function ProfileSettings() {
     address: "",
     website: "",
   });
+  type SettingsData = {
+  company_name: string;
+  owner_name: string;
+  email: string;
+  phone: string;
+  phone2?: string;
+  address: string;
+  website?: string;
+};
 
   const loadSettings = async () => {
   try {

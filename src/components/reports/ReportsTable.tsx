@@ -130,7 +130,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
           </div>
           <div>
             <p className="text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">
-              En attente
+              {t("reports.pending")}
             </p>
             <h2 className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {stats.pending}
@@ -183,7 +183,10 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
               {data.map((colis) => {
                 const statusKey = normalizeStatus(colis.status);
                 const cfg = statusConfig[statusKey];
-                const city = colis.receiver_city || colis.receiver_region || "—";
+                const city = colis.receiver_city || colis.receiver_region || "—"
+                
+                  ? colis.created_at.split("T")[0]
+                  : "—";
 
                 return (
 

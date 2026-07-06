@@ -80,6 +80,7 @@ export default function Sidebar({
           minWidth: "250px",
         }}
       >
+    
         <button
           className={`flex items-center px-5 py-3 mx-0 rounded-lg text-left w-full transition-all duration-200 font-medium cursor-pointer ${
             activeItem === "settings"
@@ -91,6 +92,9 @@ export default function Sidebar({
           <Settings className="mr-3 w-5 h-5 shrink-0" />
           {t("sidebar.settings")}
         </button>
+              <p className="text-xs text-gray-400 text-center   dark:text-slate-400 mt-2">
+          Version 1.0.0
+        </p>
       </div>
     </aside>
   );

@@ -428,7 +428,6 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     weight > 0 &&
     trackingNo.trim() !== "";
 
-
   const buildPayload = (): CreateColisPayload => ({
     tracking_number: trackingNo.trim(),
     sender: {
