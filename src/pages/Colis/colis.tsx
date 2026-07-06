@@ -195,47 +195,47 @@ export default function Colis({
     Swal.fire({
       title: t("colis.editTitle"),
       html: `
-        <div style="text-align:left;font-family:sans-serif;font-size:13px;display:flex;flex-direction:column;gap:10px">
-          <p style="color:#6b7280;margin:0 0 4px">Colis <strong style="font-family:monospace">${colis.trackingNo}</strong></p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="text-left font-sans text-xs flex flex-col gap-3.5">
+          <p class="text-gray-500 dark:text-slate-400 mb-1">Colis <strong class="font-mono">${colis.trackingNo}</strong></p>
+          <div class="grid grid-cols-2 gap-2">
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Expéditeur *</label>
-              <input id="e-sender" type="text" value="${colis.sender}" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
+              <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Expéditeur *</label>
+              <input id="e-sender" type="text" value="${colis.sender}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
             </div>
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Destinataire *</label>
-              <input id="e-receiver" type="text" value="${colis.receiver}" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
+              <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Destinataire *</label>
+              <input id="e-receiver" type="text" value="${colis.receiver}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
             </div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div class="grid grid-cols-3 gap-2">
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Ville *</label>
-              <input id="e-city" type="text" value="${colis.city}" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
+              <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Ville *</label>
+              <input id="e-city" type="text" value="${colis.city}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
             </div>
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Type de livraison</label>
-              <select id="e-type" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
-                <option value="Agence" ${colis.type === "Agence" || colis.type === "Standard" ? "selected" : ""}>À l'agence</option>
-                <option value="Domicile" ${colis.type === "Domicile" ? "selected" : ""}>À domicile</option>
+              <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Type de livraison</label>
+              <select id="e-type" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
+                <option value="Agence" ${colis.type === "Agence" || colis.type === "Standard" ? "selected" : ""} class="dark:bg-slate-900">À l'agence</option>
+                <option value="Domicile" ${colis.type === "Domicile" ? "selected" : ""} class="dark:bg-slate-900">À domicile</option>
               </select>
             </div>
             <div>
-              <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Poids (kg)</label>
-              <input id="e-weight" type="number" step="0.1" min="0.1" value="${colis.weight}" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
+              <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Poids (kg)</label>
+              <input id="e-weight" type="number" step="0.1" min="0.1" value="${colis.weight}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
             </div>
           </div>
           <div>
-            <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Statut</label>
-            <select id="e-status" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
-              <option value="En attente" ${colis.status === "En attente" ? "selected" : ""}>En attente</option>
-              <option value="En transit" ${colis.status === "En transit" ? "selected" : ""}>En transit</option>
-              <option value="Livré" ${colis.status === "Livré" ? "selected" : ""}>Livré</option>
-              <option value="Annulé" ${colis.status === "Annulé" ? "selected" : ""}>Annulé</option>
+            <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Statut</label>
+            <select id="e-status" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
+              <option value="En attente" ${colis.status === "En attente" ? "selected" : ""} class="dark:bg-slate-900">En attente</option>
+              <option value="En transit" ${colis.status === "En transit" ? "selected" : ""} class="dark:bg-slate-900">En transit</option>
+              <option value="Livré" ${colis.status === "Livré" ? "selected" : ""} class="dark:bg-slate-900">Livré</option>
+              <option value="Annulé" ${colis.status === "Annulé" ? "selected" : ""} class="dark:bg-slate-900">Annulé</option>
             </select>
           </div>
           <div>
-            <label style="display:block;font-size:11px;font-weight:600;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Prix Total (DH)</label>
-            <input id="e-price" type="number" step="0.01" min="0" value="${colis.totalPrice}" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;box-sizing:border-box">
+            <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Prix Total (DH)</label>
+            <input id="e-price" type="number" step="0.01" min="0" value="${colis.totalPrice}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
           </div>
         </div>
       `,
@@ -388,7 +388,7 @@ export default function Colis({
   return (
     <div className="flex flex-col gap-6 w-full">
       <div>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-slate-100">
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
           {t("colis.pageTitle")}
         </h2>
         <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">{t("colis.subtitle")}</p>
@@ -423,7 +423,7 @@ export default function Colis({
             ),
             suffix: "DH",
             icon: DollarSign,
-            bg: "bg-emerald-50 dark:bg-emerald-950/30",
+            bg: "bg-emerald-50 dark:bg-emerald-500/10",
             color: "text-emerald-600 dark:text-emerald-400",
           },
           {
@@ -431,7 +431,7 @@ export default function Colis({
             value: String(stats.express),
             suffix: "",
             icon: TrendingUp,
-            bg: "bg-amber-50 dark:bg-amber-950/30",
+            bg: "bg-amber-50 dark:bg-amber-500/10",
             color: "text-amber-600 dark:text-amber-400",
           },
         ].map(({ label, value, suffix, icon: Icon, bg, color }) => (
@@ -443,10 +443,10 @@ export default function Colis({
               <Icon size={22} />
             </div>
             <div>
-              <p className="text-gray-400 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              <p className="text-gray-400 dark:text-slate-500 text-xs font-semibold uppercase tracking-wider">
                 {label}
               </p>
-              <p className="text-2xl font-semibold text-gray-800 dark:text-slate-100 mt-0.5">
+              <p className="text-2xl font-semibold text-gray-800 dark:text-white mt-0.5">
                 {value}{" "}
                 {suffix && (
                   <span className="text-sm font-medium text-gray-500 dark:text-slate-400">
@@ -459,14 +459,15 @@ export default function Colis({
         ))}
       </div>
 
-
-    {/* Toolbar */}
-        <div className="p-5 mb-2 border-b border-gray-100 dark:border-slate-800 dark:bg-slate-900 rounded-lg flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      {/* ── Table Card ── */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col">
+        {/* Toolbar */}
+        <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-slate-100">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white">
               {t("colis.shipmentList")}
             </h3>
-            <span className="bg-[#FDF1EA] dark:bg-brand-orange/10 text-brand-orange text-xs px-2.5 py-0.5 rounded-full font-bold border border-orange-100 dark:border-brand-orange/20">
+            <span className="bg-[#FDF1EA] dark:bg-orange-500/10 text-brand-orange text-xs px-2.5 py-0.5 rounded-full font-bold border border-orange-100 dark:border-orange-500/20">
               {t("colis.recordsCount", { count: filteredColis.length })}
             </span>
           </div>
@@ -486,7 +487,7 @@ export default function Colis({
                   setCurrentPage(1);
                 }}
                 placeholder={t("colis.searchPlaceholder")}
-                className="pl-9 pr-4 py-2 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-900 w-full transition-all text-gray-700 dark:text-slate-200"
+                className="pl-9 pr-4 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-800 w-full transition-all text-gray-700 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
               />
             </div>
 
@@ -498,11 +499,11 @@ export default function Colis({
                   setSelectedCity(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-3 pr-8 py-2 bg-gray-50 dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-900 transition-all text-gray-600 dark:text-slate-200 appearance-none cursor-pointer font-medium"
+                className="pl-3 pr-8 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-800 transition-all text-gray-600 dark:text-slate-350 appearance-none cursor-pointer font-medium"
               >
-                <option value="">{t("colis.allCities")}</option>
+                <option value="" className="dark:bg-slate-900">{t("colis.allCities")}</option>
                 {cities.map((c) => (
-                  <option key={c} value={c}>
+                  <option key={c} value={c} className="dark:bg-slate-900">
                     {c}
                   </option>
                 ))}
@@ -523,14 +524,10 @@ export default function Colis({
           </div>
         </div>
 
-      {/* ── Table Card ── */}
-      <div className="bg-white  dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col">
-    
-
         {/* Table */}
         <div className="overflow-x-auto w-full">
-          <table className="w-full text-left text-sm whitespace-nowrap ">
-            <thead className="bg-gray-50/70 dark:bg-slate-800/50 text-gray-500 dark:text-slate-400 border-b border-gray-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider ">
+          <table className="w-full text-left text-sm whitespace-nowrap">
+            <thead className="bg-gray-50/70 dark:bg-slate-800/40 text-gray-500 dark:text-slate-400 border-b border-gray-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4">{t("colis.tracking")}</th>
                 <th className="px-6 py-4">{t("colis.sender")}</th>
@@ -547,7 +544,7 @@ export default function Colis({
                 <th className="px-6 py-4 text-center">{t("common.actions")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-slate-800 dark:bg-slate-950">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
               {currentItems.length > 0 ? (
                 currentItems.map((colis) => (
                   <tr
@@ -578,7 +575,7 @@ export default function Colis({
                     </td>
 
                     {/* Ville */}
-                    <td className="px-6 py-4 text-gray-600 dark:text-slate-300">
+                    <td className="px-6 py-4 text-gray-600 dark:text-slate-350">
                       <div className="flex items-center gap-1.5">
                         <MapPin size={13} className="text-gray-400 dark:text-slate-500 shrink-0" />
                         {colis.city}
@@ -590,12 +587,12 @@ export default function Colis({
                       <span
                         className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
                           colis.type === "Domicile"
-                            ? "bg-green-50 text-green-700 border border-green-100 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50"
+                            ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-500/20"
                             : colis.type === "Agence"
-                              ? "bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50"
+                              ? "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20"
                               : colis.type === "Fragile"
-                                ? "bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50"
-                                : "bg-gray-50 text-gray-700 border border-gray-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                                ? "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-500/20"
+                                : "bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border border-gray-100 dark:border-slate-700"
                         }`}
                       >
                         {typeLabel(colis.type)}
@@ -605,12 +602,12 @@ export default function Colis({
                       <span
                         className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
                           colis.status === "Livré"
-                            ? "bg-green-50 text-green-700 border border-green-100 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900/50"
+                            ? "bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-500/20"
                             : colis.status === "En transit"
-                              ? "bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50"
+                              ? "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500/20"
                               : colis.status === "Annulé"
-                                ? "bg-red-50 text-red-700 border border-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/50"
-                                : "bg-yellow-50 text-yellow-700 border border-yellow-100 dark:bg-yellow-950/30 dark:text-yellow-400 dark:border-yellow-900/50"
+                                ? "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-500/20"
+                                : "bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-500/20"
                         }`}
                       >
                         {statusLabel(colis.status)}
@@ -671,10 +668,10 @@ export default function Colis({
                         size={36}
                         className="text-gray-300 dark:text-slate-600 stroke-[1.5]"
                       />
-                      <span className="font-medium text-gray-400 dark:text-slate-400 text-sm">
+                      <span className="font-medium text-gray-400 dark:text-slate-500 text-sm">
                         {t("colis.noParcelFound")}
                       </span>
-                      <p className="text-xs text-gray-300 dark:text-slate-500 max-w-xs">
+                      <p className="text-xs text-gray-300 dark:text-slate-600 max-w-xs">
                         {t("colis.noParcelHint")}
                       </p>
                     </div>
@@ -687,18 +684,18 @@ export default function Colis({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="p-5 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50/30 dark:bg-slate-900/50">
+          <div className="p-5 border-t border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-50/30 dark:bg-slate-900/30">
             <span className="text-xs text-gray-500 dark:text-slate-400 font-medium">
               {t("colis.showing")}{" "}
-              <span className="font-bold text-gray-700 dark:text-slate-200">
+              <span className="font-bold text-gray-700 dark:text-slate-350">
                 {indexOfFirstItem + 1}
               </span>{" "}
               {t("colis.to")}{" "}
-              <span className="font-bold text-gray-700 dark:text-slate-200">
+              <span className="font-bold text-gray-700 dark:text-slate-350">
                 {Math.min(indexOfLastItem, totalItems)}
               </span>{" "}
               {t("colis.of")}{" "}
-              <span className="font-bold text-gray-700 dark:text-slate-200">{totalItems}</span>{" "}
+              <span className="font-bold text-gray-700 dark:text-slate-350">{totalItems}</span>{" "}
               {t("colis.parcels")}
             </span>
 
@@ -706,7 +703,7 @@ export default function Colis({
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className="p-2 border border-gray-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-950 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="p-2 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -719,7 +716,7 @@ export default function Colis({
                     className={`min-w-8 h-8 px-2 flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
                       currentPage === page
                         ? "bg-brand-orange text-white border border-brand-orange shadow-sm"
-                        : "border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900"
+                        : "border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                     }`}
                   >
                     {page}
@@ -732,7 +729,7 @@ export default function Colis({
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="p-2 border border-gray-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-950 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="p-2 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 <ChevronRight size={16} />
               </button>

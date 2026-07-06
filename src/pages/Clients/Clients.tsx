@@ -144,10 +144,12 @@ export default function ClientsPage() {
         filterRegion === "Toutes" || client.region === filterRegion;
       const matchesVille =
         filterVille === "Toutes" || client.city === filterVille;
+      const matchesType =
+        filterClientType === "Tous" || client.client_type === filterClientType;
 
-      return matchesSearch && matchesPays && matchesRegion && matchesVille;
+      return matchesSearch && matchesPays && matchesRegion && matchesVille && matchesType;
     });
-  }, [clients, searchQuery, filterPays, filterRegion, filterVille]);
+  }, [clients, searchQuery, filterPays, filterRegion, filterVille, filterClientType]);
 
   const paginatedClients = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -275,6 +277,7 @@ export default function ClientsPage() {
     setFilterPays("Tous");
     setFilterRegion("Toutes");
     setFilterVille("Toutes");
+    setFilterClientType("Tous");
     setCurrentPage(1);
   };
 
@@ -492,7 +495,8 @@ export default function ClientsPage() {
         {(searchQuery ||
           filterPays !== "Tous" ||
           filterRegion !== "Toutes" ||
-          filterVille !== "Toutes") && (
+          filterVille !== "Toutes" ||
+          filterClientType !== "Tous") && (
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-800 flex flex-wrap gap-2 items-center">
               <span className="text-xs text-gray-400 dark:text-slate-505 font-medium">
                 {t("clients.activeFilters")}
@@ -535,6 +539,17 @@ export default function ClientsPage() {
                   {t("clients.city")} : {filterVille}
                   <button
                     onClick={() => setFilterVille("Toutes")}
+                    className="hover:bg-orange-100 dark:hover:bg-orange-950 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {filterClientType !== "Tous" && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 dark:bg-orange-500/10 text-brand-orange text-xs font-semibold">
+                  {t("clients.clientType")} : {t(`clients.${filterClientType}`)}
+                  <button
+                    onClick={() => setFilterClientType("Tous")}
                     className="hover:bg-orange-100 dark:hover:bg-orange-950 p-0.5 rounded-md cursor-pointer"
                   >
                     <X className="w-3 h-3" />

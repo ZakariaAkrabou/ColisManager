@@ -1,4 +1,3 @@
-// path = src/components/reports/ReportsTable.tsx
 import {
   Package,
   Truck,
@@ -10,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { FileText } from "lucide-react";
 import { generateFacture } from "../facture/generateFacture";
 import { generateBonCommande } from "../bonCommande/generateBonCommande";
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 
 export interface ReportColis {
   id: number;
@@ -83,7 +82,6 @@ const handleFacture = async (colis: ReportColis) => {
 };
 
 
-// ─── Component ────────────────────────────────────────────────────────────────
 
 const ReportsTable = ({ data, stats }: ReportsTableProps) => {
   const { t } = useTranslation();
@@ -250,7 +248,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                     <td className="px-5 py-3.5 text-center">
                       <button
                         onClick={() => handleFacture(colis)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-medium transition"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-medium transition cursor-pointer"
                       >
                         <FileText size={14} />
                         Facture
@@ -262,7 +260,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                     <td className="px-5 py-3.5 text-center">
                       <button
                         onClick={() => generateBonCommande(colis)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium transition"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium transition cursor-pointer"
                       >
                         <FileText size={14} />
                         Bon De Commande

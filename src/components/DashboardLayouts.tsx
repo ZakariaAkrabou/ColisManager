@@ -17,7 +17,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayouts({ children }: DashboardLayoutProps) {
   const { t } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeItem, setActiveItem] = useState("clients");
+  const [activeItem, setActiveItem] = useState("dashboard");
   const [isMobile, setIsMobile] = useState(false);
 
   const [pendingColis, setPendingColis] = useState<any | null>(null);

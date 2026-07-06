@@ -259,7 +259,7 @@ export default function AddClientModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 ">
       <button
         type="button"
         aria-label={t("common.close") || "Close"}
@@ -280,7 +280,7 @@ export default function AddClientModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 transition-colors hover:bg-white dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-gray-400 transition-colors hover:bg-white dark:hover:bg-slate-800 hover:text-gray-700 dark:hover:text-white cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -483,14 +483,14 @@ export default function AddClientModal({
             <button
               type="button"
               onClick={onClose}
-              className="h-10 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 text-sm font-semibold text-gray-600 dark:text-slate-300 transition-colors hover:border-gray-300 dark:hover:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
+              className="h-10 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 text-sm font-semibold text-gray-600 dark:text-slate-300 transition-colors hover:border-gray-300 dark:hover:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer"
             >
               {t("common.cancel")}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-10 rounded-xl bg-brand-orange px-5 text-sm font-semibold text-white shadow-md shadow-brand-orange/10 transition-colors hover:bg-brand-orange/90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-10 rounded-xl bg-brand-orange px-5 text-sm font-semibold text-white shadow-md shadow-brand-orange/10 transition-colors hover:bg-brand-orange/90 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
             >
               {isSubmitting
                 ? t("common.saving") || "Saving..."

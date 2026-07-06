@@ -11,16 +11,35 @@
 body {
   margin: 0;
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
-  @apply bg-gray-50 text-gray-800;
-}
-@theme {
-  --color-brand-blue: #2B4C8C;
-  --color-brand-orange: #E26D28;
+  @apply bg-gray-50 text-gray-800 dark:bg-slate-950 dark:text-slate-100;
 }
 
-body {
-  margin: 0;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  @apply bg-gray-50 text-gray-800;
+/* Global SweetAlert2 Dark Mode Styling Overrides */
+.dark .swal2-popup {
+  background-color: #0f172a !important; /* bg-slate-900 */
+  color: #f1f5f9 !important; /* text-slate-100 */
+  border: 1px solid #1e293b !important; /* border-slate-800 */
+}
+.dark .swal2-title {
+  color: #ffffff !important;
+}
+.dark .swal2-html-container {
+  color: #cbd5e1 !important; /* text-slate-300 */
+}
+.dark .swal2-input, 
+.dark .swal2-select, 
+.dark .swal2-textarea {
+  background-color: #1e293b !important; /* bg-slate-800 */
+  color: #ffffff !important;
+  border-color: #334155 !important; /* border-slate-700 */
+}
+.dark .swal2-input:focus, 
+.dark .swal2-select:focus, 
+.dark .swal2-textarea:focus {
+  border-color: #E26D28 !important; /* brand orange */
+  box-shadow: 0 0 0 3px rgba(226, 109, 40, 0.2) !important;
+}
+.dark .swal2-validation-message {
+  background-color: #1e293b !important;
+  color: #f87171 !important; /* red-400 */
 }
