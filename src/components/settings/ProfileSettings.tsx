@@ -24,8 +24,7 @@ export default function ProfileSettings() {
   const loadSettings = async () => {
   try {
     setIsLoading(true);
-
-    const data = await invoke("get_settings");
+    const data = await invoke<any>("get_settings");
 
     console.log("DATA FROM RUST:", data);
 
@@ -100,29 +99,7 @@ export default function ProfileSettings() {
         onSubmit={handleSubmit}
         className="space-y-6 max-w-2xl animate-fade-in dark:text-slate-100"
       >
-        {/* <div className="flex items-center gap-4 p-4 rounded-xl bg-orange-50/50 border border-orange-100/50 dark:bg-slate-900 dark:border-slate-800">
-          <div className="w-16 h-16 rounded-xl bg-orange-100 flex items-center justify-center text-brand-orange font-bold text-xl uppercase shrink-0 shadow-inner dark:bg-orange-200">
-            {settings.companyName.substring(0, 2)}
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-gray-805 dark:text-slate-100">
-              {t("settings.profile.logoTitle")}
-            </h3>
-
-            <p className="text-xs text-gray-500 mt-0.5 dark:text-slate-400">
-              {t("settings.profile.logoHint")}
-            </p>
-
-            <button
-              type="button"
-              className="mt-2 text-xs font-semibold text-brand-orange hover:text-brand-orange/80 cursor-pointer"
-            >
-              {t("settings.profile.changeImage")}
-            </button>
-          </div>
-        </div> */}
-
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-slate-300">
