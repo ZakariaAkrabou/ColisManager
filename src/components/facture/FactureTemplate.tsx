@@ -64,14 +64,18 @@ body{
 }
 
 .title{
-  font-size:34px;
+  font-size:25px;
   font-weight:bold;
   text-transform:uppercase;
+}
+.value{
+  font-size:12px;
+  font-weight:normal;
 }
 
 .subtitle{
   margin-top:4px;
-  font-size:20px;
+  font-size:10px;
   line-height:1.4;
 }
 
@@ -79,7 +83,7 @@ body{
   margin-top:6px;
   border:1px solid #000;
   padding:4px;
-  font-size:20px;
+  font-size:15px;
   font-weight:bold;
 }
 
@@ -93,14 +97,14 @@ body{
 
 .section-title{
   text-align:center;
-  font-size:20px;
+  font-size:15px;
   font-weight:bold;
   margin-bottom:5px;
   text-transform:uppercase;
 }
 
 .info{
-  font-size:20px;
+  font-size:12px;
   line-height:1.4;
 }
 
@@ -119,7 +123,7 @@ body{
 }
 
 .label{
- font-size : 20px;
+ font-size : 12px;
   font-weight:bold;
 }
 
@@ -127,10 +131,10 @@ body{
 
 .total{
   margin-top:8px;
-  padding-top:6px;
+  padding-top:4px;
   border-top:1px dashed #000;
   text-align:center;
-  font-size:30px;
+  font-size:15px;
   font-weight:bold;
 }
 
@@ -138,23 +142,24 @@ body{
 
 .footer{
   margin-top:8px;
-  padding-top:6px;
+  padding-top:4px;
   border-top:1px dashed #000;
   text-align:center;
 }
 
 .paid{
-  font-size:28px;
+  font-size:25px;
   font-weight:bold;
 }
 
 .thankyou{
-  font-size:19px;
+  font-size:8px;
   margin-top:4px;
+  font-weight:semi-bold;
 }
 
 .date{
-  font-size:18px;
+  font-size:10px;
   margin-top:2px;
 }
 
@@ -246,26 +251,26 @@ body{
 
       <div class="row">
         <span class="label">Tracking:</span>
-        <span>${colis.tracking_number}</span>
+        <span class="value">${colis.tracking_number}</span>
       </div>
 
       <div class="row">
         <span class="label">Poids:</span>
-        <span>${colis.weight} KG</span>
+        <span class="value">${colis.weight} KG</span>
       </div>
           <div class="row">
         <span class="label">Number De Colis:</span>
-        <span> 1 </span>
+        <span class="value"> 1 </span>
       </div>
     
       <div class="row">
         <span class="label">Type:</span>
-        <span>${colis.delivery_type}</span>
+        <span class="value">${colis.delivery_type}</span>
       </div>
 
       <div class="row">
         <span class="label">Statut:</span>
-        <span>${colis.status}</span>
+        <span class="value">${colis.status}</span>
       </div>
 
     </div>
@@ -285,7 +290,7 @@ body{
     </div>
 
     <div class="thankyou">
-      Merci pour votre confiance
+N.B : Tous Les Colis Dépassant 100 Euros Doivent Être Déclarés. Nous Ne Sommes Pas Responsables Des Bagages Non Conformes À La Loi. La Société N’Est Pas Tenue Responsable De Toutes Les Formalités Douanières.
     </div>
 
     <div class="date">

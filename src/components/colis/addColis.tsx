@@ -430,19 +430,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     weight > 0 &&
     trackingNo.trim() !== "";
 
-  const buildNewColis = () => ({
-    id: `CLS${Math.floor(100 + Math.random() * 900)}`,
-    trackingNo,
-    sender: sender.name,
-    receiver: receiver.name,
-    city: receiver.city || receiver.region || "—",
-    type: deliveryType === "domicile" ? "Express" : "Standard",
-    weight: typeof weight === "number" ? weight : 0,
-    totalPrice,
-    status: "En attente" as const,
-    date: new Date().toISOString().split("T")[0],
-  });
-
+ 
   const buildPayload = (): CreateColisPayload => ({
     tracking_number: trackingNo.trim(),
     sender: {

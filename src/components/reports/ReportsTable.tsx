@@ -4,7 +4,6 @@ import {
   Truck,
   CheckCircle,
   Clock,
-  XCircle,
   MapPin,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -82,12 +81,7 @@ const statusConfig = {
 const handleFacture = async (colis: ReportColis) => {
   await generateFacture(colis);
 };
-const normalizeDeliveryType = (type: string) => {
-  const v = type?.toLowerCase() ?? "";
-  if (v === "home" || v === "domicile") return "À domicile";
-  if (v === "agency" || v === "agence") return "Agence";
-  return type;
-};
+
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -138,7 +132,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
           </div>
           <div>
             <p className="text-gray-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wide">
-              En attente
+              {t("reports.pending")}
             </p>
             <h2 className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {stats.pending}
@@ -191,8 +185,8 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
               {data.map((colis) => {
                 const statusKey = normalizeStatus(colis.status);
                 const cfg = statusConfig[statusKey];
-                const city = colis.receiver_city || colis.receiver_region || "—";
-                const date = colis.created_at
+                const city = colis.receiver_city || colis.receiver_region || "—"
+                
                   ? colis.created_at.split("T")[0]
                   : "—";
 
