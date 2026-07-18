@@ -1,289 +1,299 @@
 import { invoke } from "@tauri-apps/api/core";
-import JsBarcode from "jsbarcode";
+import QRCode from "qrcode";
 
 export async function generateBonCommande(colis: any) {
   const settings: any = await invoke("get_settings");
   
-    const iframe = document.createElement("iframe");
-
+  const iframe = document.createElement("iframe");
   iframe.style.position = "fixed";
   iframe.style.width = "0";
   iframe.style.height = "0";
   iframe.style.border = "0";
-
   document.body.appendChild(iframe);
+
+  const qrImage = await QRCode.toDataURL(colis.tracking_number, {
+    width: 220,
+    margin: 1,
+  });
 
   const doc = iframe.contentWindow?.document;
   if (!doc) return;
 
-  // ✅ 1. CREATE BARCODE FIRST (OUTSIDE HTML)
-  const canvas = document.createElement("canvas");
+  // Format dynamic fields to match the image requirements
+  const companyName = (settings?.company_name || "TRAPPES ROYAL TRA").toUpperCase();
+  const dateFormatted = colis.created_at 
+    ? new Date(colis.created_at).toLocaleDateString("fr-FR") 
+    : new Date().toLocaleDateString("fr-FR");
+  const weightFormatted = (colis.weight || 0).toString().replace(".", ",");
+  
+  const desc = (colis.description || "").trim();
+  const piecesText = desc.toLowerCase().includes("sac") ? desc : `1 SAC ${desc}`.trim();
+  
+  const paymentStatus = (colis.total_amount && colis.total_amount > 0) 
+    ? `${colis.total_amount} DH` 
+    : "PAYE";
 
-  JsBarcode(canvas, colis.tracking_number, {
-    format: "CODE128",
-    width: 2,
-    height: 80,
-    displayValue: true,
-  });
-
-  const barcodeImg = canvas.toDataURL("image/png");
-
-  // ✅ 2. HTML PRINT TEMPLATE
   doc.open();
   doc.write(`
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8"/>
-
 <title>Bon de Commande</title>
-
 <style>
-@page{
-  size:A4 landscape;
-  margin:8mm;
+@page {
+  size: 100mm 40mm;
+  margin: 0;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  width: 100mm;
+  height: 40mm;
+  background: #fff;
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+}
+.label-container {
+  width: 100mm;
+  height: 40mm;
+  display: flex;
+  border: 1.5px solid #000;
+  overflow: hidden;
 }
 
-*{
-  box-sizing:border-box;
+/* Columns */
+.left-col {
+  width: 38mm;
+  height: 100%;
+  border-right: 1.5px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 2px;
 }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#fff;
-  color:#111827;
+.right-col {
+  width: 62mm;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.container{
-  width:100%;
-  border:2px solid #111827;
-  border-radius:12px;
-  overflow:hidden;
+/* Left Column elements */
+.company-name {
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* HEADER */
-.header{
-  background:#111827;
-  color:white;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:20px;
+.qr-code-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
-.company{
-  font-size:22px;
-  font-weight:bold;
-    color:#ef4444;
-
+.qr-code-wrapper img {
+  width: 22mm;
+  height: 22mm;
+  object-fit: contain;
 }
 
-.doc-title{
-  text-align:right;
+.colis-info {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
-.doc-title h1{
-  margin:0;
-  color:#ef4444;
-  font-size:28px;
+.pieces-text {
+  font-size: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* TRACKING */
-.tracking{
-  padding:15px;
-  text-align:center;
-  border-bottom:1px solid #ddd;
+.weight-text {
+  font-size: 8px;
+  font-weight: bold;
 }
 
-.tracking-label{
-  font-size:12px;
-  color:#666;
-  text-transform:uppercase;
+/* Right Column elements */
+.tracking-row {
+  height: 10mm;
+  background: #000;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1.5px solid #000;
 }
 
-.tracking-number{
-  font-size:24px;
-  font-weight:bold;
+.tracking-text {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
-/* BARCODE */
-.barcode{
-  text-align:center;
-  padding:15px;
-  border-bottom:1px solid #ddd;
+.receiver-row {
+  height: 13mm;
+  border-bottom: 1.5px solid #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  gap: 1px;
 }
 
-.barcode img{
-  width:100%;
-  max-width:500px;
+.receiver-name {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* GRID */
-.content{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:15px;
-  padding:15px;
+.receiver-phone {
+  font-size: 9px;
+  font-weight: bold;
+  text-align: center;
 }
 
-.card{
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:12px;
+.destination-row {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
 }
 
-.card-title{
-  font-size:12px;
-  font-weight:bold;
-  color:#ef4444;
-  margin-bottom:10px;
-  text-transform:uppercase;
+.city-box-wrapper {
+  width: 62%;
+  border-right: 1.5px solid #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1px;
 }
 
-.row{
-  margin-bottom:8px;
+.city-box {
+  border: 1px solid #000;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1px;
 }
 
-.label{
-  font-size:10px;
-  color:#666;
-  text-transform:uppercase;
+.city-title {
+  font-size: 5px;
+  color: #555;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: bold;
 }
 
-.value{
-  font-size:14px;
-  font-weight:600;
+.city-name {
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* SIGNATURE */
-.signatures{
-  display:flex;
-  justify-content:space-around;
-  padding:30px;
+.payment-date-wrapper {
+  width: 38%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 1px;
 }
 
-.sign-box{
-  width:250px;
-  text-align:center;
+.payment-status {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
 }
 
-.line{
-  border-top:2px solid #111827;
-  margin-bottom:8px;
-}
-
-.sign-title{
-  font-weight:bold;
-  font-size:13px;
+.print-date {
+  font-size: 7px;
+  font-weight: bold;
+  text-align: center;
 }
 </style>
-
 </head>
-
 <body>
-
-<div class="container">
-
-  <!-- HEADER -->
-  <div class="header">
-    <div class="company">
-  ${settings?.company_name || "COMPANY NAME"}
-</div>
-
-    <div class="doc-title">
-      <h1>BON DE COMMANDE</h1>
-      <div style="font-size:12px">
-        ${new Date(colis.created_at).toLocaleDateString("fr-FR")}
-      </div>
-    </div>
-  </div>
-
-  <!-- TRACKING -->
-  <div class="tracking">
-    <div class="tracking-label">Tracking Number</div>
-    <div class="tracking-number">
-      ${colis.tracking_number}
-    </div>
-  </div>
-
-  <!-- BARCODE -->
-  <div class="barcode">
-    <img src="${barcodeImg}" />
-  </div>
-
-  <!-- CONTENT -->
-  <div class="content">
-
-    <!-- DESTINATAIRE -->
-    <div class="card">
-      <div class="card-title">Destinataire</div>
-
-      <div class="row">
-        <div class="label">Nom</div>
-        <div class="value">${colis.receiver_name}</div>
-      </div>
-
-      <div class="row">
-        <div class="label">Téléphone</div>
-        <div class="value">${colis.receiver_phone}</div>
-      </div>
-
-      <div class="row">
-        <div class="label">Ville</div>
-        <div class="value">${colis.receiver_city}</div>
-      </div>
-    </div>
-
-    <!-- COLIS -->
-    <div class="card">
-      <div class="card-title">Colis</div>
-
-      <div class="row">
-        <div class="label">Description</div>
-        <div class="value">${colis.description || "-"}</div>
-      </div>
-
-      <div class="row">
-        <div class="label">Poids</div>
-        <div class="value">${colis.weight} KG</div>
-      </div>
-    </div>
-
-    <!-- LIVRAISON -->
-    <div class="card">
-      <div class="card-title">Livraison</div>
-
-      <div class="row">
-        <div class="label">Date</div>
-        <div class="value">
-          ${new Date(colis.created_at).toLocaleDateString("fr-FR")}
+<div class="label-container">
+    <!-- Left Column -->
+    <div class="left-col">
+        <div class="company-name">${companyName}</div>
+        <div class="qr-code-wrapper">
+            <img src="${qrImage}" class="qr">
         </div>
-      </div>
-
-      <div class="row">
-        <div class="label">Montant</div>
-        <div class="value">${colis.total_amount} DH</div>
-      </div>
-
-      <div class="row">
-        <div class="label">Tracking</div>
-        <div class="value">${colis.tracking_number}</div>
-      </div>
+        <div class="colis-info">
+            <div class="pieces-text">${piecesText}</div>
+            <div class="weight-text">${weightFormatted} (KG)</div>
+        </div>
     </div>
 
-  </div>
-
-
+    <!-- Right Column -->
+    <div class="right-col">
+        <div class="tracking-row">
+            <span class="tracking-text">${colis.tracking_number}</span>
+        </div>
+        <div class="receiver-row">
+            <div class="receiver-name">${colis.receiver_name}</div>
+            <div class="receiver-phone">${colis.receiver_phone}</div>
+        </div>
+        <div class="destination-row">
+            <div class="city-box-wrapper">
+                <div class="city-box">
+                    <div class="city-title">Pour les objets</div>
+                    <div class="city-name">${(colis.receiver_city || "").toUpperCase()}</div>
+                </div>
+            </div>
+            <div class="payment-date-wrapper">
+                <div class="payment-status">${paymentStatus}</div>
+                <div class="print-date">${dateFormatted}</div>
+            </div>
+        </div>
+    </div>
 </div>
-
 </body>
 </html>
-`);
+  `);
 
   doc.close();
 
   setTimeout(() => {
     iframe.contentWindow?.print();
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
   }, 300);
 }

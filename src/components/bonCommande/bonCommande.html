@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bon de Commande</title>
+    <link rel="stylesheet" href="bonCommande.css">
+</head>
+<body>
+
+<div class="label-container">
+    <!-- Left Column -->
+    <div class="left-col">
+        <div class="company-name">
+            {{company_name}}
+        </div>
+        <div class="qr-code-wrapper">
+            <img src="{{qrImage}}" class="qr">
+        </div>
+        <div class="colis-info">
+            <div class="pieces-text">
+                {{pieces}} SAC {{description}}
+            </div>
+            <div class="weight-text">
+                {{weight}} (KG)
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="right-col">
+        <div class="tracking-row">
+            <span class="tracking-text">{{tracking_number}}</span>
+        </div>
+        <div class="receiver-row">
+            <div class="receiver-name">{{receiver_name}}</div>
+            <div class="receiver-phone">{{receiver_phone}}</div>
+        </div>
+        <div class="destination-row">
+            <div class="city-box-wrapper">
+                <div class="city-box">
+                    <div class="city-title">Pour les objets</div>
+                    <div class="city-name">{{receiver_city}}</div>
+                </div>
+            </div>
+            <div class="payment-date-wrapper">
+                <div class="payment-status">{{payment}}</div>
+                <div class="print-date">{{date}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
