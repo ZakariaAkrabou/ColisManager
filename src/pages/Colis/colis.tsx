@@ -33,6 +33,7 @@ interface DbColis {
   receiver_region?: string;
   delivery_type: string;
   weight: number;
+  quantity?: number;
   total_amount: number;
   status: string;
   created_at?: string;
@@ -82,6 +83,7 @@ export default function Colis({
     type: normalizeColisType(item.delivery_type),
     deliveryType: item.delivery_type,
     weight: item.weight,
+    quantity: item.quantity || 1,
     totalPrice: item.total_amount,
     status: normalizeColisStatus(item.status),
     statusRaw: item.status,
@@ -207,7 +209,7 @@ export default function Colis({
               <input id="e-receiver" type="text" value="${colis.receiver}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
             </div>
           </div>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-4 gap-2">
             <div>
               <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Ville *</label>
               <input id="e-city" type="text" value="${colis.city}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
@@ -223,9 +225,14 @@ export default function Colis({
               <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Poids (kg)</label>
               <input id="e-weight" type="number" step="0.1" min="0.1" value="${colis.weight}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
             </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Quantité</label>
+              <input id="e-quantity" type="number" step="1" min="1" value="${colis.quantity || 1}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
+            </div>
           </div>
-          <div>
-            <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Statut</label>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-gray-400 dark:text-slate-500 mb-1 uppercase tracking-wider">Statut</label>
             <select id="e-status" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
               <option value="En attente" ${colis.status === "En attente" ? "selected" : ""} class="dark:bg-slate-900">En attente</option>
               <option value="En transit" ${colis.status === "En transit" ? "selected" : ""} class="dark:bg-slate-900">En transit</option>
@@ -288,6 +295,9 @@ export default function Colis({
         const weight = parseFloat(
           (document.getElementById("e-weight") as HTMLInputElement).value,
         );
+        const quantity = parseInt(
+          (document.getElementById("e-quantity") as HTMLInputElement).value,
+        );
         const totalPrice = parseFloat(
           (document.getElementById("e-price") as HTMLInputElement).value,
         );
@@ -297,12 +307,13 @@ export default function Colis({
           !city ||
           !status ||
           isNaN(weight) ||
+          isNaN(quantity) ||
           isNaN(totalPrice)
         ) {
           Swal.showValidationMessage(t("colis.requiredFields"));
           return false;
         }
-        return { sender, receiver, city, type, status, weight, totalPrice };
+        return { sender, receiver, city, type, status, weight, quantity, totalPrice };
       },
     }).then((result) => {
       if (result.isConfirmed) {
@@ -315,6 +326,7 @@ export default function Colis({
             delivery_type: result.value.type,
             status: result.value.status,
             weight: result.value.weight,
+            quantity: result.value.quantity,
             total_amount: result.value.totalPrice,
           },
         })
@@ -538,6 +550,7 @@ export default function Colis({
                 </th>
                 <th className="px-6 py-4 text-center">{t("colis.statusLabel")}</th>
                 <th className="px-6 py-4 text-right">{t("colis.weight")}</th>
+                <th className="px-6 py-4 text-right">Quantité</th>
                 <th className="px-6 py-4 text-right">
                   {t("colis.totalPrice")}
                 </th>
@@ -614,12 +627,16 @@ export default function Colis({
                       </span>
                     </td>
 
-                    {/* Poids */}
                     <td className="px-6 py-4 text-right font-semibold text-gray-600 dark:text-slate-300">
                       {colis.weight.toFixed(1)}{" "}
                       <span className="text-xs text-gray-400 dark:text-slate-500 font-normal">
                         kg
                       </span>
+                    </td>
+
+                    {/* Quantité */}
+                    <td className="px-6 py-4 text-right font-semibold text-gray-600 dark:text-slate-300">
+                      {colis.quantity || 1}
                     </td>
 
                     {/* Total Price */}

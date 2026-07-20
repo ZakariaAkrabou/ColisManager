@@ -9,6 +9,7 @@ export interface ColisItem {
     city: string;
     type: ColisType;
     weight: number;
+    quantity?: number;
     totalPrice: number;
     status: ColisStatus;
     date: string;

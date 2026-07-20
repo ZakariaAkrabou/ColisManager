@@ -68,6 +68,7 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
             ReceiverFullAddress,
             ReceiverClientID,
             Weight,
+            Quantity,
             Description,
             DeliveryType,
             TotalAmount,
@@ -76,7 +77,7 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
             Image2,
             Image3
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING ColisID
         "#,
     )
@@ -91,6 +92,7 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
     .bind(payload.receiver.address.trim())
     .bind(receiver_client_id)
     .bind(payload.weight)
+    .bind(payload.quantity)
     .bind(optional_trim(payload.description.as_deref()))
     .bind(delivery_type)
     .bind(calculated_amount)
@@ -154,6 +156,7 @@ pub async fn update_colis(pool: &SqlitePool, payload: UpdateColisRequest) -> Res
             ReceiverLocationID = ?,
             DeliveryType = ?,
             Weight = ?,
+            Quantity = ?,
             Status = ?,
             TotalAmount = ?,
             UpdatedAt = CURRENT_TIMESTAMP
@@ -165,6 +168,7 @@ pub async fn update_colis(pool: &SqlitePool, payload: UpdateColisRequest) -> Res
     .bind(receiver_location_id)
     .bind(delivery_type)
     .bind(payload.weight)
+    .bind(payload.quantity)
     .bind(status)
     .bind(payload.total_amount)
     .bind(payload.id)
@@ -384,6 +388,7 @@ const COLIS_SELECT_BASE_SQL: &str = r#"
         c.ReceiverFullAddress AS ReceiverFullAddress,
         c.ReceiverClientID AS ReceiverClientID,
         c.Weight AS Weight,
+        c.Quantity AS Quantity,
         c.Description AS Description,
         c.DeliveryType AS DeliveryType,
         c.TotalAmount AS TotalAmount,
@@ -411,6 +416,7 @@ const COLIS_SELECT_SQL: &str = r#"
         c.ReceiverFullAddress AS ReceiverFullAddress,
         c.ReceiverClientID AS ReceiverClientID,
         c.Weight AS Weight,
+        c.Quantity AS Quantity,
         c.Description AS Description,
         c.DeliveryType AS DeliveryType,
         c.TotalAmount AS TotalAmount,

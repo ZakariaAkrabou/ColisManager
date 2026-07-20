@@ -175,6 +175,16 @@ export function DetailColisModal({ colis, isOpen, onClose }: DetailColisProps) {
                       {colis.weight} <span className="text-xs font-normal text-gray-400 dark:text-slate-500">kg</span>
                     </span>
                   </div>
+                  {/* Quantité */}
+                  <div className="flex items-center justify-between px-3.5 py-2.5">
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-slate-400">
+                      <Package size={13} />
+                      <span className="text-xs font-medium">Quantité</span>
+                    </div>
+                    <span className="text-sm font-bold text-gray-800 dark:text-slate-200">
+                      {colis.quantity || 1}
+                    </span>
+                  </div>
                   {/* Date */}
                   <div className="flex items-center justify-between px-3.5 py-2.5">
                     <div className="flex items-center gap-2 text-gray-500 dark:text-slate-400">

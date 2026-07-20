@@ -72,6 +72,7 @@ interface CreateColisPayload {
     save_client: boolean;
   };
   weight: number;
+  quantity: number;
   description?: string;
   delivery_type: string;
   total_amount: number;
@@ -336,6 +337,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
 
   // Colis details
   const [weight, setWeight] = useState<number | "">("");
+  const [quantity, setQuantity] = useState<number | "">(1);
   const [description, setDescription] = useState("");
   const [images, setImages] = useState<(File | null)[]>([null, null, null]);
 
@@ -426,6 +428,8 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     receiver.city.trim() &&
     typeof weight === "number" &&
     weight > 0 &&
+    typeof quantity === "number" &&
+    quantity > 0 &&
     trackingNo.trim() !== "";
 
   const buildPayload = (): CreateColisPayload => ({
@@ -448,6 +452,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
       save_client: saveReceiver,
     },
     weight: typeof weight === "number" ? weight : 0,
+    quantity: typeof quantity === "number" ? quantity : 1,
     description: description.trim() || undefined,
     delivery_type: deliveryType,
     total_amount: totalPrice,
@@ -809,7 +814,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
         <div className="flex flex-col gap-5">
           {/* DÉTAILS DU COLIS */}
           <Section icon={Scale} title={t("addColis.parcelDetails")}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Field label={t("colis.tracking")} required>
                 <div className="flex gap-2">
                   <input
@@ -847,6 +852,21 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                     )
                   }
                   placeholder="Ex: 15"
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="Quantité" required>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={quantity}
+                  onChange={(e) =>
+                    setQuantity(
+                      e.target.value === "" ? "" : parseInt(e.target.value, 10),
+                    )
+                  }
+                  placeholder="Ex: 1"
                   className={inputCls}
                 />
               </Field>
