@@ -1,6 +1,7 @@
 import { Home, Package, Users, MapPin, FileText, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
+import { useState, useEffect } from "react";
+import { getVersion } from "@tauri-apps/api/app";
 const navItems = [
   { id: "dashboard", labelKey: "sidebar.dashboard", icon: Home },
   { id: "colis", labelKey: "sidebar.colis", icon: Package },
@@ -23,6 +24,11 @@ export default function Sidebar({
   onItemClick,
 }: SidebarProps) {
   const { t } = useTranslation();
+  const [appVersion, setAppVersion] = useState<string>("");
+
+  useEffect(() => {
+    getVersion().then(setAppVersion).catch(console.error);
+  }, []);
 
   return (
     <aside
@@ -91,6 +97,11 @@ export default function Sidebar({
           <Settings className="mr-3 w-5 h-5 shrink-0" />
           {t("sidebar.settings")}
         </button>
+        {appVersion && (
+          <div className="mt-4 text-center text-xs text-gray-400 dark:text-slate-500 font-medium">
+            v{appVersion}
+          </div>
+        )}
       </div>
     </aside>
   );

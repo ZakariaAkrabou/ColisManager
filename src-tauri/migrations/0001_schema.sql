@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS Colis (
     ReceiverClientID INTEGER,
     
     Weight REAL NOT NULL,
+    Quantity INTEGER NOT NULL DEFAULT 1,
     Description TEXT NULL,
     
     Image1 BLOB,

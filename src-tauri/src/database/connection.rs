@@ -50,6 +50,17 @@ pub async fn init_db(app_handle: &AppHandle) -> Result<AppState, String> {
             .map_err(|e| e.to_string())?;
     }
 
+    let quantity_exists: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM pragma_table_info('Colis') WHERE name='Quantity';")
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if quantity_exists == 0 {
+        pool.execute("ALTER TABLE Colis ADD COLUMN Quantity INTEGER NOT NULL DEFAULT 1;")
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+
     pool.execute("INSERT OR IGNORE INTO Locations (LocationID, Country, City, Region) VALUES (1, 'Morocco', 'Casablanca', 'Casablanca-Settat');")
         .await
         .map_err(|e| e.to_string())?;

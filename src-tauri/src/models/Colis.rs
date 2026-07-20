@@ -33,6 +33,8 @@ pub struct Colis {
     pub receiver_client_id: Option<i64>,
     #[sqlx(rename = "Weight")]
     pub weight: f64,
+    #[sqlx(rename = "Quantity")]
+    pub quantity: i32,
     #[sqlx(rename = "Description")]
     pub description: Option<String>,
     #[sqlx(rename = "DeliveryType")]
@@ -74,6 +76,7 @@ pub struct CreateColisRequest {
     pub sender: PartyPayload,
     pub receiver: ReceiverPayload,
     pub weight: f64,
+    pub quantity: i32,
     pub description: Option<String>,
     pub delivery_type: String,
     pub total_amount: f64,
@@ -92,6 +95,7 @@ pub struct UpdateColisRequest {
     pub delivery_type: String,
     pub status: String,
     pub weight: f64,
+    pub quantity: i32,
     pub total_amount: f64,
     pub image_1: Option<Vec<u8>>,
     pub image_2: Option<Vec<u8>>,

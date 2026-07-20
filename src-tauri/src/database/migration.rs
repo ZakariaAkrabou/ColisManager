@@ -40,6 +40,7 @@ pub fn get_migrations() -> Vec<Migration> {
                     ReceiverFullAddress TEXT NOT NULL,
                     ReceiverClientID INTEGER,
                     Weight REAL NOT NULL,
+                    Quantity INTEGER NOT NULL DEFAULT 1,
                     Description TEXT NULL,
                     Image1 BLOB,
                     Image2 BLOB,
@@ -87,6 +88,14 @@ pub fn get_migrations() -> Vec<Migration> {
             description: "seed_static_locations",
             sql: r#"
                 INSERT OR IGNORE INTO Locations (LocationID, Country, City, Region) VALUES (1, 'Morocco', 'Casablanca', 'Casablanca-Settat');
+            "#,
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 3,
+            description: "add_quantity_to_colis",
+            sql: r#"
+                ALTER TABLE Colis ADD COLUMN Quantity INTEGER NOT NULL DEFAULT 1;
             "#,
             kind: MigrationKind::Up,
         },
