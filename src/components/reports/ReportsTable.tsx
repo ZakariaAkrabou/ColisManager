@@ -12,6 +12,7 @@ import { generateBonCommande } from "../bonCommande/generateBonCommande";
 
 
 export interface ReportColis {
+  quantity: number;
   id: number;
   tracking_number: string;
 
@@ -183,10 +184,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
               {data.map((colis) => {
                 const statusKey = normalizeStatus(colis.status);
                 const cfg = statusConfig[statusKey];
-                const city = colis.receiver_city || colis.receiver_region || "—"
-                
-                  ? colis.created_at.split("T")[0]
-                  : "—";
+           
 
                 return (
 
@@ -222,7 +220,7 @@ const ReportsTable = ({ data, stats }: ReportsTableProps) => {
                     <td className="px-5 py-3.5 text-gray-600 dark:text-slate-400">
                       <div className="flex items-center gap-1.5">
                         <MapPin size={12} className="text-gray-400 shrink-0" />
-                        {city}
+                        {colis.receiver_city || colis.receiver_region || "—" }
                       </div>
                     </td>
 

@@ -260,7 +260,7 @@ body{
       </div>
           <div class="row">
         <span class="label">Number De Colis:</span>
-        <span class="value"> 1 </span>
+        <span class="value"> ${colis.quantity || 1 } </span>
       </div>
     
       <div class="row">

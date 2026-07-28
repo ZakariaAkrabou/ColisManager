@@ -45,25 +45,23 @@ export async function generateBonCommande(colis: any) {
   size: 100mm 40mm;
   margin: 0;
 }
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+
+html,
 body {
-  width: 100mm;
-  height: 40mm;
-  background: #fff;
-  color: #000;
-  font-family: Arial, Helvetica, sans-serif;
-  overflow: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100mm;
+    height: 40mm;
+    overflow: hidden;
 }
+
 .label-container {
-  width: 100mm;
-  height: 40mm;
-  display: flex;
-  border: 1.5px solid #000;
-  overflow: hidden;
+position: absolute ;
+    width: 100mm;
+    height: 40mm;
+    border: 1px solid #000;
+    display: flex;
+    box-sizing: border-box;
 }
 
 /* Columns */
@@ -87,7 +85,7 @@ body {
 
 /* Left Column elements */
 .company-name {
-  font-size: 8px;
+  font-size: 14px;
   font-weight: 900;
   text-transform: uppercase;
   text-align: center;
@@ -155,7 +153,7 @@ body {
   height: 13mm;
   border-bottom: 1.5px solid #000;
   display: flex;
-  flex-direction: column;
+  flex-direction: Row;
   justify-content: center;
   align-items: center;
   padding: 2px;
@@ -195,7 +193,6 @@ body {
 }
 
 .city-box {
-  border: 1px solid #000;
   width: 100%;
   height: 100%;
   display: flex;
@@ -214,8 +211,8 @@ body {
 }
 
 .city-name {
-  font-size: 14px;
-  font-weight: 900;
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
   text-align: center;
   width: 100%;
@@ -223,7 +220,15 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
+.quantity-text {
+  font-size: 8px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .payment-date-wrapper {
   width: 38%;
   display: flex;
@@ -255,10 +260,7 @@ body {
         <div class="qr-code-wrapper">
             <img src="${qrImage}" class="qr">
         </div>
-        <div class="colis-info">
-            <div class="pieces-text">${piecesText}</div>
-            <div class="weight-text">${weightFormatted} (KG)</div>
-        </div>
+       
     </div>
 
     <!-- Right Column -->
@@ -269,16 +271,22 @@ body {
         <div class="receiver-row">
             <div class="receiver-name">${colis.receiver_name}</div>
             <div class="receiver-phone">${colis.receiver_phone}</div>
+                                <div class="city-name">${(colis.receiver_city || "").toUpperCase()}</div>
+
         </div>
         <div class="destination-row">
             <div class="city-box-wrapper">
                 <div class="city-box">
-                    <div class="city-title">Pour les objets</div>
-                    <div class="city-name">${(colis.receiver_city || "").toUpperCase()}</div>
-                </div>
+ <div class="colis-info">
+            <div class="pieces-text">${piecesText}</div>
+            <div class="weight-text">${weightFormatted} (KG)</div>
+            <div class="quantity-text">quantité: ${colis.quantity || 111}</div>
+        </div>                </div>
             </div>
             <div class="payment-date-wrapper">
-                <div class="payment-status">${paymentStatus}</div>
+            
+            <div class="payment-status">${paymentStatus}</div>
+            <div class="payment-status">PAYE</div>
                 <div class="print-date">${dateFormatted}</div>
             </div>
         </div>
