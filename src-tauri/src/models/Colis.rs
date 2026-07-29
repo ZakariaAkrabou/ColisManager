@@ -43,6 +43,8 @@ pub struct Colis {
     pub total_amount: f64,
     #[sqlx(rename = "Status")]
     pub status: String,
+    #[sqlx(rename = "Paid")]
+    pub paid: bool,
     #[sqlx(rename = "Notes")]
     pub notes: Option<String>,
     #[sqlx(rename = "CreatedAt")]
@@ -81,6 +83,7 @@ pub struct CreateColisRequest {
     pub delivery_type: String,
     pub total_amount: f64,
     pub notes: Option<String>,
+    pub paid: bool,
     pub image_1: Option<Vec<u8>>,
     pub image_2: Option<Vec<u8>>,
     pub image_3: Option<Vec<u8>>,
@@ -97,6 +100,7 @@ pub struct UpdateColisRequest {
     pub weight: f64,
     pub quantity: i32,
     pub total_amount: f64,
+    pub paid: bool,
     pub image_1: Option<Vec<u8>>,
     pub image_2: Option<Vec<u8>>,
     pub image_3: Option<Vec<u8>>,

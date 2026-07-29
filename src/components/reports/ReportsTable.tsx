@@ -33,6 +33,7 @@ export interface ReportColis {
 
   weight: number;
   total_amount: number;
+  paid?: boolean;
 
   status: string;
   created_at: string;

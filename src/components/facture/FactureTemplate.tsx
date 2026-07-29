@@ -286,7 +286,7 @@ body{
   <div class="footer">
 
     <div class="paid">
-      PAYÉ
+      ${colis.paid ? "PAYÉ" : "NON PAYÉ"}
     </div>
 
     <div class="thankyou">

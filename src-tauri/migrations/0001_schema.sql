@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS Colis (
     
     DeliveryType TEXT NOT NULL CHECK(DeliveryType IN ('agency', 'home')),
     TotalAmount REAL NOT NULL,
+    Paid BOOLEAN NOT NULL DEFAULT 0,
     
     Status TEXT NOT NULL DEFAULT 'pending' CHECK(Status IN ('pending', 'transit', 'delivered', 'cancelled')),
     Notes TEXT,

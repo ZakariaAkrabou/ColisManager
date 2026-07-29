@@ -203,6 +203,15 @@ export function DetailColisModal({ colis, isOpen, onClose }: DetailColisProps) {
                       {colis.totalPrice.toFixed(2)}<span className="text-xs font-bold ml-1">DH</span>
                     </span>
                   </div>
+                  <div className="flex items-center justify-between px-3.5 py-2.5">
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-slate-400">
+                      <DollarSign size={13} />
+                      <span className="text-xs font-medium">Paiement</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold ${colis.paid ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" : "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"}`}>
+                      {colis.paid ? "Payé" : "Non payé"}
+                    </span>
+                  </div>
                 </div>
               </div>
 

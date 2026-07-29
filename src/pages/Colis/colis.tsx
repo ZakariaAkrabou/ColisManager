@@ -36,6 +36,7 @@ interface DbColis {
   quantity?: number;
   total_amount: number;
   status: string;
+  paid?: boolean;
   created_at?: string;
 }
 
@@ -87,6 +88,7 @@ export default function Colis({
     totalPrice: item.total_amount,
     status: normalizeColisStatus(item.status),
     statusRaw: item.status,
+    paid: Boolean(item.paid),
     date: item.created_at ? item.created_at.split("T")[0] : new Date().toISOString().split("T")[0],
   });
 
@@ -245,6 +247,10 @@ export default function Colis({
             <input id="e-price" type="number" step="0.01" min="0" value="${colis.totalPrice}" class="w-full p-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange">
           </div>
         </div>
+        <div class="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-slate-700 p-2.5">
+          <input id="e-paid" type="checkbox" ${colis.paid ? "checked" : ""} class="h-4 w-4 rounded accent-brand-orange">
+          <label for="e-paid" class="text-xs font-semibold text-gray-600 dark:text-slate-300">Payé</label>
+        </div>
       `,
       showCancelButton: true,
       confirmButtonText: t("common.save"),
@@ -301,6 +307,7 @@ export default function Colis({
         const totalPrice = parseFloat(
           (document.getElementById("e-price") as HTMLInputElement).value,
         );
+        const paid = (document.getElementById("e-paid") as HTMLInputElement).checked;
         if (
           !sender ||
           !receiver ||
@@ -313,7 +320,7 @@ export default function Colis({
           Swal.showValidationMessage(t("colis.requiredFields"));
           return false;
         }
-        return { sender, receiver, city, type, status, weight, quantity, totalPrice };
+        return { sender, receiver, city, type, status, weight, quantity, totalPrice, paid };
       },
     }).then((result) => {
       if (result.isConfirmed) {
@@ -328,6 +335,7 @@ export default function Colis({
             weight: result.value.weight,
             quantity: result.value.quantity,
             total_amount: result.value.totalPrice,
+            paid: result.value.paid,
           },
         })
           .then((updatedDbColis) => {

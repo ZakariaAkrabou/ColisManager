@@ -77,6 +77,7 @@ interface CreateColisPayload {
   delivery_type: string;
   total_amount: number;
   notes?: string;
+  paid: boolean;
   image_1?: number[] | null;
   image_2?: number[] | null;
   image_3?: number[] | null;
@@ -92,6 +93,7 @@ type ColisListItem = {
   weight: number;
   totalPrice: number;
   status: string;
+  paid: boolean;
   date: string;
 };
 
@@ -348,6 +350,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
 
   // Notes
   const [notes, setNotes] = useState("");
+  const [isPaid, setIsPaid] = useState(false);
 
   // Computed
   const pricePerKg = deliveryType === "agence" ? shippingSettings.agencyDeliveryFee : shippingSettings.homeDeliveryFee;
@@ -457,6 +460,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     delivery_type: deliveryType,
     total_amount: totalPrice,
     notes: notes.trim() || undefined,
+    paid: isPaid,
   });
 
   const mapDbColisToListItem = (item: any): ColisListItem => ({
@@ -469,6 +473,7 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
     weight: item.weight,
     totalPrice: item.total_amount,
     status: item.status || "En attente",
+    paid: Boolean(item.paid),
     date: item.created_at ? item.created_at.split("T")[0] : new Date().toISOString().split("T")[0],
   });
 
@@ -880,6 +885,17 @@ export default function AddColisPage({ onBack, onSave }: AddColisPageProps) {
                 className={inputCls}
               />
             </Field>
+            <label className="flex items-center gap-2 cursor-pointer w-fit rounded-lg border border-gray-200 dark:border-slate-700 px-3 py-2 bg-gray-50 dark:bg-slate-800">
+              <input
+                type="checkbox"
+                checked={isPaid}
+                onChange={(e) => setIsPaid(e.target.checked)}
+                className="w-3.5 h-3.5 rounded accent-brand-orange cursor-pointer dark:bg-slate-850 dark:border-slate-700"
+              />
+              <span className="text-xs font-semibold text-gray-700 dark:text-slate-300">
+                {isPaid ? "Payé" : "Non payé"}
+              </span>
+            </label>
             <Field label={t("addColis.photos")}>
               <div className="flex items-center gap-2">
                 {images.map((file, idx) => (

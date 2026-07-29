@@ -72,12 +72,13 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
             Description,
             DeliveryType,
             TotalAmount,
+            Paid,
             Notes,
             Image1,
             Image2,
             Image3
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         RETURNING ColisID
         "#,
     )
@@ -96,6 +97,7 @@ pub async fn create_colis(pool: &SqlitePool, payload: CreateColisRequest) -> Res
     .bind(optional_trim(payload.description.as_deref()))
     .bind(delivery_type)
     .bind(calculated_amount)
+    .bind(payload.paid)
     .bind(optional_trim(payload.notes.as_deref()))
     .bind(payload.image_1.as_deref())
     .bind(payload.image_2.as_deref())
@@ -159,6 +161,7 @@ pub async fn update_colis(pool: &SqlitePool, payload: UpdateColisRequest) -> Res
             Quantity = ?,
             Status = ?,
             TotalAmount = ?,
+            Paid = ?,
             UpdatedAt = CURRENT_TIMESTAMP
         WHERE ColisID = ?
         "#
@@ -171,6 +174,7 @@ pub async fn update_colis(pool: &SqlitePool, payload: UpdateColisRequest) -> Res
     .bind(payload.quantity)
     .bind(status)
     .bind(payload.total_amount)
+    .bind(payload.paid)
     .bind(payload.id)
     .execute(&mut *tx)
     .await
@@ -393,6 +397,7 @@ const COLIS_SELECT_BASE_SQL: &str = r#"
         c.DeliveryType AS DeliveryType,
         c.TotalAmount AS TotalAmount,
         c.Status AS Status,
+        c.Paid AS Paid,
         c.Notes AS Notes,
         c.CreatedAt AS CreatedAt
     FROM Colis c
@@ -421,6 +426,7 @@ const COLIS_SELECT_SQL: &str = r#"
         c.DeliveryType AS DeliveryType,
         c.TotalAmount AS TotalAmount,
         c.Status AS Status,
+        c.Paid AS Paid,
         c.Notes AS Notes,
         c.CreatedAt AS CreatedAt
     FROM Colis c

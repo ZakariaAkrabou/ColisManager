@@ -5,7 +5,9 @@ import i18n from "../../i18n";
 export type EditableColisFields = Pick<
   ColisItem,
   "sender" | "receiver" | "city" | "type"
->;
+> & {
+  paid: boolean;
+};
 
 export async function showEditColisModal(
   colis: ColisItem,
@@ -38,6 +40,10 @@ export async function showEditColisModal(
 							</select>
 						</div>
 					</div>
+					<div class="flex items-center gap-2 rounded-lg border border-gray-200 p-2.5">
+						<input type="checkbox" id="edit-paid" class="h-4 w-4 rounded accent-brand-orange" ${colis.paid ? "checked" : ""}>
+						<label for="edit-paid" class="text-sm text-gray-700">Payé</label>
+					</div>
 				</div>
 			</div>
 		`,
@@ -58,13 +64,15 @@ export async function showEditColisModal(
       ).value.trim();
       const type = (document.getElementById("edit-type") as HTMLSelectElement)
         .value as ColisItem["type"];
+      const paid = (document.getElementById("edit-paid") as HTMLInputElement)
+        .checked;
 
       if (!sender || !receiver || !city) {
         Swal.showValidationMessage(i18n.t("colis.requiredFields"));
         return false;
       }
 
-      const payload: EditableColisFields = { sender, receiver, city, type };
+      const payload: EditableColisFields = { sender, receiver, city, type, paid };
       return payload;
     },
   });

@@ -12,5 +12,6 @@ export interface ColisItem {
     quantity?: number;
     totalPrice: number;
     status: ColisStatus;
+    paid: boolean;
     date: string;
 }

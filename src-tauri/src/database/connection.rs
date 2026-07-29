@@ -61,6 +61,17 @@ pub async fn init_db(app_handle: &AppHandle) -> Result<AppState, String> {
             .map_err(|e| e.to_string())?;
     }
 
+    let paid_exists: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM pragma_table_info('Colis') WHERE name='Paid';")
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if paid_exists == 0 {
+        pool.execute("ALTER TABLE Colis ADD COLUMN Paid BOOLEAN NOT NULL DEFAULT 0;")
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+
     pool.execute("INSERT OR IGNORE INTO Locations (LocationID, Country, City, Region) VALUES (1, 'Morocco', 'Casablanca', 'Casablanca-Settat');")
         .await
         .map_err(|e| e.to_string())?;
