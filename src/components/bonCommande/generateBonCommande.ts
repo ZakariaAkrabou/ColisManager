@@ -64,16 +64,16 @@ position: absolute ;
     box-sizing: border-box;
 }
 
-/* Columns */
-.left-col {
-  width: 38mm;
-  height: 100%;
-  border-right: 1.5px solid #000;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2px 2px;
+/* Columns */.left-col {
+    width: 38mm;
+    height: 100%;
+    border-left: 1.5px solid #000;
+    border-right: 1.5px solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1mm;
+    box-sizing: border-box;
 }
 
 .right-col {
@@ -100,13 +100,21 @@ position: absolute ;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
 }
 
 .qr-code-wrapper img {
-  width: 22mm;
-  height: 22mm;
+  width: 18mm;
+  height: 18mm;
   object-fit: contain;
+}
+.colis-info_left {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  justify-content: space-between;
+  
+  gap: 2px;
 }
 
 .colis-info {
@@ -114,7 +122,7 @@ position: absolute ;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 
 .pieces-text {
@@ -127,15 +135,17 @@ position: absolute ;
 }
 
 .weight-text {
-  font-size: 8px;
+  font-size: 7px;
   font-weight: bold;
+  display: flex;
+  flex-direction: row;
 }
 
 /* Right Column elements */
 .tracking-row {
   height: 10mm;
-  background: #000;
-  color: #fff;
+  color: #000;
+  background: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -203,7 +213,7 @@ position: absolute ;
 }
 
 .city-title {
-  font-size: 5px;
+  font-size: 7px;
   color: #555;
   text-transform: uppercase;
   text-align: center;
@@ -221,13 +231,9 @@ position: absolute ;
   text-overflow: ellipsis;
 }
 .quantity-text {
-  font-size: 8px;
+  font-size: 7px;
   font-weight: bold;
   text-align: center;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .payment-date-wrapper {
   width: 38%;
@@ -259,34 +265,41 @@ position: absolute ;
         <div class="company-name">${companyName}</div>
         <div class="qr-code-wrapper">
             <img src="${qrImage}" class="qr">
-        </div>
+            </div>
+            <div class="colis-info_left"> 
+            <span class="weight-text">${weightFormatted} (KG)</span>
+            <span class="quantity-text">QTT: ${colis.quantity || 111}</span>
+            </div>
        
     </div>
 
     <!-- Right Column -->
     <div class="right-col">
         <div class="tracking-row">
-            <span class="tracking-text">${colis.tracking_number}</span>
-        </div>
+          <span class="full_address">${colis.receiver_full_address}</span>
+                          </div>
         <div class="receiver-row">
-            <div class="receiver-name">${colis.receiver_name}</div>
-            <div class="receiver-phone">${colis.receiver_phone}</div>
-                                <div class="city-name">${(colis.receiver_city || "").toUpperCase()}</div>
+         <span class="city-name">${(colis.receiver_country || "").toUpperCase()}</span>
+                       <span class="city-name">${(colis.receiver_city || "").toUpperCase()}</span>
+
+    
+          
 
         </div>
         <div class="destination-row">
             <div class="city-box-wrapper">
                 <div class="city-box">
  <div class="colis-info">
+   <div class="receiver-name">${colis.receiver_name}</div>
+            <div class="receiver-phone">${colis.receiver_phone}</div>
             <div class="pieces-text">${piecesText}</div>
-            <div class="weight-text">${weightFormatted} (KG)</div>
-            <div class="quantity-text">quantité: ${colis.quantity || 111}</div>
         </div>                </div>
             </div>
             <div class="payment-date-wrapper">
             
             <div class="payment-status">${paymentStatus}</div>
-            <div class="payment-status">PAYE</div>
+            <div class="payment-status">      ${colis.paid ? "PAYÉ" : "NON PAYÉ"}
+</div>
                 <div class="print-date">${dateFormatted}</div>
             </div>
         </div>
