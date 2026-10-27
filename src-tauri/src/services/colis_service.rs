@@ -195,6 +195,46 @@ pub async fn delete_colis(pool: &SqlitePool, id: i64) -> Result<(), String> {
     Ok(())
 }
 
+pub async fn delete_multiple_colis(pool: &SqlitePool, ids: Vec<i64>) -> Result<(), String> {
+    if ids.is_empty() {
+        return Ok(());
+    }
+    let mut tx = pool.begin().await.map_err(|e| e.to_string())?;
+    for id in ids {
+        sqlx::query("DELETE FROM StatusHistory WHERE ColisID = ?")
+            .bind(id)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        sqlx::query("DELETE FROM Colis WHERE ColisID = ?")
+            .bind(id)
+            .execute(&mut *tx)
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+    tx.commit().await.map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+pub async fn delete_all_colis(pool: &SqlitePool) -> Result<(), String> {
+    let mut tx = pool.begin().await.map_err(|e| e.to_string())?;
+
+    sqlx::query("DELETE FROM StatusHistory")
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    sqlx::query("DELETE FROM Colis")
+        .execute(&mut *tx)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    tx.commit().await.map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
 pub async fn get_colis_images(pool: &SqlitePool, id: i64) -> Result<ColisImages, String> {
     sqlx::query_as::<_, ColisImages>(
         "SELECT Image1, Image2, Image3 FROM Colis WHERE ColisID = ?"

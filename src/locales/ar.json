@@ -232,6 +232,19 @@
     "typeLabel": "النوع",
     "weight": "الوزن",
     "totalPrice": "السعر الإجمالي",
+    "restart": "إعادة تعيين (Restart)",
+    "restartConfirmTitle": "إعادة التعيين / Restart؟",
+    "restartConfirmText": "سيتم إنشاء نسخة احتياطية لقاعدة البيانات تلقائياً، ثم حذف جميع الطرود نهائياً. هل أنت متأكد؟",
+    "restartConfirmButton": "نعم، إعادة التعيين",
+    "restartSuccessTitle": "تمت العملية بنجاح",
+    "restartSuccessText": "تم إنشاء النسخة الاحتياطية وحذف جميع الطرود بنجاح.",
+    "selectedCount": "{{count}} محدد",
+    "deleteSelected": "حذف المحدد",
+    "deleteSelectedConfirmTitle": "حذف الطرود المحددة؟",
+    "deleteSelectedConfirmText": "سيتم حذف {{count}} طرد بشكل نهائي.",
+    "deleteSelectedSuccess": "تم حذف الطرود المحددة بنجاح.",
+    "selectAll": "تحديد الكل",
+    "deselectAll": "إلغاء تحديد الكل",
     "detailsTitle": "تفاصيل الطرد",
     "editTitle": "تعديل الطرد",
     "requiredFields": "يرجى تعبئة جميع الحقول المطلوبة.",
@@ -303,7 +316,12 @@
     "restoreSuccess": "تم استرجاع النسخة الاحتياطية",
     "deleteSuccess": "تم حذف النسخة الاحتياطية",
     "restoreConfirm": "استرجاع النسخة؟",
-    "deleteConfirm": "حذف النسخة؟"
+    "deleteConfirm": "حذف النسخة؟",
+    "rename": "إعادة التسمية",
+    "renameTitle": "إعادة تسمية النسخة الاحتياطية",
+    "renamePlaceholder": "الاسم الجديد...",
+    "renameSuccess": "تمت إعادة تسمية النسخة الاحتياطية بنجاح",
+    "customName": "اسم النسخة الاحتياطية (اختياري)"
   }
   }
 

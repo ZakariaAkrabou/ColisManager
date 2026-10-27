@@ -13,12 +13,52 @@ import {
   MapPin,
   TrendingUp,
   Plus,
+  RotateCcw,
+  Check,
+  Minus,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import type { ColisItem, ColisType, ColisStatus } from "../../types/colis";
 import { DetailColisModal } from "../../components/colis/detailColis";
+
+function ModernCheckbox({
+  checked,
+  indeterminate = false,
+  onChange,
+  ariaLabel,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+  onChange: () => void;
+  ariaLabel?: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={indeterminate ? "mixed" : checked}
+      aria-label={ariaLabel}
+      onClick={(e) => {
+        e.stopPropagation();
+        onChange();
+      }}
+      className="inline-flex items-center justify-center p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange cursor-pointer group"
+    >
+      <div
+        className={`w-4.5 h-4.5 rounded-[6px] flex items-center justify-center transition-all duration-200 border ${
+          checked || indeterminate
+            ? "bg-gradient-to-tr from-brand-orange to-amber-500 border-transparent text-white shadow-xs shadow-orange-500/30 scale-100"
+            : "bg-white dark:bg-slate-800/90 border-gray-300 dark:border-slate-600 group-hover:border-brand-orange/60 group-hover:bg-orange-50/40 dark:group-hover:bg-slate-700/60"
+        } active:scale-90`}
+      >
+        {checked && <Check size={12} strokeWidth={3} className="text-white animate-in zoom-in-75 duration-150" />}
+        {!checked && indeterminate && <Minus size={12} strokeWidth={3} className="text-white animate-in zoom-in-75 duration-150" />}
+      </div>
+    </button>
+  );
+}
 
 type LocalColisItem = ColisItem & { statusRaw?: string; deliveryType?: string };
 
@@ -59,6 +99,9 @@ export default function Colis({
   const [selectedCity, setSelectedCity] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDetailColis, setSelectedDetailColis] = useState<LocalColisItem | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isRestarting, setIsRestarting] = useState(false);
+  const [isDeletingSelected, setIsDeletingSelected] = useState(false);
 
   const normalizeColisStatus = (status: string): ColisStatus => {
     const value = status?.toLowerCase();
@@ -386,6 +429,11 @@ export default function Colis({
       try {
         await invoke("delete_colis", { id: parseInt(id) });
         setColisList((prev) => prev.filter((c) => c.id !== id));
+        setSelectedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
         await Swal.fire({
           title: t("common.deleted"),
           text: t("colis.deletedText"),
@@ -401,6 +449,215 @@ export default function Colis({
           icon: "error",
           confirmButtonText: t("common.close"),
         });
+      }
+    }
+  };
+
+  const isAllPageSelected =
+    currentItems.length > 0 &&
+    currentItems.every((c) => selectedIds.has(c.id));
+  const isSomePageSelected =
+    currentItems.some((c) => selectedIds.has(c.id));
+
+  const handleToggleSelectAllPage = () => {
+    if (isAllPageSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        currentItems.forEach((c) => next.delete(c.id));
+        return next;
+      });
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        currentItems.forEach((c) => next.add(c.id));
+        return next;
+      });
+    }
+  };
+
+  const handleToggleSelectOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAllFiltered = () => {
+    if (selectedIds.size === filteredColis.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredColis.map((c) => c.id)));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+
+    const result = await Swal.fire({
+      title: t("colis.deleteSelectedConfirmTitle"),
+      text: t("colis.deleteSelectedConfirmText", { count: selectedIds.size }),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: t("common.deleteConfirm"),
+      cancelButtonText: t("common.cancel"),
+      confirmButtonColor: "#DC2626",
+      cancelButtonColor: "#6B7280",
+      reverseButtons: true,
+      focusCancel: true,
+      customClass: {
+        popup: "rounded-xl",
+        confirmButton: "rounded-lg",
+        cancelButton: "rounded-lg",
+      },
+    });
+
+    if (result.isConfirmed) {
+      try {
+        setIsDeletingSelected(true);
+        const idsToDelete = Array.from(selectedIds).map((id) => parseInt(id));
+        await invoke("delete_multiple_colis", { ids: idsToDelete });
+
+        setColisList((prev) => prev.filter((c) => !selectedIds.has(c.id)));
+        setSelectedIds(new Set());
+
+        await Swal.fire({
+          title: t("common.deleted"),
+          text: t("colis.deleteSelectedSuccess"),
+          icon: "success",
+          timer: 1400,
+          showConfirmButton: false,
+        });
+      } catch (err: any) {
+        console.error("Failed to delete selected colis:", err);
+        await Swal.fire({
+          title: t("common.error"),
+          text: err?.toString() || "Failed to delete selected colis.",
+          icon: "error",
+          confirmButtonText: t("common.close"),
+        });
+      } finally {
+        setIsDeletingSelected(false);
+      }
+    }
+  };
+
+  const handleRestart = async () => {
+    const defaultBackupName = `backup_before_reset_${new Date().toISOString().slice(0, 10).replace(/-/g, "")}_${new Date().toTimeString().slice(0, 8).replace(/:/g, "")}`;
+
+    const result = await Swal.fire({
+      title: t("colis.restartConfirmTitle"),
+      html: `
+        <div class="text-left font-sans text-xs flex flex-col gap-3">
+          <p class="text-gray-600 dark:text-slate-300 leading-relaxed">${t("colis.restartConfirmText")}</p>
+          <div>
+            <label class="block text-[11px] font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+              ${t("backup.customName") || "Nom de la sauvegarde"}
+            </label>
+            <input
+              id="swal-restart-backup-name"
+              type="text"
+              value="${defaultBackupName}"
+              class="w-full p-2.5 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-brand-orange"
+            />
+          </div>
+        </div>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: t("colis.restartConfirmButton") || "Restart",
+      cancelButtonText: t("common.cancel"),
+      confirmButtonColor: "#DC2626",
+      cancelButtonColor: "#6B7280",
+      reverseButtons: true,
+      focusCancel: true,
+      customClass: {
+        popup: "rounded-2xl",
+        confirmButton: "rounded-xl font-semibold px-4 py-2",
+        cancelButton: "rounded-xl font-semibold px-4 py-2",
+      },
+      preConfirm: () => {
+        const inputEl = document.getElementById("swal-restart-backup-name") as HTMLInputElement;
+        const customName = inputEl?.value?.trim() || defaultBackupName;
+        if (/[\/\\:*?"<>|]/.test(customName)) {
+          Swal.showValidationMessage("Caractères invalides (/ \\ : * ? \" < > |)");
+          return false;
+        }
+        return customName;
+      },
+    });
+
+    if (result.isConfirmed) {
+      const chosenName = result.value;
+      try {
+        setIsRestarting(true);
+
+        Swal.fire({
+          title: "Restart...",
+          text: t("colis.restartConfirmText"),
+          allowOutsideClick: false,
+          customClass: { popup: "rounded-2xl" },
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        // 1. Create backup first
+        const backupResult = await invoke<string>("create_backup");
+        const generatedFileName = backupResult.split(/[\\/]/).pop() || "";
+
+        let finalBackupName = generatedFileName;
+        if (chosenName && chosenName !== generatedFileName && generatedFileName) {
+          try {
+            finalBackupName = await invoke<string>("rename_backup", {
+              oldName: generatedFileName,
+              newName: chosenName,
+            });
+          } catch (renameErr) {
+            console.warn("Could not rename restart backup:", renameErr);
+          }
+        }
+
+        // 2. Delete all colis
+        await invoke("delete_all_colis");
+
+        // 3. Reset local state
+        setColisList([]);
+        setSelectedIds(new Set());
+        setCurrentPage(1);
+
+        await Swal.fire({
+          title: t("colis.restartSuccessTitle"),
+          html: `
+            <div class="text-left font-sans text-xs flex flex-col gap-2.5">
+              <p class="text-gray-600 dark:text-slate-300">${t("colis.restartSuccessText")}</p>
+              <div class="p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-xs font-mono break-all text-gray-800 dark:text-slate-200 flex items-center gap-2">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>${finalBackupName}</span>
+              </div>
+            </div>
+          `,
+          icon: "success",
+          confirmButtonColor: "#E26D28",
+          confirmButtonText: t("common.close"),
+          customClass: { popup: "rounded-2xl" },
+        });
+      } catch (err: any) {
+        console.error("Failed to restart:", err);
+        await Swal.fire({
+          title: t("common.error"),
+          text: err?.toString() || "Failed to restart.",
+          icon: "error",
+          confirmButtonText: t("common.close"),
+          confirmButtonColor: "#E26D28",
+          customClass: { popup: "rounded-2xl" },
+        });
+      } finally {
+        setIsRestarting(false);
       }
     }
   };
@@ -480,10 +737,11 @@ export default function Colis({
       </div>
 
       {/* ── Table Card ── */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col">
+      {/* ── Table Card ── */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden flex flex-col">
         {/* Toolbar */}
         <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <h3 className="text-lg font-bold text-gray-800 dark:text-white">
               {t("colis.shipmentList")}
             </h3>
@@ -492,12 +750,12 @@ export default function Colis({
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex flex-wrap gap-2.5 items-center">
             {/* Search */}
             <div className="relative w-64">
               <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
-                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
+                size={15}
               />
               <input
                 type="text"
@@ -507,7 +765,7 @@ export default function Colis({
                   setCurrentPage(1);
                 }}
                 placeholder={t("colis.searchPlaceholder")}
-                className="pl-9 pr-4 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-800 w-full transition-all text-gray-700 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                className="pl-9 pr-4 py-2 bg-gray-50/90 dark:bg-slate-800/80 border border-gray-200/90 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange/40 focus:border-brand-orange focus:bg-white dark:focus:bg-slate-800 w-full transition-all text-gray-700 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500 shadow-2xs"
               />
             </div>
 
@@ -519,7 +777,7 @@ export default function Colis({
                   setSelectedCity(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-3 pr-8 py-2 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:bg-white dark:focus:bg-slate-800 transition-all text-gray-600 dark:text-slate-350 appearance-none cursor-pointer font-medium"
+                className="pl-3.5 pr-8 py-2 bg-gray-50/90 dark:bg-slate-800/80 border border-gray-200/90 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-orange/40 focus:border-brand-orange focus:bg-white dark:focus:bg-slate-800 transition-all text-gray-600 dark:text-slate-300 appearance-none cursor-pointer font-medium shadow-2xs"
               >
                 <option value="" className="dark:bg-slate-900">{t("colis.allCities")}</option>
                 {cities.map((c) => (
@@ -528,15 +786,26 @@ export default function Colis({
                   </option>
                 ))}
               </select>
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-slate-500">
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 dark:text-slate-500">
                 <Filter size={13} />
               </div>
             </div>
 
+            {/* Restart Button */}
+            <button
+              onClick={handleRestart}
+              disabled={isRestarting}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white hover:border-transparent hover:shadow-md hover:shadow-rose-600/20 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
+              title={t("colis.restart")}
+            >
+              <RotateCcw size={14} className={isRestarting ? "animate-spin" : ""} />
+              Restart
+            </button>
+
             {/* Ajouter Colis */}
             <button
               onClick={onNavigateToAdd}
-              className="px-4 py-2 bg-brand-orange text-white rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-orange to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl text-xs font-semibold shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 active:scale-95 transition-all duration-200 cursor-pointer"
             >
               <Plus size={15} />
               {t("colis.addParcel")}
@@ -544,11 +813,55 @@ export default function Colis({
           </div>
         </div>
 
+        {/* Selected Items Action Bar */}
+        {selectedIds.size > 0 && (
+          <div className="mx-5 mt-4 p-3 bg-gradient-to-r from-orange-50/90 via-amber-50/80 to-orange-50/90 dark:from-slate-800/90 dark:via-slate-800/80 dark:to-slate-800/90 border border-orange-200/80 dark:border-orange-800/40 rounded-2xl flex items-center justify-between gap-3 flex-wrap shadow-sm animate-in slide-in-from-top-2 duration-200">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-orange text-white text-xs font-bold shadow-xs">
+                <Check size={13} strokeWidth={3} />
+                {t("colis.selectedCount", { count: selectedIds.size })}
+              </span>
+              <button
+                onClick={handleSelectAllFiltered}
+                className="text-xs text-brand-orange hover:text-orange-700 dark:hover:text-orange-400 hover:underline font-semibold cursor-pointer transition-colors"
+              >
+                {selectedIds.size === filteredColis.length
+                  ? t("colis.deselectAll")
+                  : `${t("colis.selectAll")} (${filteredColis.length})`}
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDeleteSelected}
+                disabled={isDeletingSelected}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white rounded-xl text-xs font-semibold shadow-sm shadow-rose-600/20 active:scale-95 transition-all duration-150 cursor-pointer disabled:opacity-50"
+              >
+                <Trash2 size={13} />
+                {t("colis.deleteSelected")}
+              </button>
+              <button
+                onClick={() => setSelectedIds(new Set())}
+                className="px-3 py-1.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 rounded-xl text-xs font-medium hover:bg-gray-50 dark:hover:bg-slate-700 active:scale-95 transition-all duration-150 cursor-pointer shadow-2xs"
+              >
+                {t("common.cancel")}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Table */}
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-gray-50/70 dark:bg-slate-800/40 text-gray-500 dark:text-slate-400 border-b border-gray-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider">
               <tr>
+                <th className="w-12 px-4 py-4 text-center">
+                  <ModernCheckbox
+                    checked={isAllPageSelected}
+                    indeterminate={isSomePageSelected && !isAllPageSelected}
+                    onChange={handleToggleSelectAllPage}
+                    ariaLabel={isAllPageSelected ? t("colis.deselectAll") : t("colis.selectAll")}
+                  />
+                </th>
                 <th className="px-6 py-4">{t("colis.tracking")}</th>
                 <th className="px-6 py-4">{t("colis.sender")}</th>
                 <th className="px-6 py-4">{t("colis.receiver")}</th>
@@ -570,8 +883,19 @@ export default function Colis({
                 currentItems.map((colis) => (
                   <tr
                     key={colis.id}
-                    className="hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors group"
+                    className={`hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors group ${
+                      selectedIds.has(colis.id) ? "bg-orange-50/60 dark:bg-orange-950/20" : ""
+                    }`}
                   >
+                    {/* Checkbox */}
+                    <td className="w-12 px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                      <ModernCheckbox
+                        checked={selectedIds.has(colis.id)}
+                        onChange={() => handleToggleSelectOne(colis.id)}
+                        ariaLabel={`Select ${colis.trackingNo}`}
+                      />
+                    </td>
+
                     {/* N°Track */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
@@ -657,29 +981,29 @@ export default function Colis({
 
                     {/* Actions */}
                     <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-1">
+                      <div className="flex items-center justify-center gap-1.5">
                         <button
                           onClick={() => handleDetails(colis)}
-                          className="p-1.5 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30 rounded-lg transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-teal-600 dark:text-teal-400 bg-teal-50/80 dark:bg-teal-950/40 hover:bg-teal-600 hover:text-white dark:hover:bg-teal-500 dark:hover:text-white transition-all duration-150 shadow-xs hover:shadow-teal-500/20 active:scale-90 cursor-pointer"
                           title={t("common.details")}
                         >
-                          <Eye size={16} />
+                          <Eye size={15} />
                         </button>
                         <button
                           onClick={() => handleEdit(colis)}
-                          className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-950/40 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all duration-150 shadow-xs hover:shadow-blue-500/20 active:scale-90 cursor-pointer"
                           title={t("common.edit")}
                         >
-                          <Edit size={16} />
+                          <Edit size={15} />
                         </button>
                         <button
                           onClick={() =>
                             handleDelete(colis.id, colis.trackingNo)
                           }
-                          className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-600 dark:text-rose-400 bg-rose-50/80 dark:bg-rose-950/40 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-150 shadow-xs hover:shadow-rose-500/20 active:scale-90 cursor-pointer"
                           title={t("common.delete")}
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>
@@ -687,7 +1011,7 @@ export default function Colis({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center">
+                  <td colSpan={11} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <Package
                         size={36}
@@ -728,9 +1052,9 @@ export default function Colis({
               <button
                 onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className="p-2 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 cursor-pointer shadow-2xs"
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={15} />
               </button>
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -738,10 +1062,10 @@ export default function Colis({
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`min-w-8 h-8 px-2 flex items-center justify-center rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`min-w-8 h-8 px-2.5 flex items-center justify-center rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer ${
                       currentPage === page
-                        ? "bg-brand-orange text-white border border-brand-orange shadow-sm"
-                        : "border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
+                        ? "bg-gradient-to-r from-brand-orange to-amber-500 text-white shadow-sm shadow-orange-500/25 border border-transparent"
+                        : "border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 shadow-2xs"
                     }`}
                   >
                     {page}
@@ -754,9 +1078,9 @@ export default function Colis({
                   setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className="p-2 border border-gray-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-95 cursor-pointer shadow-2xs"
               >
-                <ChevronRight size={16} />
+                <ChevronRight size={15} />
               </button>
             </div>
           </div>

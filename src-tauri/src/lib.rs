@@ -52,6 +52,8 @@ pub fn run() {
             commands::colis_commands::get_colis,
             commands::colis_commands::update_colis,
             commands::colis_commands::delete_colis,
+            commands::colis_commands::delete_multiple_colis,
+            commands::colis_commands::delete_all_colis,
             commands::colis_commands::get_colis_images,
 
             commands::settings_commandes::save_settings,
@@ -65,6 +67,7 @@ pub fn run() {
             commands::backup_commands::get_backups,
             commands::backup_commands::delete_backup,
             commands::backup_commands::restore_backup_file,
+            commands::backup_commands::rename_backup,
             // commands::backup_commands::restart_app,
             
         ])

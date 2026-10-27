@@ -33,7 +33,7 @@ pub fn get_backups(app: AppHandle) -> Result<Vec<String>, String> {
         if let Some(name) = path.file_name() {
             let name = name.to_string_lossy().to_string();
 
-            if name.starts_with("backup_") && name.ends_with(".db") {
+            if name.ends_with(".db") && name != "colismanager.db" {
                 backups.push(name);
             }
         }
@@ -43,6 +43,49 @@ pub fn get_backups(app: AppHandle) -> Result<Vec<String>, String> {
     backups.reverse();
 
     Ok(backups)
+}
+
+#[tauri::command]
+pub fn rename_backup(app: AppHandle, old_name: String, new_name: String) -> Result<String, String> {
+    let app_dir = app.path().app_local_data_dir().map_err(|e| e.to_string())?;
+
+    let clean_new = new_name.trim().trim_end_matches(".db").trim();
+    if clean_new.is_empty() {
+        return Err("Le nom de sauvegarde ne peut pas être vide".to_string());
+    }
+
+    if clean_new.contains('/') || clean_new.contains('\\') || clean_new.contains(':') || clean_new.contains('*') || clean_new.contains('?') || clean_new.contains('"') || clean_new.contains('<') || clean_new.contains('>') || clean_new.contains('|') || clean_new.contains("..") {
+        return Err("Caractères invalides dans le nom de sauvegarde".to_string());
+    }
+
+    let final_new_name = format!("{}.db", clean_new);
+
+    let old_db = app_dir.join(&old_name);
+    let new_db = app_dir.join(&final_new_name);
+
+    if !old_db.exists() {
+        return Err(format!("Fichier {} introuvable", old_name));
+    }
+
+    if new_db.exists() && old_name != final_new_name {
+        return Err("Une sauvegarde avec ce nom existe déjà".to_string());
+    }
+
+    fs::rename(&old_db, &new_db).map_err(|e| e.to_string())?;
+
+    let old_wal = app_dir.join(old_name.replace(".db", ".db-wal"));
+    let new_wal = app_dir.join(format!("{}.db-wal", clean_new));
+    if old_wal.exists() {
+        let _ = fs::rename(old_wal, new_wal);
+    }
+
+    let old_shm = app_dir.join(old_name.replace(".db", ".db-shm"));
+    let new_shm = app_dir.join(format!("{}.db-shm", clean_new));
+    if old_shm.exists() {
+        let _ = fs::rename(old_shm, new_shm);
+    }
+
+    Ok(final_new_name)
 }
 
 #[tauri::command]

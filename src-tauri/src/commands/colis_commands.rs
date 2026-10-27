@@ -40,3 +40,16 @@ pub async fn delete_colis(
     colis_service::delete_colis(&state.db, id).await
 }
 
+#[tauri::command]
+pub async fn delete_multiple_colis(
+    state: State<'_, AppState>,
+    ids: Vec<i64>,
+) -> Result<(), String> {
+    colis_service::delete_multiple_colis(&state.db, ids).await
+}
+
+#[tauri::command]
+pub async fn delete_all_colis(state: State<'_, AppState>) -> Result<(), String> {
+    colis_service::delete_all_colis(&state.db).await
+}
+
