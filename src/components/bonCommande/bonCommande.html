@@ -1,53 +1,88 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <title>Bon de Commande</title>
     <link rel="stylesheet" href="bonCommande.css">
 </head>
+
 <body>
 
-<div class="label-container">
-    <!-- Left Column -->
-    <div class="left-col">
-        <div class="company-name">
-            {{company_name}}
-        </div>
-        <div class="qr-code-wrapper">
-            <img src="{{qrImage}}" class="qr">
-        </div>
-        <div class="colis-info">
-            <div class="pieces-text">
-                {{pieces}} SAC {{description}}
-            </div>
-            <div class="weight-text">
-                {{weight}} (KG)
-            </div>
-        </div>
-    </div>
-
-    <!-- Right Column -->
-    <div class="right-col">
-        <div class="tracking-row">
-            <span class="tracking-text">{{tracking_number}}</span>
-        </div>
-        <div class="receiver-row">
-            <div class="receiver-name">{{receiver_name}}</div>
-            <div class="receiver-phone">{{receiver_phone}}</div>
-        </div>
-        <div class="destination-row">
-            <div class="city-box-wrapper">
-                <div class="city-box">
-                    <div class="city-title">Pour les objets</div>
-                    <div class="city-name">{{receiver_city}}</div>
+    <div class="label-container">
+        <!-- Header: Logo, Company Info & QR Code -->
+        <div class="header-row">
+            <div class="company-section">
+                <!-- Logo: img if logo_path set, initials badge otherwise (resolved in generateBonCommande.ts) -->
+                <div class="company-logo-placeholder">{{logo}}</div>
+                <div class="company-details">
+                    <div class="company-title">{{company_name}}</div>
+                    <div class="company-phone">{{company_phone}}</div>
                 </div>
             </div>
-            <div class="payment-date-wrapper">
-                <div class="print-date">{{date}}</div>
+            <div class="qr-section">
+                <img src="{{qrImage}}" alt="QR">
+            </div>
+        </div>
+
+        <!-- Date -->
+        <div class="date-label">Date: {{date}}</div>
+
+        <!-- Destinataire & HUB row -->
+        <div class="destinataire-hub-row">
+            <div class="destinataire-box">
+                <div class="destinataire-header">
+                    <span class="destinataire-title">Destinataire</span>
+                    <span class="city-badge">{{receiver_city}}</span>
+                </div>
+                <div class="destinataire-name">{{receiver_name}}</div>
+                <div class="destinataire-address">{{receiver_address}}</div>
+                <div class="destinataire-phone">Tél: {{receiver_phone}}</div>
+            </div>
+            <div class="hub-box">
+                <div class="hub-text">HUB {{receiver_city}}</div>
+            </div>
+        </div>
+
+        <!-- CRBT & Barcode row -->
+        <div class="crbt-barcode-row">
+            <div class="crbt-box">
+                <div class="crbt-title">{{crbt_status}}</div>
+                <div class="crbt-amount">{{total_amount}}</div>
+            </div>
+            <div class="barcode-box">
+                <div class="tracking-code">#{{tracking_number}}</div>
+                <img class="barcode-img" src="{{barcodeImage}}" alt="Barcode">
+            </div>
+        </div>
+
+        <!-- Expéditeur & Nature du produit -->
+        <div class="expediteur-nature-row">
+            <div class="expediteur-col">
+                <div class="col-header">Expéditeur</div>
+                <div class="expediteur-name">{{sender_name}}</div>
+                <div class="expediteur-phone">Tél: {{sender_phone}}</div>
+                <div class="expediteur-city">{{sender_city}}</div>
+            </div>
+            <div class="nature-col">
+                <div class="col-header">Nature du produit</div>
+                <div class="nature-desc">{{description}}</div>
+            </div>
+        </div>
+
+        <!-- Bottom instructions row -->
+        <div class="bottom-instructions-row">
+            <div class="notice-box-left">
+                <div class="arabic-bold">يمكن فتح الطرد</div>
+                <div class="french-sub">Essayage interdit</div>
+                <div class="arabic-sub">لا يسمح بالقياس</div>
+            </div>
+            <div class="notice-box-right">
+                <div class="arabic-bold">شركتنا مكلفة بالتوصيل فقط</div>
             </div>
         </div>
     </div>
-</div>
 
 </body>
+
 </html>
