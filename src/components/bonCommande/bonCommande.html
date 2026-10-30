@@ -40,7 +40,7 @@
                 <div class="destinataire-phone">Tél: {{receiver_phone}}</div>
             </div>
             <div class="hub-box">
-                <div class="hub-text">HUB {{receiver_city}}</div>
+                <div class="hub-text">{{receiver_country}}</div>
             </div>
         </div>
 
@@ -73,12 +73,10 @@
         <!-- Bottom instructions row -->
         <div class="bottom-instructions-row">
             <div class="notice-box-left">
-                <div class="arabic-bold">يمكن فتح الطرد</div>
-                <div class="french-sub">Essayage interdit</div>
-                <div class="arabic-sub">لا يسمح بالقياس</div>
+                <div class="tracking-code">#{{tracking_number}}</div>
             </div>
             <div class="notice-box-right">
-                <div class="arabic-bold">شركتنا مكلفة بالتوصيل فقط</div>
+                <div class="payment-status">{{payment_status}}</div>
             </div>
         </div>
     </div>

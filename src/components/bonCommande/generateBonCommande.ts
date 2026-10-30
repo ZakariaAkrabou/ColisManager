@@ -14,7 +14,7 @@ export async function generateBonCommande(colis: any) {
 
   // Generate QR Code
   const qrImage = await QRCode.toDataURL(colis.tracking_number || "NO-TRACKING", {
-    width: 150,
+    width: 250,
     margin: 1,
   });
 
@@ -24,8 +24,8 @@ export async function generateBonCommande(colis: any) {
     const canvas = document.createElement("canvas");
     JsBarcode(canvas, colis.tracking_number || "000000000", {
       format: "CODE128",
-      width: 2,
-      height: 36,
+      width: 2.5,
+      height: 50,
       displayValue: false,
       margin: 0,
       background: "#ffffff",
@@ -54,6 +54,7 @@ export async function generateBonCommande(colis: any) {
     : new Date().toISOString().split("T")[0];
 
   const receiverCity = (colis.receiver_city || "CASABLANCA").toUpperCase();
+  const receiverCountry = (colis.receiver_country || colis.country || "MAROC").toUpperCase();
   const receiverName = colis.receiver_name || "client";
   const receiverAddress = colis.receiver_full_address || colis.receiver_address || "";
   const receiverPhone = colis.receiver_phone || "";
@@ -69,6 +70,7 @@ export async function generateBonCommande(colis: any) {
     : "0.00 DH";
 
   const crbtText = colis.paid ? "PAYÉ" : "CRBT: C/Espèce";
+  const paymentStatus = colis.payment_status || (colis.paid ? "PAYÉ" : "NON PAYÉ");
   const trackingNumber = colis.tracking_number || "";
 
   doc.open();
@@ -80,7 +82,7 @@ export async function generateBonCommande(colis: any) {
 <title>Bon de Commande</title>
 <style>
 @page {
-  size: 50mm 50mm;
+  size: 100mm 100mm;
   margin: 0;
 }
 
@@ -94,8 +96,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  width: 50mm;
-  height: 50mm;
+  width: 100mm;
+  height: 100mm;
   overflow: hidden;
   background: #fff;
   color: #000;
@@ -105,10 +107,10 @@ body {
 }
 
 .label-container {
-  width: 50mm;
-  height: 50mm;
+  width: 100mm;
+  height: 100mm;
   box-sizing: border-box;
-  padding: 1mm 1.2mm;
+  padding: 2mm 3mm;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -121,38 +123,38 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 9.5mm;
+  height: 19mm;
   width: 100%;
 }
 
 .company-section {
   display: flex;
   align-items: center;
-  gap: 1.2mm;
+  gap: 2.5mm;
   flex: 1;
   overflow: hidden;
 }
 
 .company-logo-img {
-  width: 8mm;
-  height: 8mm;
+  width: 16mm;
+  height: 16mm;
   flex-shrink: 0;
   object-fit: contain;
-  border-radius: 1mm;
+  border-radius: 2mm;
 }
 
 .company-logo-initials {
-  width: 8mm;
-  height: 8mm;
+  width: 16mm;
+  height: 16mm;
   flex-shrink: 0;
   background: #008e82 !important;
   color: #fff !important;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 11px;
+  font-size: 22px;
   font-weight: 900;
-  border-radius: 1mm;
+  border-radius: 2mm;
   text-transform: uppercase;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
@@ -166,27 +168,27 @@ body {
 }
 
 .company-title {
-  font-size: 7.5px;
+  font-size: 15px;
   font-weight: 900;
   color: #000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .company-phone {
-  font-size: 5.2px;
+  font-size: 10.5px;
   font-weight: 700;
   color: #111;
   white-space: nowrap;
-  line-height: 1.1;
-  margin-top: 0.5px;
+  line-height: 1.15;
+  margin-top: 1px;
 }
 
 .qr-section {
-  width: 9.5mm;
-  height: 9.5mm;
+  width: 19mm;
+  height: 19mm;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -194,33 +196,33 @@ body {
 }
 
 .qr-section img {
-  width: 9mm;
-  height: 9mm;
+  width: 18mm;
+  height: 18mm;
   object-fit: contain;
 }
 
 /* Date */
 .date-label {
-  font-size: 4.5px;
-  font-weight: 600;
+  font-size: 9px;
+  font-weight: 700;
   color: #222;
-  margin-top: 0.2mm;
-  margin-bottom: 0.3mm;
+  margin-top: 0.5mm;
+  margin-bottom: 0.5mm;
   line-height: 1;
 }
 
 /* Destinataire & HUB row */
 .destinataire-hub-row {
   display: flex;
-  gap: 1mm;
-  height: 9.8mm;
+  gap: 2mm;
+  height: 19.5mm;
   width: 100%;
 }
 
 .destinataire-box {
   flex: 1.85;
-  border: 0.8px solid #000;
-  padding: 0.5mm 0.8mm;
+  border: 1.2px solid #000;
+  padding: 1.2mm 2mm;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -234,95 +236,95 @@ body {
 }
 
 .destinataire-title {
-  font-size: 5px;
+  font-size: 10px;
   font-weight: 900;
 }
 
 .city-badge {
-  border: 0.8px solid #000;
-  padding: 0.1mm 0.8mm;
-  font-size: 4.5px;
+  border: 1.2px solid #000;
+  padding: 0.3mm 2mm;
+  font-size: 9.5px;
   font-weight: 900;
   text-transform: uppercase;
   line-height: 1.1;
 }
 
 .destinataire-name {
-  font-size: 4.8px;
-  font-weight: 700;
+  font-size: 10.5px;
+  font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .destinataire-address {
-  font-size: 4.2px;
+  font-size: 9px;
   color: #111;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .destinataire-phone {
-  font-size: 4.8px;
+  font-size: 10.5px;
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .hub-box {
   flex: 1;
-  border: 0.8px solid #000;
+  border: 1.2px solid #000;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 0.4mm;
+  padding: 1mm;
   overflow: hidden;
 }
 
 .hub-text {
-  font-size: 5.2px;
+  font-size: 13px;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 /* CRBT & Barcode row */
 .crbt-barcode-row {
   display: flex;
-  gap: 1mm;
-  height: 7.6mm;
+  gap: 2mm;
+  height: 16mm;
   width: 100%;
   align-items: stretch;
 }
 
 .crbt-box {
-  width: 16mm;
+  width: 33mm;
   background: #008e82 !important;
   color: #fff !important;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0.3mm 0.5mm;
+  padding: 0.8mm 1.5mm;
   flex-shrink: 0;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 
 .crbt-title {
-  font-size: 4px;
+  font-size: 8.5px;
   font-weight: 700;
   line-height: 1;
 }
 
 .crbt-amount {
-  font-size: 7px;
+  font-size: 15px;
   font-weight: 900;
   white-space: nowrap;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 .barcode-box {
@@ -335,17 +337,17 @@ body {
 }
 
 .tracking-code {
-  font-size: 4.8px;
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.5px;
   white-space: nowrap;
   line-height: 1;
-  margin-bottom: 0.2mm;
+  margin-bottom: 0.5mm;
 }
 
 .barcode-img {
   width: 100%;
-  height: 4.8mm;
+  height: 10.5mm;
   object-fit: fill;
   display: block;
 }
@@ -353,15 +355,15 @@ body {
 /* Expéditeur & Nature du produit */
 .expediteur-nature-row {
   display: flex;
-  border: 0.8px solid #000;
-  height: 8.8mm;
+  border: 1.2px solid #000;
+  height: 18mm;
   width: 100%;
 }
 
 .expediteur-col {
   width: 50%;
-  border-right: 0.8px solid #000;
-  padding: 0.4mm 0.8mm;
+  border-right: 1.2px solid #000;
+  padding: 1mm 2mm;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -369,83 +371,89 @@ body {
 }
 
 .col-header {
-  font-size: 4.8px;
+  font-size: 10px;
   font-weight: 900;
   line-height: 1;
 }
 
 .expediteur-name {
-  font-size: 4.2px;
+  font-size: 9px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .expediteur-phone {
-  font-size: 4.5px;
+  font-size: 9.5px;
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .expediteur-city {
-  font-size: 4.5px;
+  font-size: 9.5px;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .nature-col {
   width: 50%;
-  padding: 0.4mm 0.8mm;
+  padding: 1mm 2mm;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
 .nature-desc {
-  font-size: 4.5px;
+  font-size: 9.5px;
   font-weight: 600;
-  margin-top: 0.3mm;
-  line-height: 1.15;
+  margin-top: 0.8mm;
+  line-height: 1.2;
   word-break: break-word;
 }
 
 /* Bottom instructions row */
 .bottom-instructions-row {
   display: flex;
-  gap: 1mm;
-  height: 6.8mm;
+  gap: 2mm;
+  height: 13.5mm;
   width: 100%;
 }
 
 .notice-box-left {
   flex: 1;
-  border: 0.8px solid #000;
+  border: 1.2px solid #000;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 0.3mm;
+  padding: 0.8mm;
   overflow: hidden;
 }
 
+.notice-box-left .tracking-code {
+  font-size: 12px;
+  font-weight: 900;
+  margin: 0;
+}
+
 .arabic-bold {
-  font-size: 4.5px;
+  font-size: 10px;
   font-weight: 900;
   line-height: 1.1;
   direction: rtl;
 }
 
 .french-sub {
-  font-size: 3.8px;
+  font-size: 8px;
   font-weight: 600;
   line-height: 1.1;
 }
 
 .arabic-sub {
-  font-size: 4px;
+  font-size: 8.5px;
   font-weight: 700;
   line-height: 1.1;
   direction: rtl;
@@ -453,17 +461,24 @@ body {
 
 .notice-box-right {
   flex: 1.5;
-  border: 0.8px solid #000;
+  border: 1.2px solid #000;
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 0.4mm;
+  padding: 0.8mm;
   overflow: hidden;
 }
 
+.notice-box-right .payment-status {
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .notice-box-right .arabic-bold {
-  font-size: 5px;
+  font-size: 11px;
   font-weight: 900;
   direction: rtl;
 }
@@ -500,7 +515,7 @@ body {
             <div class="destinataire-phone">Tél: ${receiverPhone}</div>
         </div>
         <div class="hub-box">
-            <div class="hub-text">HUB ${receiverCity}</div>
+            <div class="hub-text">${receiverCountry}</div>
         </div>
     </div>
 
@@ -533,12 +548,10 @@ body {
     <!-- Bottom instructions row -->
     <div class="bottom-instructions-row">
         <div class="notice-box-left">
-            <div class="arabic-bold">يمكن فتح الطرد</div>
-            <div class="french-sub">Essayage interdit</div>
-            <div class="arabic-sub">لا يسمح بالقياس</div>
+            <div class="tracking-code">#${trackingNumber}</div>
         </div>
         <div class="notice-box-right">
-            <div class="arabic-bold">شركتنا مكلفة بالتوصيل فقط</div>
+            <div class="payment-status">${paymentStatus}</div>
         </div>
     </div>
 </div>
